@@ -1,0 +1,42 @@
+
+
+.inputField .icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.inputField .icon2 {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: auto;
+}
+.inputField .icon2 button {
+  border: none;
+  background: transparent;
+  color: #898989;
+  font-size: 23px;
+}
+.inputField .iconImage {
+  height: 24px; /* Adjust size as needed */
+  width: auto;
+}
+.inputField input {
+  height: 44px;
+  width: 100%;
+  padding: 0 15px;
+  border-radius: 4.3px;
+  border: 1px solid #041e5e;
+  font-size: 14px;
+  color: #000;
+}
+
+.inputField input::placeholder {
+  color: #757575;
+}
+.textarea_container  {
+  width: 100%!important;
+}
