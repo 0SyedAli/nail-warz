@@ -2,12 +2,11 @@
 import { useEffect, useState } from "react";
 import "../../styles/auth.module.css";
 import styles from "../../styles/auth.module.css";
-import SpinnerLoading from "@/components/Spinner/SpinnerLoading";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
+import { usePathname, useSearchParams } from "next/navigation";
 
 export default function AuthLayout({ children }) {
-  const pathname = usePathname() 
+
+  const pathname = usePathname()
   const searchParams = useSearchParams()
   const [header, setHeader] = useState();
   const content = {
@@ -61,10 +60,16 @@ export default function AuthLayout({ children }) {
     const key = window.location.href.split("/").pop();
     setHeader(content[key]);
   }, [pathname, searchParams]);
+
   return (
     <div className={styles.auth_container}>
       <div className={styles.auth_image}></div>
-      <div className={styles.auth_form_container}>
+      <div
+        className={`${styles.auth_form_container} ${pathname === "/auth/login" || pathname === "/auth/signup" || pathname === "/auth/uploadservice"
+            ? "align-items-center"
+            : "align-items-start"
+          }`}
+      >
         <div className={styles.auth_form}>
           {/* {!header ? <SpinnerLoading /> : children} */}
           {children}

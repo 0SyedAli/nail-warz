@@ -1,119 +1,81 @@
-"use client"
-import CardLineChart from "@/components/CardLineChart";
-import MyPie from "@/components/MyPie";
-import Link from "next/link";
-import { useEffect } from "react";
+"use client";
+import { useState, useEffect, useMemo } from "react";
+import Cookies from "js-cookie";
 
-const img1 = "/images/dollar-circle.png";
-const img2 = "/images/chart-square.png";
-const img3 = "/images/money-send.png";
-const img4 = "/images/discount-circle.png";
+const PAGE_SIZE = 10;                         // items per page
 
-const image1 = "/images/logo.png";
-const image2 = "/images/logo.png";
+const Technicians = () => {
+  const [techs, setTechs] = useState([]);   // raw API data
+  const [page, setPage] = useState(1);    // current page
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [salonId, setSalonId] = useState("");
 
-const DashboardPanel = ({ activeTab }) => {
-  // Sample order data
-  const orders = [
-    {
-      _id: "#4FE21",
-      employeeName: "Safa Jafarova",
-      birthDate: "11.05.2002",
-      startDate: "27.11.2023",
-      telefon: "+994 51 123 4567",
-      addNew: "Daha çox",
-    },
-    {
-      _id: "#4FE21",
-      employeeName: "Safa Jafarova",
-      birthDate: "11.05.2002",
-      startDate: "27.11.2023",
-      telefon: "+994 51 123 4567",
-      addNew: "Daha çox",
-    },
-    {
-      _id: "#4FE21",
-      employeeName: "Safa Jafarova",
-      birthDate: "11.05.2002",
-      startDate: "27.11.2023",
-      telefon: "+994 51 123 4567",
-      addNew: "Daha çox",
-    },
-    {
-      _id: "#4FE21",
-      employeeName: "Safa Jafarova",
-      birthDate: "11.05.2002",
-      startDate: "27.11.2023",
-      telefon: "+994 51 123 4567",
-      addNew: "Daha çox",
-    },
-    {
-      _id: "#4FE21",
-      employeeName: "Safa Jafarova",
-      birthDate: "11.05.2002",
-      startDate: "27.11.2023",
-      telefon: "+994 51 123 4567",
-      addNew: "Daha çox",
-    },
-    {
-      _id: "#4FE21",
-      employeeName: "Safa Jafarova",
-      birthDate: "11.05.2002",
-      startDate: "27.11.2023",
-      telefon: "+994 51 123 4567",
-      addNew: "Daha çox",
-    },
-    {
-      _id: "#4FE21",
-      employeeName: "Safa Jafarova",
-      birthDate: "11.05.2002",
-      startDate: "27.11.2023",
-      telefon: "+994 51 123 4567",
-      addNew: "Daha çox",
-    },
-    {
-      _id: "#4FE21",
-      employeeName: "Safa Jafarova",
-      birthDate: "11.05.2002",
-      startDate: "27.11.2023",
-      telefon: "+994 51 123 4567",
-      addNew: "Daha çox",
-    },
-    {
-      _id: "#4FE21",
-      employeeName: "Safa Jafarova",
-      birthDate: "11.05.2002",
-      startDate: "27.11.2023",
-      telefon: "+994 51 123 4567",
-      addNew: "Daha çox",
-    },
-    {
-      _id: "#4FE21",
-      employeeName: "Safa Jafarova",
-      birthDate: "11.05.2002",
-      startDate: "27.11.2023",
-      telefon: "+994 51 123 4567",
-      addNew: "Daha çox",
-    },
-    {
-      _id: "#4FE21",
-      employeeName: "Safa Jafarova",
-      birthDate: "11.05.2002",
-      startDate: "27.11.2023",
-      telefon: "+994 51 123 4567",
-      addNew: "Daha çox",
-    },
-  ];
-  const pieData = [
-    { id: "Expenses", label: "Expenses", value: 40 },
-    { id: "Comes", label: "Comes", value: 25 },
-  ];
-  // Filter orders based on the active tab
-  const filteredOrders = orders.filter((order) =>
-    activeTab
-      ? order.status.toLowerCase().includes(activeTab.toLowerCase())
-      : true
-  );
+  useEffect(() => {
+    const cookie = Cookies.get("user");
+    if (!cookie) return router.push("/auth/login");
+    try {
+      const u = JSON.parse(cookie);
+      if (u?._id) setSalonId(u._id);
+      else router.push("/auth/login");
+    } catch {
+      router.push("/auth/login");
+    }
+  }, []);
+  /* ──────────────── Fetch once on mount ──────────────── */
+  useEffect(() => {
+    if (!salonId) return;
+    (async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/getAllTechniciansBySalonId?salonId=${salonId}`
+        );
+        if (!res.ok) throw new Error("Network error");
+
+        const json = await res.json();
+        if (!json.success || !Array.isArray(json.data))
+          throw new Error("Unexpected API shape");
+
+        setTechs(json.data);
+      } catch (err) {
+        console.error(err);
+        setError(err.message || "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [salonId]);
+
+  /* ──────────────── Pagination helpers ──────────────── */
+  const totalPages = Math.max(1, Math.ceil(techs.length / PAGE_SIZE));
+
+  // memoise the slice for current page
+  const currentSlice = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE;
+    return techs.slice(start, start + PAGE_SIZE);
+  }, [techs, page]);
+
+  /* ──────────────── Render ──────────────── */
+  if (loading)
+    return (
+      <div className="page">
+        <p className="m-4">Loading technicians…</p>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="page">
+        <p className="m-4 text-danger">Error: {error}</p>
+      </div>
+    );
+
+  if (techs.length === 0)
+    return (
+      <div className="page">
+        <p className="m-4">No technicians found for this salon.</p>
+      </div>
+    );
 
   return (
     <div className="page">
@@ -124,48 +86,56 @@ const DashboardPanel = ({ activeTab }) => {
               <thead>
                 <tr>
                   <th scope="col"># ID</th>
-                  <th scope="col">Employee Name</th>
-                  <th scope="col">Birth date</th>
-                  <th scope="col">Start date</th>
-                  <th scope="col">Telefon</th>
-                  <th scope="col">Add new</th>
+                  <th scope="col">Full Name</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Start Date</th>
+                  <th scope="col">Designation</th>
                 </tr>
               </thead>
+
               <tbody>
-                {filteredOrders.map((order, index) => (
-                  <tr key={index}>
-                    <td scope="row">{order._id}</td>
-                    <td>{order.employeeName}</td>
-                    <td>{order.birthDate}</td>
-                    {/* <td
-                      className={`dollar_td ${order.price &&
-                        !isNaN(
-                          parseFloat(order.price.replace(/[^\d.-]/g, ""))
-                        ) &&
-                        parseFloat(order.price.replace(/[^\d.-]/g, "")) < 0
-                        ? "loss"
-                        : ""
-                        }`}
-                    >
-                      {order.price}
-                    </td> */}
-                    <td>{order.startDate}</td>
-                    <td>{order.telefon}</td>
-                    <td>{order.addNew}</td>
-                    {/* <td className={`status_td ${order.status.toLowerCase()}`}>
-                      <span>{order.status}</span>
-                    </td> */}
+                {currentSlice.map((t) => (
+                  <tr key={t._id}>
+                    <td>{t._id.slice(-5)}</td>
+                    <td>{t.fullName}</td>
+                    <td>{t.email}</td>
+                    <td>{new Date(t.createdAt).toLocaleDateString()}</td>
+                    <td>{t.designation || "-"}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <div className="pagination justify-content-end mt-4">
-              <button className="active">1</button>
-              <button>2</button>
-              <button>3</button>
-              <button>4</button>
-              <button>&gt;&gt;</button>
-            </div>
+
+            {/* ───── Pagination controls ───── */}
+            {totalPages > 1 && (
+              <div className="pagination justify-content-end mt-4">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  &lt;
+                </button>
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (n) => (
+                    <button
+                      key={n}
+                      className={n === page ? "active" : ""}
+                      onClick={() => setPage(n)}
+                    >
+                      {n}
+                    </button>
+                  )
+                )}
+
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                >
+                  &gt;
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -173,4 +143,4 @@ const DashboardPanel = ({ activeTab }) => {
   );
 };
 
-export default DashboardPanel;
+export default Technicians;

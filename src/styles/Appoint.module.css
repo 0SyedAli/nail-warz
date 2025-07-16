@@ -17,6 +17,7 @@
     display: flex;
     align-items: center;
     gap: 30px;
+    width: 100%;
 }
 
 .legend {
@@ -74,6 +75,7 @@
     font-size: 16px;
     font-weight: bold;
     color: #333;
+    width: 150px;
 }
 
 .grid {
@@ -125,6 +127,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
+}
+.icon img {
+    width: 35px;
+    height: 35px;
+    border-radius: 100%;
 }
 
 .monthNav {

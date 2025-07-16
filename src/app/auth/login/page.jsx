@@ -99,7 +99,7 @@ export default function LoginPage() {
         />
         {errors.password && <p style={{ color: "red" }}>{errors.password.message}</p>}
         <AuthBtn
-          title={"Continue"}
+          title={"Login"}
           type="submit"
           disabled={loading}
         />

@@ -124,7 +124,7 @@ a {
 
 .inputField {
   position: relative;
-  margin: 7px 0 15px 0;
+  margin: 3px 0 8px 0;
 }
 
 .select_gender {
@@ -276,7 +276,7 @@ input::placeholder {
 .calender_item input {
   position: absolute;
   width: 100%;
-  height: 100%;
+  height: 44px;
   opacity: 0;
 }
 
@@ -299,7 +299,7 @@ input::placeholder {
 }
 
 .time_picker input {
-  height: 49px;
+  height: 44px;
   width: 100%;
   padding: 0 20px;
   border-radius: 5px;
@@ -668,11 +668,14 @@ table.table.caption-top th {
 }
 
 .orderBtn {
-  border-radius: 6px;
-  color: #FFF;
-  font-family: var(--font-inter);
-  font-size: 13px;
-  padding: 7px 15px;
+  border-radius: 6px !important;
+  color: #FFF !important;
+  font-family: var(--font-inter) !important;
+  font-size: 13px !important;
+  padding: 7px 15px !important;
+  height: auto !important;
+  border: 1px solid transparent !important;
+  width: auto !important;
 }
 
 .orderBtn.green {
@@ -681,16 +684,30 @@ table.table.caption-top th {
 
 .orderBtn.red {
   background-color: #FE0000;
+  width: 72px !important;
 }
 
+
 .orderBtn.green:hover {
-  border: 1px solid #3DBE01;
+  border: 1px solid #3DBE01 !important;
   background-color: transparent;
+  color: #000 !important;
 }
 
 .orderBtn.red:hover {
-  border: 1px solid #FE0000;
+  border: 1px solid #FE0000 !important;
   background-color: transparent;
+  color: #000 !important;
+}
+
+.orderBtn:disabled {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.orderBtn img {
+  width: 30px;
+  height: 30px;
 }
 
 .dash_btn2 {
@@ -1533,7 +1550,7 @@ button.reset_btn svg {
 .inputField textarea {
   width: 100%;
   padding: 10px 15px;
-  margin: 10px 0 0;
+  margin: 3px 0 0;
   border-radius: 4.3px;
   border: 1px solid #041e5e;
   font-size: 14px;
@@ -1557,6 +1574,8 @@ button.reset_btn svg {
   position: absolute;
   top: 0;
   left: 0;
+  cursor: pointer;
+
 }
 
 .aus_dialog .modal-body {
@@ -1827,6 +1846,12 @@ button.reset_btn svg {
   position: relative;
 }
 
+.ast_file label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .ast_item .ast_file h5 {
   font-size: 12px;
   font-family: var(--font-lato);
@@ -1841,14 +1866,21 @@ button.reset_btn svg {
   font-size: 19px;
 }
 
+.ast_item .ast_file {
+  cursor: pointer;
+}
+
 .ast_item .ast_file input {
   opacity: 0;
   height: 100%;
   width: 100%;
   position: absolute;
+  cursor: pointer;
 }
 
+
 .am_field input,
+.am_field select,
 .am_field textarea {
   width: 100%;
   height: 45px;
@@ -1861,11 +1893,16 @@ button.reset_btn svg {
   color: #454545;
 }
 
+.am_field select {
+  appearance: revert;
+}
+
 .am_field label {
   font-family: var(--font-lato);
   font-weight: 700;
   font-size: 13px;
   color: #606060;
+  padding-bottom: 7px;
 }
 
 .register_link h5 {
@@ -1878,6 +1915,29 @@ button.reset_btn svg {
 .register_link a {
   color: #0066ff;
   text-decoration: underline;
+}
+
+.addNewService {
+  margin-top: 30px;
+  padding: 20px;
+  box-shadow: 0 0 10px 2px #cccccc7d;
+  border-radius: 10px;
+}
+
+.addNewService label {
+  margin: 5px 0;
+}
+
+.as_days button {
+  min-width: 60px;
+  height: 45px;
+  border-color: #C11111;
+  color: #C11111;
+}
+
+.as_days button.btn-primary {
+  background-color: #C11111;
+  color: #FFF;
 }
 
 @keyframes page-popup {

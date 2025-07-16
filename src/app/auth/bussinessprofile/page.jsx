@@ -10,6 +10,8 @@ import { FiPlusCircle } from "react-icons/fi";
 import Cookies from "js-cookie";
 import Image from "next/image";
 import { RxCross2 } from "react-icons/rx";
+import { showErrorToast } from "src/lib/toast";
+import api from "../../../lib/axios";
 
 const MAX_IMAGES = 3;
 
@@ -46,6 +48,7 @@ const schema = Yup.object({
 export default function BussinessProfile() {
   const router = useRouter();
   const [adminId, setAdminId] = useState("");
+  const [categoryList, setCategoryList] = useState("");
 
   /* RHF setup */
   const {
@@ -62,12 +65,14 @@ export default function BussinessProfile() {
       startTime: "",
       endTime: "",
       images: [],
+      category: "",
     },
   });
 
   /* preview URLs for selected files */
   const images = watch("images");
   const [previews, setPreviews] = useState([]);
+
   useEffect(() => {
     const urls = images.map((f) => URL.createObjectURL(f));
     setPreviews(urls);
@@ -87,6 +92,22 @@ export default function BussinessProfile() {
     }
   }, []);
 
+  /* fetch technicians once salonId exists */
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await api.get(`/getAllCategories`);
+        if (res?.data?.success) {
+          setCategoryList(res?.data?.data || []);
+        } else {
+          showErrorToast("Failed to fetch technicians");
+        }
+      } catch {
+        showErrorToast("Failed to fetch technicians");
+      }
+    })();
+  }, []);
+
   /* submit */
   const onSubmit = async (data) => {
     const formData = new FormData();
@@ -103,8 +124,8 @@ export default function BussinessProfile() {
     const days = data.workingDays.map((d) => ({
       day: d,
       isActive: true,
-      openingTime: data.startTime,
-      closeingTime: data.endTime,
+      startTime: data.startTime,
+      endTime: data.endTime,
     }));
     formData.append("workingDays", JSON.stringify(days));
 
@@ -127,7 +148,7 @@ export default function BussinessProfile() {
     if (!res.ok || !result.success)
       throw new Error(result.message || "Profile update failed");
 
-    router.push("/auth/addyourtechnician");
+    router.push(`/auth/addyourtechnician?salonId=${result?.data?._id}`);
   };
 
   /* remove image helper */
@@ -169,7 +190,7 @@ export default function BussinessProfile() {
 
       {/* working‑day checkboxes */}
       {/* <label>Select Working Days</label>
-      <div className="d-flex mt-2 mb-3" style={{ gap: 10 }}>
+      <div className="d-flex mt-1 mb-2" style={{ gap: 10 }}>
         {["Monday", "Tuesday", "Wednesday", "Thursday", "Saturday", "Sunday"].map(
           (d) => (
             <div key={d}>
@@ -185,7 +206,7 @@ export default function BussinessProfile() {
       </div> */}
 
       <label>Select Working Days</label>
-      <div className="d-flex mt-2 mb-3" style={{ gap: 10 }}>
+      <div className="d-flex mt-1 mb-2" style={{ gap: 10 }}>
         {["Monday", "Tuesday", "Wednesday", "Thursday", "Saturday", "Sunday"].map(
           (d) => (
             <div key={d} className="calender_item">
@@ -215,7 +236,7 @@ export default function BussinessProfile() {
       </div> */}
 
       <label>Operating Hours</label>
-      <div className="cs-form time_picker mt-1 mb-3 d-flex gap-3 align-items-center">
+      <div className="cs-form time_picker mt-1 mb-2 d-flex gap-3 align-items-center">
         <input
           type="time"
           className="form-control"
@@ -234,7 +255,32 @@ export default function BussinessProfile() {
           {errors.startTime?.message || errors.endTime?.message}
         </p>
       )}
+      <label>Assign Category</label>
+      <select
+        className="form-select input_field2 mt-2"
+        {...register("category")}
+      >
+        <option value="">-- choose --</option>
+        {categoryList && categoryList.map((cat) => (
+          <option key={cat?._id} value={cat?._id}>
+            {cat?.categoryName}
+          </option>
+        ))}
+      </select>
+      {errors.category && <p className="text-danger">{errors.category.message}</p>}
 
+      {/* Selected category pill */}
+      <div className="d-flex flex-wrap my-2 gap-2">
+        {watch("category") && (
+          <span
+            className="tags_category"
+            onClick={() => setValue("category", "", { shouldValidate: true })}
+          >
+            {categoryList && categoryList.find((c) => c.id === watch("category"))?.label || "Unknown"}
+            <RxCross2 />
+          </span>
+        )}
+      </div>
       {/* image upload */}
       <label>Upload Images (max 3)</label>
       <div className="input_file">
@@ -268,7 +314,7 @@ export default function BussinessProfile() {
 
       {/* previews */}
       {previews.length > 0 && (
-        <div className="my-3 d-flex gap-2 flex-wrap">
+        <div className="my-3 d-flex gap-2 flex-wrap" >
           {previews.map((src, i) => (
             <div key={i} style={{ position: "relative" }}>
               <Image
@@ -276,6 +322,7 @@ export default function BussinessProfile() {
                 alt=""
                 width={100}
                 height={100}
+                style={{ height: "100px" }}
                 className="rounded border object-fit-cover"
               />
               <button

@@ -11,6 +11,7 @@ import { useState } from "react";
 import { showErrorToast, showSuccessToast } from "src/lib/toast";
 import Cookies from "js-cookie"; // ✅ Import js-cookie
 import api from "../../../lib/axios";
+import Link from "next/link";
 // ✅ Yup validation schema
 const schema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
@@ -94,7 +95,13 @@ export default function LoginPage() {
       />
       {errors.password && <p style={{ color: "red" }}>{errors.password.message}</p>}
 
-      <AuthBtn title={"Continue"} type="submit" disabled={loading} />
+      <AuthBtn title={"Signup"} type="submit" disabled={loading} />
+      <div className="register_link">
+        <h5>
+          {"Already have an account? "}
+          <Link href="login">Login</Link>
+        </h5>
+      </div>
     </form>
   );
 }
