@@ -16,15 +16,6 @@ import SuccessModal from "@/components/Modal/SuccessModal";
 import { useDisclosure } from "@chakra-ui/react";
 
 const MAX_IMAGES = 3;
-// const CATEGORY_OPTIONS = [
-//   { id: "65f1a23a9e21d8e61babcde1", label: "Hair" },
-//   { id: "65f1a23a9e21d8e61babcde2", label: "Nails" },
-//   { id: "65f1a23a9e21d8e61babcde3", label: "Massage" },
-//   { id: "65f1a23a9e21d8e61babcde4", label: "Skin" },
-// ];
-
-
-
 
 const schema = Yup.object({
   serviceName: Yup.string().required("Service name is required"),
@@ -126,35 +117,33 @@ export default function UploadService() {
 
   /* submit */
   const onSubmit = async (data) => {
-    try {
-      const fd = new FormData();
-      fd.append("salonId", salonId);
-      fd.append("serviceName", data.serviceName);
-      fd.append("price", data.servicePrice);
-      fd.append("description", data.description);
-      fd.append("technicianId", JSON.stringify(data.technicians));
-      data.images.forEach((file) => fd.append("images", file));
-      console.log(fd);
+  try {
+    const fd = new FormData();
+    fd.append("salonId", salonId);
+    fd.append("serviceName", data.serviceName);
+    fd.append("price", data.servicePrice);
+    fd.append("description", data.description);
+    fd.append("technicianId", JSON.stringify(data.technicians));
+    data.images.forEach((file) => fd.append("images", file));
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/createService`, {
-        method: "POST",
-        body: fd,
-      });
-      const result = await res.json();
-      if (!res.ok || !result.success) throw new Error(result.message);
-      // ✅ show modal right away
-      onOpen();
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/createService`, {
+      method: "POST",
+      body: fd,
+    });
 
-      // ✅ wait 1 second, then close modal & redirect
-      // setTimeout(() => {
-      //   onClose();
-      //   router.push(`/auth/addyourtechnician?salonId=${salonId}`);
-      // }, 1000);
-      // showSuccessToast("Service created!");
-    } catch (e) {
-      showErrorToast(e.message ?? "Failed to create service");
-    }
-  };
+    const result = await res.json();
+    if (!res.ok || !result.success) throw new Error(result.message);
+
+    // ✅ Clear cookies before redirect
+    Cookies.remove("token");
+    Cookies.remove("user");
+
+    // ✅ Redirect to login
+    router.push("/login");
+  } catch (e) {
+    showErrorToast(e.message ?? "Failed to create service");
+  }
+};
 
   /* ------------- UI ------------- */
   return (
