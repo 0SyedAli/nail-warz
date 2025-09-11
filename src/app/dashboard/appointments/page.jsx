@@ -5,16 +5,24 @@ import { BiDotsHorizontalRounded } from "react-icons/bi";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useState, useEffect, useMemo } from "react";
 import Cookies from "js-cookie";
+import AppointmentDetail from "@/components/Modal/AppointmentDetail";
+import { useDisclosure } from "@chakra-ui/react";
+import { useRouter } from "next/navigation";
+import BallsLoading from "@/components/Spinner/BallsLoading";
 
 const fallbackImg = "/images/avatar.png"; // used if service has no image
 
 const Appointments = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [activeTab, setActiveTab] = useState("previous");
   const [rawBookings, setRawBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [salonId, setSalonId] = useState("");
-  
+  const [bookingDetail, setBookingDetail] = useState(null);
+  const router = useRouter();
+
+  /* ─────────────── Get salonId from cookie ─────────────── */
   useEffect(() => {
     const cookie = Cookies.get("user");
     if (!cookie) return router.push("/auth/login");
@@ -25,55 +33,69 @@ const Appointments = () => {
     } catch {
       router.push("/auth/login");
     }
-  }, []);
-  /* ─────────────────────────────────── FETCH ────────────────────────────────── */
-  useEffect(() => {
-     if (!salonId) return;    
-    (async () => {
-      try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/getBookingsBySalonId?salonId=${salonId}`);
-        if (!res.ok) throw new Error("Network error");
+  }, [router]);
 
-        const json = await res.json();
-        if (!json.success || !Array.isArray(json.data))
-          throw new Error("Unexpected API shape");
+  /* ─────────────── Fetch bookings ─────────────── */
+  const fetchBookings = async () => {
+    if (!salonId) return;
+    try {
+      setLoading(true);
+      setError(null);
 
-        setRawBookings(json.data);
-      } catch (e) {
-        console.error(e);
-        setError(e.message || "Unknown error");
-      } finally {
-        setLoading(false);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/getBookingsBySalonId?salonId=${salonId}`
+      );
+      const json = await res.json();
+
+      if (!res.ok) throw new Error(json.message || "Network error");
+
+      if (!json.success) {
+        if (json.message === "No bookings found for this salon") {
+          setRawBookings([]);
+          return;
+        }
+        throw new Error(json.message || "Unexpected API response");
       }
-    })();
-  }, [salonId]);
 
-  /* ─────────────────────────── TRANSFORM & GROUP ───────────────────────────── */
-  /**
-   *  Map API → UI‐ready object and split into previous/upcoming
-   *  Keep it inside useMemo so it only recalculates when rawBookings changes
-   */
-  /* ---------- helper ---------- */
-  const splitTab = (dateObj, status) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);                // midnight today
-    const past = dateObj < today;
-    const finished = ["completed", "canceled", "rejected"].includes(status.toLowerCase());
-    return finished ? "previous" : "upcoming";
+      if (!Array.isArray(json.data))
+        throw new Error("Unexpected data format");
+
+      setRawBookings(json.data || []);
+    } catch (e) {
+      console.error(e);
+      setError(e.message || "Unknown error");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  /* ---------- inside useMemo ---------- */
+  // initial fetch
+  useEffect(() => {
+    fetchBookings();
+  }, [salonId]);
+  /* ─────────────── Helper: Only keep completed & accepted ─────────────── */
+  const splitTab = (status) => {
+    if (!status) return null;
+    const normalized = status.toLowerCase();
+    if (normalized === "completed") return "previous";
+    if (normalized === "accepted") return "upcoming";
+    return null; // ignore others
+  };
+
+  /* ─────────────── Transform into grouped format ─────────────── */
   const grouped = useMemo(() => {
     const data = { previous: {}, upcoming: {} };
 
     rawBookings.forEach((b) => {
+      const tab = splitTab(b.status || "");
+      if (!tab) return; // skip ignored statuses
+
       const [dd, MM, yyyy] = b.date.split("-");
       const [hh = "00", mi = "00"] = (b.time || "").split(":");
       const when = new Date(yyyy, MM - 1, dd, hh, mi);
 
-      const tab = splitTab(when, b.status || "");
-
       const item = {
+        bookingId: b._id,
         clientName: b?.userId?.username || "Unknown",
         serviceName: b?.serviceId?.serviceName || "-",
         serviceImage: b?.serviceId?.images?.[0] || fallbackImg,
@@ -87,21 +109,38 @@ const Appointments = () => {
         month: "short",
       });
 
-      if (!data[tab][label]) data[tab][label] = { label, ts: when.getTime(), items: [] };
+      if (!data[tab][label]) {
+        data[tab][label] = { label, ts: when.getTime(), items: [] };
+      }
       data[tab][label].items.push(item);
     });
 
     return data;
   }, [rawBookings]);
 
+  /* ─────────────── Fetch booking detail ─────────────── */
+  const fetchBookingDetail = async (id) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/getBookingById?bookingId=${id}`
+      );
+      const json = await res.json();
+      if (!json.success) throw new Error("Failed to load booking");
+      setBookingDetail(json.data);
+      onOpen();
+    } catch (e) {
+      console.error("Booking Detail Error:", e.message);
+    }
+  };
 
-  /* ────────────────────────────────── RENDER ────────────────────────────────── */
+  /* ─────────────── Handle loading/error/empty ─────────────── */
   if (loading)
     return (
-      <div className="page">
-        <p className="m-4">Loading appointments…</p>
+      <div className="page h-50 d-flex align-items-center">
+        <BallsLoading borderWidth="mx-auto" />
       </div>
     );
+
   if (error)
     return (
       <div className="page">
@@ -109,27 +148,26 @@ const Appointments = () => {
       </div>
     );
 
-  // const appointmentsForTab = grouped[activeTab];
-  // const dayKeys = Object.keys(appointmentsForTab).sort(
-  //   (a, b) =>
-  //     new Date(a.split(" ")[0] + " 2025").getTime() -
-  //     new Date(b.split(" ")[0] + " 2025").getTime()
-  // );
+  if (rawBookings.length === 0)
+    return (
+      <div className="page">
+        <p className="m-4">No appointments found for your salon.</p>
+        <p className="m-4">When you receive bookings, they'll appear here.</p>
+      </div>
+    );
 
-
+  /* ─────────────── Sort and render ─────────────── */
   const dayGroups = Object.values(grouped[activeTab]);
-  // ascending (earliest → latest); reverse() if you need newest first
   dayGroups.sort((a, b) => a.ts - b.ts);
-
 
   return (
     <div className="page">
       <div className="dashboard_panel_inner">
         <div className={styles.container}>
-          {/* ───── Header (month selector stays static demo) ───── */}
+          {/* Header */}
           <div className={styles.header}>
             <div className={styles.childHeader1}>
-              <div className={styles.monthNav}>
+              {/* <div className={styles.monthNav}>
                 <span className={styles.arrow}>
                   <IoIosArrowBack />
                 </span>
@@ -137,34 +175,29 @@ const Appointments = () => {
                 <span className={styles.arrow}>
                   <IoIosArrowForward />
                 </span>
-              </div>
+              </div> */}
               <div className={styles.legend}>
                 <span>
-                  <span className={styles.dotGreen}></span> Done
+                  <span className={styles.dotGreen}></span> Completed
                 </span>
                 <span>
-                  <span className={styles.dotRed}></span> Canceled
+                  <span className={styles.dotRed}></span> Accepted
                 </span>
               </div>
             </div>
-            {/* <input
-              type="text"
-              placeholder="Axtar"
-              className={styles.search}
-            /> */}
           </div>
 
-          {/* ───── Tabs ───── */}
+          {/* Tabs */}
           <div className={styles.tabs}>
             <button
-              className={`${styles.tab} ${activeTab === "previous" ? styles.active : ""
+              className={`${styles.tab} ${styles.green} ${activeTab === "previous" ? styles.active : ""
                 }`}
               onClick={() => setActiveTab("previous")}
             >
               Previous Appointments
             </button>
             <button
-              className={`${styles.tab} ${activeTab === "upcoming" ? styles.active : ""
+              className={`${styles.tab} ${styles.red} ${activeTab === "upcoming" ? styles.active : ""
                 }`}
               onClick={() => setActiveTab("upcoming")}
             >
@@ -172,48 +205,52 @@ const Appointments = () => {
             </button>
           </div>
 
-          {/* ───── Content ───── */}
+          {/* Content */}
           {dayGroups.length === 0 && (
             <p className="m-4">
-              {activeTab === "previous" ? "No past" : "No upcoming"} appointments found.
+              {activeTab === "previous" ? "No past" : "No upcoming"} appointments
+              found.
             </p>
           )}
-          {/* if (dayGroups.length === 0) {
-    return (
-          <p className="m-4">
-            {activeTab === "previous" ? "No past" : "No upcoming"} appointments found.
-          </p>
-          );
-  } */}
 
           {dayGroups.map((group) => (
-            <div key={group.label} className="d-flex align-items-center gap-3 py-2">
+            <div
+              key={group.label}
+              className="d-flex align-items-center flex-column flex-md-row gap-3 py-2"
+            >
               <div className={styles.dateLabel}>
                 <span>{group.label}</span>
               </div>
 
-              <div className="row w-100">
+              <div className="row w-100 g-3">
                 {group.items.map((item, idx) => (
-                  <div key={idx} className={`${styles.card} col-3`}>
+                  <div className="col-md-6 col-lg-4 col-xl-3 px-0">
                     <div
-                      className={`${styles.statusBar} ${item.status === "canceled" ? styles.red : styles.green
-                        }`}
-                    ></div>
+                      key={idx}
+                      className={`${styles.card}`}
+                      onClick={() => fetchBookingDetail(item.bookingId)}
+                    >
+                      <div
+                        className={`${styles.statusBar} ${activeTab === "previous" ? styles.green : styles.red
+                          }`}
+                      ></div>
 
-                    <div className={styles.cardContent}>
-                      <h4>{item.clientName}</h4>
-                      <p>{item.serviceName}</p>
-                      <div className={styles.time}>{item.time}</div>
-                    </div>
+                      <div className={styles.cardContent}>
+                        <h4>{item.clientName}</h4>
+                        <p>{item.serviceName}</p>
+                        <div className={styles.time}>{item.time}</div>
+                      </div>
 
-                    <div className={styles.icon}>
-                      <BiDotsHorizontalRounded />
-                      <Image
-                        src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${item.serviceImage}`}
-                        width={35}
-                        height={35}
-                        alt={item.serviceName}
-                      />
+                      <div className={styles.icon}>
+                        <BiDotsHorizontalRounded />
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${item.serviceImage}` || fallbackImg}
+                          width={35}
+                          height={35}
+                          alt={item.serviceName}
+                          unoptimized
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -222,6 +259,15 @@ const Appointments = () => {
           ))}
         </div>
       </div>
+
+      {/* Detail modal */}
+      <AppointmentDetail
+        isOpen={isOpen}
+        onClose={onClose}
+        modalClass="appoint_detail_container"
+        booking={bookingDetail}
+        onUpdated={fetchBookings}   // ✅ pass callback
+      />
     </div>
   );
 };

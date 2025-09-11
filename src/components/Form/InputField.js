@@ -28,7 +28,7 @@ const InputField = ({
 
           {/* Input field */}
           <Input
-            type={type}
+            type={show ? "text" : type} // ✅ use show toggle here
             {...rest}
             className={`${classInput ? classInput : ""}`}
             placeholder={placeholder}

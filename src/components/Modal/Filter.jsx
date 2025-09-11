@@ -58,7 +58,7 @@ function Filter({ isOpen, onClose, btntitle }) {
                 <FiRotateCcw />
                 Reset all
               </button>
-              <button className="themebtn4 green btn" href="/">
+              <button className="btn themebtn4 green" href="/">
                 Add Now
               </button>
             </div>

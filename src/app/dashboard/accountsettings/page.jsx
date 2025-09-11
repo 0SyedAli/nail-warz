@@ -416,7 +416,7 @@ const EditProfile = () => {
                                             Note: Your working days currently have different times. Setting new times will apply to all selected days.
                                         </div>
                                     )}
-                                    <div className="as_days d-flex flex-wrap gap-2 justify-content-between">
+                                    <div className="as_days d-flex flex-wrap gap-2 justify-content-start">
                                         {DAYS_OF_WEEK.map((day) => (
                                             <button
                                                 key={day}
@@ -491,7 +491,7 @@ const EditProfile = () => {
                             <div className="col-12">
                                 <div className="am_btn">
                                     <button
-                                        className="themebtn4 green btn"
+                                        className="btn themebtn4 green"
                                         type="submit"
                                         disabled={isSubmitting || isLoading}
                                     >

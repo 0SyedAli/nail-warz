@@ -74,6 +74,45 @@ a {
   border-width: 6px;
 }
 
+.my-spinner-border {
+  height: 60px;
+  aspect-ratio: 2;
+  border-bottom: 3px solid #0000;
+  background:
+    linear-gradient(90deg, #000 50%, #0000 0) -25% 100%/50% 3px repeat-x border-box;
+  position: relative;
+  animation: l3-0 .75s linear infinite;
+}
+
+.my-spinner-border:before {
+  content: "";
+  position: absolute;
+  inset: auto 42.5% 0;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #C11111;
+  animation: l3-1 .75s cubic-bezier(0, 900, 1, 900) infinite;
+}
+
+@keyframes l3-0 {
+  to {
+    background-position: -125% 100%
+  }
+}
+
+@keyframes l3-1 {
+
+  0%,
+  2% {
+    bottom: 0%
+  }
+
+  98%,
+  to {
+    bottom: .1%
+  }
+}
+
 .pinCode {
   justify-content: center;
 }
@@ -103,7 +142,8 @@ a {
 .resend_code h5 {
   color: #000;
   font-size: 15px;
-  font-family: "InterBold";
+  font-family: var(--font-inter);
+  font-weight: 500;
   border-bottom: 1px solid #000;
   display: inline-block;
 }
@@ -261,6 +301,10 @@ input::placeholder {
   top: 0;
 }
 
+.workDays {
+  gap: 10px;
+}
+
 .calender_item {
   height: 44px;
   width: 100%;
@@ -360,7 +404,7 @@ input::placeholder {
 
 }
 
-.sidebar_container .sc2_sid a {
+.sidebar_container .sc2_sid .logout_btn {
   display: flex;
   align-items: center;
   gap: 15px;
@@ -380,13 +424,8 @@ input::placeholder {
   position: relative;
   margin: 10px 0;
   transition: background-color 0.3s ease, transform 0.3s ease;
-  /* Add transition effects */
 }
 
-/* .sidebar_container ul li.active img {
-  filter: brightness(0) saturate(100%) invert(80%) sepia(78%) saturate(4119%) hue-rotate(337deg) brightness(96%) contrast(108%);
-  transition: filter 0.3s ease;
-} */
 
 .sidebar_container ul li a {
   text-decoration: none;
@@ -399,7 +438,8 @@ input::placeholder {
   font-size: 14px;
   font-family: "Inter";
   transition: color 0.3s ease, font-size 0.3s ease;
-  /* Add transition effects for color and font-size */
+  text-align: start;
+
 }
 
 .sidebar_container ul li a span {
@@ -597,7 +637,8 @@ input::placeholder {
 
 .OverviewCards h2 {
   font-size: 32px;
-  font-family: "InterBold";
+  font-family: var(--font-inter);
+  font-weight: 500;
   margin: 15px 0;
 }
 
@@ -950,7 +991,8 @@ table.table.caption-top th {
 
 .grand_total h4 span {
   font-weight: 900;
-  font-family: "InterBold";
+  font-family: var(--font-inter);
+  font-weight: 500;
   font-size: 22px;
 }
 
@@ -1156,6 +1198,87 @@ table.table.caption-top th {
   padding: 0 !important;
 }
 
+.appoint_detail_container {
+  max-width: 60% !important;
+}
+
+.appoint_detail {
+  padding: 20px 40px;
+}
+
+.appoint_detail h3 {
+  font-size: 20px !important;
+  text-align: start !important;
+  margin-bottom: 20px;
+}
+
+.appoint_detail h5 {
+  font-size: 14px;
+  font-family: var(--font-inter);
+  font-weight: 400;
+  color: #505050;
+}
+
+.appoint_detail h4 {
+  font-size: 16px;
+  font-family: var(--font-inter);
+  font-weight: 600;
+  color: #505050;
+}
+
+.appoint_detail h5 strong {
+  font-size: 16px;
+  padding-right: 20px;
+}
+
+.cancel_booking .aus_dialog.appoint_detail,
+.cancel_booking .aus_dialog.appoint_detail h3 {
+  text-align: center !important;
+}
+
+.cancel_booking .aus_dialog.appoint_detail h3 {
+  margin-bottom: 20px;
+  font-size: 30px !important;
+}
+
+.appoint_btn {
+  background-color: #C11111;
+  border-radius: 30px;
+  padding: 0 20px;
+  height: 44px;
+  color: #FFF;
+  border: 2px solid #C11111;
+  transition: all .3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.appoint_btn:hover {
+  background-color: transparent;
+  color: #000;
+}
+
+.customer_card {
+  background-color: #FFF;
+  box-shadow: 0 3.5px 20.5px 0 #cccccc6b;
+  border-radius: 10px;
+  width: 75%;
+  padding: 30px 40px;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.cc_leftBorder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 18.08px;
+  height: 100%;
+  background: #3DBE01;
+}
+
 /* modal css */
 .filter_modal_body {
   padding: 10px;
@@ -1220,7 +1343,8 @@ table.table.caption-top th {
 }
 
 .filter_modal_body h4 {
-  font-family: "InterBold";
+  font-family: var(--font-inter);
+  font-weight: 500;
   font-size: 16px;
   line-height: 26.63px;
   text-align: center;
@@ -1236,6 +1360,16 @@ button.reset_btn {
   gap: 6px;
   font-size: 16px;
   color: #7d7f88;
+}
+
+.auth_otp div {
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.auth_otp input {
+  font-family: var(--font-open-sans);
 }
 
 .sort_btn {
@@ -1482,7 +1616,8 @@ button.reset_btn svg {
 
 .transaction_item h3 {
   letter-spacing: 1px;
-  font-family: "InterBold";
+  font-family: var(--font-inter);
+  font-weight: 500;
   font-size: 20px;
   line-height: 24.2px;
   margin: 0;
@@ -1624,7 +1759,8 @@ button.reset_btn svg {
 
 .pp_item h3 {
   font-size: 22px;
-  font-family: "InterBold";
+  font-family: var(--font-inter);
+  font-weight: 500;
   line-height: 44px;
   color: #2c2b2b;
 }
@@ -1878,6 +2014,26 @@ button.reset_btn svg {
   cursor: pointer;
 }
 
+.term_body {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.term_content {
+  text-align: left;
+  border-top: 1px solid #ccc;
+  padding: 15px;
+
+}
+
+.term_content p {
+  font-size: 15px;
+}
+
+.term_modal {
+  max-width: 600px !important;
+}
+
 
 .am_field input,
 .am_field select,
@@ -1904,6 +2060,7 @@ button.reset_btn svg {
   color: #606060;
   padding-bottom: 7px;
 }
+
 
 .register_link h5 {
   font-family: "Inter";
@@ -1935,11 +2092,375 @@ button.reset_btn svg {
   color: #C11111;
 }
 
+.as_days button:hover,
+.as_days button:focus-visible,
+.as_days button:active {
+  background-color: transparent;
+  color: #C11111;
+  border-color: #C11111;
+  box-shadow: none;
+}
+
 .as_days button.btn-primary {
   background-color: #C11111;
   color: #FFF;
 }
 
+.menu_toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  border: 1px solid #fbb71a;
+  width: 35px;
+  height: 35px;
+  font-size: 23px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+img.sm_logo,
+button.hamburger {
+  display: none;
+}
+
+.technician_detail .card-title {
+  font-family: var(--font-poppins) !important;
+}
+
+.technician_detail .card-body p {
+  font-family: var(--font-poppins) !important;
+  line-height: 26px;
+  font-size: 15px;
+  color: #818181;
+}
+
+.technician_detail .card {
+  border: 2px solid #C11111;
+}
+
+.tech_profile p {
+  line-height: 17px !important;
+}
+
+.tech_image {
+  margin-right: 15px;
+}
+
+.tech_image img {
+  border: 3px solid #C11111;
+  min-width: 120px;
+  min-height: 120px;
+}
+
+.tech_status_container {
+  padding: 30px;
+  padding-left: 40px;
+  border-left: 2px solid #C11111;
+}
+
+.tech_status {
+  padding: 0 15px;
+  position: relative;
+
+}
+
+.tech_status::before {
+  content: "";
+  position: absolute;
+  height: 100%;
+  width: 5px;
+  border-radius: 5px;
+  background-color: #09ba28;
+  top: 0;
+  left: 0;
+}
+
+.tech_status.green::before {
+  background-color: #95BF46;
+}
+
+.tech_status.purple::before {
+  background-color: #5759F9;
+}
+
+.tech_status.orange::before {
+  background-color: #F58B28;
+}
+
+.technician_detail .btn_tech {
+  background-color: #C11111;
+  border-radius: 30px;
+  padding: 10px 20px;
+  width: 100%;
+  color: #FFF;
+}
+
+.technician_detail .btn_tech:hover {
+  color: #C11111;
+  background-color: transparent;
+  border-color: #C11111;
+}
+
+.tech_status h3 {
+  font-family: var(--font-poppins) !important;
+}
+
+.tech_info span {
+  color: #858585;
+}
+
+.tech_form .form-control {
+  border: 1px solid #000;
+  height: 44px;
+}
+
+.chakra-modal__content.cancel_booking {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 150px !important;
+}
+
+.cancel_booking .modal_container {
+  position: relative;
+}
+
+.cross_icon {
+  width: 70px;
+  height: 70px;
+  border: 3px solid #C11111;
+  color: #FFF;
+  background-color: #C11111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100%;
+  font-size: 30px;
+  margin: 0 auto;
+  margin-bottom: 20px;
+}
+
+/* chart css */
+/* ==== Chart Dashboard CSS (Plain) ==== */
+
+/* Reset & Body */
+
+
+/* Chart Card */
+.chart-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+  margin-bottom: 30px;
+  user-select: none;
+
+}
+
+.btn-link {
+  display: flex !important;
+  align-items: center !important;
+  gap: 3px !important;
+}
+
+/* Header */
+.overview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.overview-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: #333;
+}
+
+.date-selector {
+  font-size: 14px;
+  color: #666;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Amount */
+.total-amount {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* Chart Area */
+.chart-container {
+  position: relative;
+  height: 200px;
+  margin-bottom: 20px;
+}
+
+.line-chart {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-line {
+  fill: none;
+  stroke: #6c757d;
+  stroke-width: 2;
+}
+
+.chart-point {
+  fill: white;
+  stroke: #6c757d;
+  stroke-width: 2;
+  r: 4;
+}
+
+.chart-point.active {
+  fill: #6c757d;
+}
+
+.chart-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+  margin-top: 10px;
+}
+
+/* Sales Revenue */
+.sales-revenue {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
+}
+
+.revenue-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #6c757d;
+  border-radius: 50%;
+}
+
+.revenue-amount {
+  font-weight: 600;
+  color: #333;
+}
+
+/* Donut Chart */
+.donut-chart-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.donut-chart {
+  width: 120px;
+  height: 120px;
+}
+
+.donut-segment {
+  fill: none;
+  stroke-width: 20;
+}
+
+.donut-expenses {
+  stroke: #dc3545;
+}
+
+.donut-comes {
+  stroke: #28a745;
+}
+
+/* Legend */
+.chart-legend {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.legend-expenses {
+  background-color: #dc3545;
+}
+
+.legend-comes {
+  background-color: #28a745;
+}
+
+/* Stats */
+.stats-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+/* Section Title */
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.recharts-wrapper svg:focus {
+  border: none;
+  outline: none;
+}
+
+.total-amount {
+  font-weight: 600;
+  font-size: 25px;
+  font-weight: 40px;
+  line-height: 100%;
+}
+
+/* chart css */
 @keyframes page-popup {
   100% {
     opacity: 1;
@@ -1951,4 +2472,615 @@ button.reset_btn svg {
   html {
     color-scheme: dark;
   }
+}
+
+
+@media only screen and (max-width: 1399px) {
+  .sidebar_container ul li a {
+    gap: 10px;
+
+  }
+
+  .sidebar_container ul li.active a {
+    font-size: 14px;
+    padding: 12px 10px;
+  }
+}
+
+@media only screen and (max-width: 1280px) {
+  .textarea_field {
+    height: 200px;
+  }
+
+  .inputField {
+    margin: 9px 0 13px 0;
+  }
+
+  .sidebar_container ul {
+    padding: 0 0 0 30px;
+  }
+
+  .about_sec,
+  .up_timing {
+    padding: 15px;
+  }
+
+  .du_a {
+    padding-left: 33px;
+  }
+
+  .dc2_bottom {
+    gap: 10px;
+  }
+
+  .dc2_bottom div {
+    text-align: center;
+    min-width: 110px;
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+  .dc2_bottom h2 {
+    font-size: 13px;
+  }
+
+  .dc2_bottom h5 {
+    font-size: 15px;
+  }
+
+  .sidebar_container ul li.active a {
+    font-size: 12px;
+  }
+}
+
+@media only screen and (max-width: 1080px) {
+  .OverviewCards p {
+    font-size: 14px;
+  }
+
+  .OverviewCards h2 {
+    font-size: 24px;
+    margin: 10px 0;
+  }
+
+  .OverviewCards h5 {
+    font-size: 15px;
+  }
+
+  .OverviewCards h5 span {
+    font-size: 12px;
+  }
+
+  .OverviewCards img {
+    top: 15px;
+    right: 15px;
+  }
+
+}
+
+@media only screen and (max-width: 992px) {
+  .OverviewCards {
+    padding: 15px;
+  }
+
+  .OverviewCards img {
+    top: 10px;
+    right: 10px;
+    width: 35px;
+  }
+
+  .dashboard_container h2 {
+    font-size: 18px;
+  }
+
+  .topbar_container p {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .topbar_container h2 span {
+    padding-left: 10px;
+  }
+
+  .topbar_container h2 img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .topbar_container .btntheme3 {
+    padding: 8px 10px;
+    font-size: 12px;
+    height: 41px;
+    width: 120px;
+  }
+
+  .topbar_container .noti_btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .topbar_container .noti_btn img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .dp_chart1,
+  .dp_chart2 {
+    width: 100% !important;
+  }
+
+  .dp_chart2 {
+    margin-top: 50px;
+  }
+
+  table.table.caption-top th,
+  table.table.caption-top td {
+    white-space: nowrap;
+  }
+
+  .chart_head_filter {
+    flex-wrap: wrap;
+  }
+
+  .chakra-select__wrapper {
+    width: fit-content !important;
+  }
+
+  .chart_head {
+    gap: 10px;
+  }
+
+  .chart_head_filter {
+    justify-content: end;
+  }
+
+  .manage_order_head {
+    gap: 20px;
+  }
+
+  .manage_order_head .mo_tabs {
+    gap: 10px;
+    max-width: 380px;
+    overflow: auto;
+  }
+
+  .manage_order_head .mo_tabs button {
+    padding: 10px;
+  }
+
+  .dashboard_panel h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .add_product_container .themebtn4 {
+    white-space: nowrap;
+  }
+
+  .sidebar_container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  img.sm_logo,
+  button.hamburger {
+    display: block;
+    color: #FFF;
+  }
+
+  .sidebar_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .sidebar_header img {
+    width: 100%;
+    height: 100%;
+    padding: 0 10px;
+  }
+
+  .dashboard_container {
+    grid-template-columns: 10% 90%;
+  }
+
+  .sidebar_menu {
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar_menu.open {
+    transform: translateX(0);
+  }
+
+  .sidebar_menu.open button {
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sidebar_menu.open ul li.active a {
+    color: #FFF;
+  }
+
+  .sidebar_menu.open ul li a {
+    color: #000;
+  }
+
+  .sidebar_menu {
+    transform: translateX(-100%);
+    padding-top: 20px;
+  }
+
+  .sidebar_container ul {
+    margin: 10px 0;
+  }
+
+  .sidebar_menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #fff;
+    z-index: 100;
+    width: 250px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  .sidebar_menu .sm_logo {
+    margin: 0 auto;
+  }
+
+  .sidebar_container ul li a span img {
+    filter: brightness(0) saturate(100%) invert(12%) sepia(62%) saturate(7476%) hue-rotate(358deg) brightness(89%) contrast(91%);
+  }
+
+  .sidebar_container ul li.active a span img {
+    filter: brightness(0) saturate(100%) invert(100%) sepia(9%) saturate(7478%) hue-rotate(268deg) brightness(106%) contrast(102%);
+  }
+
+  .sidebar_container ul li a {
+    gap: 15px;
+
+  }
+
+  .sidebar_container ul li.active a {
+    font-size: 14px;
+  }
+
+
+  .tech_image img {
+    min-width: 80px;
+    min-height: 80px;
+    width: 80px;
+    height: 80px;
+  }
+
+  .tech_profile h1 {
+    font-size: 20px;
+    text-transform: capitalize;
+  }
+
+  .tech_status_container {
+    padding: 0;
+    border-left: 0;
+  }
+}
+
+@media only screen and (max-height: 700px) {
+  .sidebar_container ul {
+    max-height: 55vh;
+  }
+}
+
+@media only screen and (max-height: 620px) {
+  .textarea_field {
+    height: 160px;
+  }
+
+  .inputField {
+    margin: 7px 0 10px 0;
+  }
+
+  .upload_img_cont {
+    margin: 0 auto 10px;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .upload_img_cont {
+    margin: 0 auto 10px;
+  }
+
+  .select_gender {
+    width: 70px;
+    height: 70px;
+  }
+
+  .textarea_field {
+    height: 150px;
+  }
+
+  .menu_toggle {
+    display: block;
+    border: 1px solid #fbb71a;
+    width: 35px;
+    height: 35px;
+    font-size: 23px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .top_menu {
+    flex-direction: column;
+    max-height: 0;
+    overflow: hidden;
+  }
+
+  .top_menu {
+    transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out, border-radius 0.3s ease-in-out;
+    position: absolute;
+    top: 50px;
+    right: 0;
+    min-width: 150px;
+    justify-content: start;
+    align-items: flex-end !important;
+    background: #FFF;
+    z-index: 11;
+    padding: 0 20px;
+  }
+
+  .top_menu.open {
+    max-height: 300px;
+    border: 1px solid #fbb71a;
+    border-radius: 10px;
+    padding: 20px;
+  }
+
+
+  .dp_chart2 {
+    margin-top: 100px;
+  }
+
+  .dashboard_panel {
+    padding: 20px;
+  }
+
+  .dp_chart2 {
+    margin-top: 40px;
+  }
+
+  .add_product_container {
+    flex-direction: column-reverse;
+    align-items: flex-end;
+    gap: 30px;
+  }
+
+  .chakra-modal__content {
+    margin: 0 20px;
+  }
+
+  .modal_container_body {
+    overflow: auto;
+    height: 80vh;
+  }
+
+  .transaction_item {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .discount2_body .transaction_item {
+    justify-content: flex-end;
+  }
+
+  .discount2_body .transaction_item .ti_inner {
+    width: 100%;
+  }
+
+  .discount2_body .transaction_item .ti_validity {
+    flex-wrap: wrap;
+    gap: 5px !important;
+  }
+
+  .discount2_body .transaction_item .ti_validity h6:nth-child(2) {
+    display: none;
+  }
+
+  .up_cover img {
+    height: 220px;
+  }
+
+  .dashboard_container {
+    grid-template-columns: 14% 86%;
+  }
+
+  .noti-modal-dialog {
+    max-width: 60vw;
+    margin-top: 110px !important;
+    margin: 0 20px auto auto;
+  }
+
+  .chakra-modal__content-container {
+    z-index: 1111111;
+  }
+}
+
+@media only screen and (max-width: 576px) {
+  .topbar_container h1 {
+    font-size: 20px;
+  }
+
+  .tc_profile {
+    gap: 10px;
+  }
+
+  .dp_chart1>div {
+    height: 300px !important;
+  }
+
+  .tc_profile h4 {
+    font-size: 16px;
+  }
+
+  .tc_profile h5 {
+    font-size: 14px;
+  }
+
+  .tc_profile img {
+    width: 40px;
+  }
+
+  .change_week button span {
+    display: none;
+  }
+
+  .overview-header {
+    padding: 10px 20px;
+  }
+
+  .chart-card {
+    padding: 0;
+  }
+
+  .topbar_container {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    row-gap: 10px;
+  }
+
+  .topbar_container h1 {
+    font-size: 17px;
+    font-weight: 800;
+    font-family: "Poppins";
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .dp_chart2 {
+    margin-top: 80px;
+  }
+
+  .OverviewCards h2,
+  .OverviewCards h5 {
+    display: inline-block;
+    margin-bottom: 0;
+  }
+
+  .OverviewCards h5 {
+    padding-left: 10px;
+  }
+
+  .manage_order_head {
+    flex-direction: column;
+  }
+
+  .ti_inner img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .ti_inner h5 {
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .ed_btns {
+    padding-right: 0;
+  }
+
+  .pp_item p {
+    width: 100%;
+  }
+
+  .dash_head2 {
+    padding: 40px 0px 0px;
+
+  }
+
+  .dash_head2 h3 {
+    font-size: 22px;
+  }
+
+  .pp_item p {
+    line-height: 22px;
+  }
+
+  .customer_section button {
+    width: 130px;
+    padding: 10px;
+  }
+
+  .customer_section .cs_user h3 {
+    font-size: 14px;
+  }
+
+  .cs_user img {
+    height: 30px;
+    width: 30px;
+  }
+
+  .dashboard_container {
+    grid-template-columns: 17% 83%;
+  }
+
+  .change_month h4 {
+    font-size: 17px;
+  }
+
+  .dashboard_container h2 {
+    font-size: 14px;
+  }
+
+  .dp_chart1>div {
+    height: 240px !important;
+  }
+
+  .tc_profile {
+    flex-direction: row-reverse;
+    text-align: start;
+    margin-top: 8px;
+  }
+
+  .tc_profile h5 {
+    font-size: 12px;
+  }
+
+  .tc_profile h4 {
+    font-size: 14px;
+  }
+
+  .calender_item label {
+    font-size: 12px;
+  }
+
+  .workDays {
+    gap: 5px;
+  }
+
+  .addNewService {
+    padding: 10px;
+  }
+
+  .tech_image img {
+    min-width: 60px;
+    min-height: 60px;
+    width: 60px;
+    height: 60px;
+  }
+  
+  .chakra-modal__content {
+    margin: 0 10px;
+  }
+
 }

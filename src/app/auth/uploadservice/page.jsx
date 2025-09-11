@@ -1,10 +1,10 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useRouter, useSearchParams } from "next/navigation";
-
+import Cookies from "js-cookie";
 import InputField from "@/components/Form/InputField";
 import { AuthBtn } from "@/components/AuthBtn/AuthBtn";
 import { FiPlusCircle } from "react-icons/fi";
@@ -16,15 +16,6 @@ import SuccessModal from "@/components/Modal/SuccessModal";
 import { useDisclosure } from "@chakra-ui/react";
 
 const MAX_IMAGES = 3;
-// const CATEGORY_OPTIONS = [
-//   { id: "65f1a23a9e21d8e61babcde1", label: "Hair" },
-//   { id: "65f1a23a9e21d8e61babcde2", label: "Nails" },
-//   { id: "65f1a23a9e21d8e61babcde3", label: "Massage" },
-//   { id: "65f1a23a9e21d8e61babcde4", label: "Skin" },
-// ];
-
-
-
 
 const schema = Yup.object({
   serviceName: Yup.string().required("Service name is required"),
@@ -43,7 +34,7 @@ const schema = Yup.object({
     .required("At least one image is required"),
 });
 
-export default function UploadService() {
+function UploadService() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const salonId = searchParams.get("salonId");
@@ -95,19 +86,6 @@ export default function UploadService() {
     })();
   }, [salonId]);
 
-  /* helpers for chip arrays */
-  // const addChip = (field, value) => {
-  //   if (!value) return;
-  //   const arr = watch(field);
-  //   if (arr.includes(value)) return;
-  //   setValue(field, [...arr, value], { shouldValidate: true });
-  // };
-  // const removeChip = (field, idx) => {
-  //   const arr = [...watch(field)];
-  //   arr.splice(idx, 1);
-  //   setValue(field, arr, { shouldValidate: true });
-  // };
-
   const addChip = (field, value) => {
     if (!value) return;
 
@@ -134,23 +112,21 @@ export default function UploadService() {
       fd.append("description", data.description);
       fd.append("technicianId", JSON.stringify(data.technicians));
       data.images.forEach((file) => fd.append("images", file));
-      console.log(fd);
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/createService`, {
         method: "POST",
         body: fd,
       });
+
       const result = await res.json();
       if (!res.ok || !result.success) throw new Error(result.message);
-      // ✅ show modal right away
-      onOpen();
 
-      // ✅ wait 1 second, then close modal & redirect
-      // setTimeout(() => {
-      //   onClose();
-      //   router.push(`/auth/addyourtechnician?salonId=${salonId}`);
-      // }, 1000);
-      // showSuccessToast("Service created!");
+      // ✅ Clear cookies before redirect
+      Cookies.remove("token");
+      Cookies.remove("user");
+
+      // ✅ Redirect to login
+      router.push("login");
     } catch (e) {
       showErrorToast(e.message ?? "Failed to create service");
     }
@@ -202,34 +178,6 @@ export default function UploadService() {
           ))}
         </div>
 
-        {/* Category select */}
-        {/* Category select */}
-        {/* <label>Assign Category</label>
-        <select
-          className="form-select input_field2"
-          {...register("category")}
-        >
-          <option value="">-- choose --</option>
-          {CATEGORY_OPTIONS.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.label}
-            </option>
-          ))}
-        </select>
-        {errors.category && <p className="text-danger">{errors.category.message}</p>}
-
-        <div className="d-flex flex-wrap my-2 gap-2">
-          {watch("category") && (
-            <span
-              className="tags_category"
-              onClick={() => setValue("category", "", { shouldValidate: true })}
-            >
-              {CATEGORY_OPTIONS.find((c) => c.id === watch("category"))?.label || "Unknown"}
-              <RxCross2 />
-            </span>
-          )}
-        </div> */}
-
         {/* image upload */}
         <label>Upload Images (max 3)</label>
         <div className="input_file">
@@ -279,5 +227,14 @@ export default function UploadService() {
       </form>
       <SuccessModal isOpen={isOpen} onClose={onClose} />
     </>
+  );
+}
+
+
+export default function WrappedAddTechnician() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UploadService />
+    </Suspense>
   );
 }

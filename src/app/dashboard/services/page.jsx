@@ -5,29 +5,54 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { showErrorToast, showSuccessToast } from "src/lib/toast";
 import { AuthBtn } from "@/components/AuthBtn/AuthBtn";
+import Cookies from "js-cookie";
+import BallsLoading from "@/components/Spinner/BallsLoading";
 
 const fallbackImg = "/images/avatar.png";
-const SALON_ID = "687181540a1ce00c6a3fa4b2";
-const IMG_BASE = process.env.NEXT_PUBLIC_IMAGE_URL;     // e.g. https://cdn.example.com
+const IMG_BASE = process.env.NEXT_PUBLIC_IMAGE_URL;
 
 export default function Services() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(null);
+  const [salonId, setSalonId] = useState("");
   const [error, setError] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);   // 👈 new
+  const itemsPerPage = 5;                              // 👈 change page size here
+
   const router = useRouter();
+
+  /* ──────────── COOKIE CHECK ──────────── */
+  useEffect(() => {
+    const cookie = Cookies.get("user");
+    if (!cookie) {
+      router.replace("/auth/login");
+      return;
+    }
+    try {
+      const user = JSON.parse(cookie);
+      if (user?._id) {
+        setSalonId(user._id);
+      } else {
+        router.replace("/auth/login");
+      }
+    } catch {
+      router.replace("/auth/login");
+    }
+  }, [router]);
 
   /* ─────────────── GET ─────────────── */
   useEffect(() => {
+    if (!salonId) return;
     (async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/getAllServicesBySalonId?salonId=${SALON_ID}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/getAllServicesBySalonId?salonId=${salonId}`,
           { cache: "no-store" }
         );
         if (!res.ok) throw new Error(`Server responded ${res.status}`);
         const json = await res.json();
-        setServices(json?.data ?? []);          // <── path changed
+        setServices(json?.data ?? []);
       } catch (err) {
         console.error(err);
         setError("Failed to load services");
@@ -36,7 +61,7 @@ export default function Services() {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [salonId]);
 
   /* ───────────── DELETE ───────────── */
   const handleDelete = useCallback(async (service) => {
@@ -48,9 +73,9 @@ export default function Services() {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/deleteService`,
         {
-          method: "POST",                       // or DELETE, if the API allows
-          headers: { "Content-Type": "application/json" },   //  ←  add this
-          body: JSON.stringify({ id: service._id }),         //  req.body.id
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: service._id }),
         }
       );
 
@@ -65,12 +90,28 @@ export default function Services() {
       setDeleting(null);
     }
   }, []);
+
   /* ───────────── EDIT ───────────── */
   const handleEdit = (service) =>
     router.push(`/dashboard/services/${service._id}`);
 
+  /* ───────────── PAGINATION ───────────── */
+  const totalPages = Math.ceil(services.length / itemsPerPage);
+  const indexOfLast = currentPage * itemsPerPage;
+  const indexOfFirst = indexOfLast - itemsPerPage;
+  const currentServices = services.slice(indexOfFirst, indexOfLast);
+
+  const handlePageChange = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
   /* ──────────── RENDER ──────────── */
-  if (loading) return <p className="p-4">Loading…</p>;
+  if (loading) return (
+    <div className="page h-50 d-flex align-items-center">
+      <BallsLoading borderWidth="mx-auto" />
+    </div>
+  );
   if (error) return <p className="p-4 text-danger">{error}</p>;
   if (!services.length)
     return (
@@ -86,7 +127,7 @@ export default function Services() {
     <div className="page">
       <div className="dashboard_panel_inner">
         <div className="py-4 dash_list">
-          <div className="table-responsive">
+          <div className="table-responsive pb-3">
             <table className="table caption-top">
               <thead>
                 <tr>
@@ -99,7 +140,7 @@ export default function Services() {
                 </tr>
               </thead>
               <tbody>
-                {services.map((s) => {
+                {currentServices.map((s) => {
                   const imageSrc =
                     s.images?.length && IMG_BASE
                       ? `${IMG_BASE}/${s.images[0]}`
@@ -109,9 +150,7 @@ export default function Services() {
                     s.technicianId?.[0]?.fullName ||
                     s.technicianId?.[0]?.email ||
                     "—";
-                  const category =
-                    s.categoryId?.categoryName ||
-                    "—";
+                  const category = s.categoryId?.categoryName || "—";
 
                   return (
                     <tr key={s._id}>
@@ -125,7 +164,7 @@ export default function Services() {
                         {s.serviceName}
                       </td>
                       <td>${Number(s.price).toFixed(2)}</td>
-                      <td>{category ?? "—"}</td>
+                      <td>{category}</td>
                       <td>{technician}</td>
                       <td>
                         <div className="d-flex gap-2 justify-content-end">
@@ -135,15 +174,13 @@ export default function Services() {
                           >
                             Edit
                           </button>
-                          {/* <button
-                            className="btn orderBtn red"
-                            
-                            
-                          >
-                            {deleting === s._id ? "Deleting…" : "Delete"}
-                          </button> */}
-                          <AuthBtn title="Delete" location_btn="btn orderBtn red" type="submit" onClick={() => handleDelete(s)} disabled={deleting === s._id} />
-
+                          <AuthBtn
+                            title="Delete"
+                            location_btn="btn orderBtn red"
+                            type="submit"
+                            onClick={() => handleDelete(s)}
+                            disabled={deleting === s._id}
+                          />
                         </div>
                       </td>
                     </tr>
@@ -151,6 +188,44 @@ export default function Services() {
                 })}
               </tbody>
             </table>
+
+            {/* ─────────── Pagination ─────────── */}
+            {services.length > itemsPerPage && (
+
+              <div className="d-flex justify-content-between align-items-center mt-3">
+                <button
+                  className="btn btn-sm btn-outline-secondary"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+
+                <div>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => handlePageChange(i + 1)}
+                      className={`btn btn-sm mx-1 ${currentPage === i + 1
+                        ? "btn-primary"
+                        : "btn-outline-secondary"
+                        }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  className="btn btn-sm btn-outline-secondary"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
+              </div>
+            )}
+            {/* Add Service Button */}
             <div className="d-flex justify-content-end mt-4">
               <Link href="addnewservice" className="btn dash_btn2">
                 Add New Service

@@ -1,7 +1,7 @@
 import { Spinner } from "@chakra-ui/react";
-const SpinnerLoading = () => {
+const SpinnerLoading = ({spinner_class}) => {
   return (
-    <div className="spinner_loader">
+    <div className={`spinner_loader ${spinner_class}`}>
       <Spinner
         thickness="4px"
         speed="0.65s"

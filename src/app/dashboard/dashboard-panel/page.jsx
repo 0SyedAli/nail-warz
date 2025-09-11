@@ -1,34 +1,44 @@
-"use client";
-import { useEffect, useState } from "react";
-import CardLineChart from "@/components/CardLineChart";
-import MyPie from "@/components/MyPie";
-import Cookies from "js-cookie";
+"use client"
 
+import MyChart2 from "@/components/dashChart/MyChart2";
+import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
+import SpinnerLoading from "@/components/Spinner/SpinnerLoading";
 const DashboardPanel = ({ activeTab }) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [salonId, setSalonId] = useState("");
   const [empty, setEmpty] = useState(false);   // <- NEW
-
+  const router = useRouter();
+  // Sample order data
   const pieData = [
     { id: "Expenses", label: "Expenses", value: 40 },
     { id: "Comes", label: "Comes", value: 25 },
   ];
-
+  // Filter orders based on the active tab
   useEffect(() => {
     const cookie = Cookies.get("user");
+
     if (!cookie) return router.push("/auth/login");
+
     try {
       const u = JSON.parse(cookie);
-      if (u?._id) setSalonId(u._id);
-      else router.push("/auth/login");
-    } catch {
+
+      if (u?._id) {
+        // setSalonId(u._id);
+        setSalonId(u._id);
+
+      } else {
+        console.warn("User has no _id:", u);
+        router.push("/auth/login");
+      }
+    } catch (err) {
+      console.error("Cookie parse error:", err);
       router.push("/auth/login");
     }
   }, []);
-  console.log(salonId);
-
   useEffect(() => {
     if (!salonId) return;
 
@@ -83,9 +93,8 @@ const DashboardPanel = ({ activeTab }) => {
   return (
     <div className="page">
       <div className="dashboard_panel_inner">
-        {/* Charts */}
         <div className="my-4 d-flex mb-0">
-          <div className="dp_chart1" style={{ width: "60%" }}>
+          {/* <div className="dp_chart1" style={{ width: "60%" }}>
             <CardLineChart />
           </div>
           <div className="dp_chart2" style={{ width: "40%" }}>
@@ -100,7 +109,8 @@ const DashboardPanel = ({ activeTab }) => {
                 <h5>500</h5>
               </div>
             </div>
-          </div>
+          </div> */}
+          <MyChart2 />
         </div>
 
         {/* Booking List */}
@@ -108,7 +118,7 @@ const DashboardPanel = ({ activeTab }) => {
           <h2 className="mb-3">Activity</h2>
 
           {loading ? (
-            <p>Loading bookings…</p>
+            <SpinnerLoading />
           ) : error ? (
             <p className="text-danger">Error: {error}</p>
           ) : empty ? (
@@ -127,7 +137,7 @@ const DashboardPanel = ({ activeTab }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredOrders.map((order, index) => (
+                  {filteredOrders.slice(0, 4).map((order, index) => (
                     <tr key={index}>
                       <td>{order.employeeName}</td>
                       <td className="user_td">{order.category}</td>

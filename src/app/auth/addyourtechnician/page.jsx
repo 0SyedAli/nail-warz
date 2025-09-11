@@ -1,22 +1,25 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 
 import InputField from "@/components/Form/InputField";
 import { AuthBtn } from "@/components/AuthBtn/AuthBtn";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FiPlusCircle } from "react-icons/fi";
-import Cookies from "js-cookie";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+
+/* ---------- Days ---------- */
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Saturday", "Sunday"];
 
-/* ---------- Yup schema (single image) ---------- */
+/* ---------- Yup schema ---------- */
 const schema = Yup.object({
   fullName: Yup.string().required("Full name is required"),
-  phoneNumber: Yup.string().min(6, "Min 6 characters").required("Phone number is required"),
+  phoneNumber: Yup.string()
+    .min(6, "Min 6 characters")
+    .matches(/^[+\d][\d\s\-()]+$/, "Invalid phone number format")
+    .required("Phone number is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
   description: Yup.string().required("Description is required"),
   designation: Yup.string().required("Designation is required"),
@@ -26,7 +29,30 @@ const schema = Yup.object({
     .min(1, "Select at least one working day"),
 
   startTime: Yup.string().required("Start time is required"),
-  endTime: Yup.string().required("End time is required"),
+  endTime: Yup.string()
+    .required("End time is required")
+    .test("is-after-start", "End time must be after start time", function (value) {
+      const { startTime } = this.parent;
+      return !startTime || !value || value > startTime;
+    }),
+
+  breakStart: Yup.string()
+    .nullable()
+    .test("break-after-start", "Break must be after work start", function (value) {
+      const { startTime } = this.parent;
+      return !value || !startTime || value > startTime;
+    }),
+
+  breakEnd: Yup.string()
+    .nullable()
+    .test("break-after-breakstart", "Break end must be after break start", function (value) {
+      const { breakStart } = this.parent;
+      return !value || !breakStart || value > breakStart;
+    })
+    .test("break-before-end", "Break must end before work end", function (value) {
+      const { endTime } = this.parent;
+      return !value || !endTime || value < endTime;
+    }),
 
   image: Yup.mixed()
     .required("Image is required")
@@ -36,7 +62,7 @@ const schema = Yup.object({
     ),
 });
 
-export default function AddTechnician() {
+const AddTechnician = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [salonId, setSalonId] = useState("");
@@ -46,7 +72,7 @@ export default function AddTechnician() {
     if (!id) return router.push("/auth/login");
     setSalonId(id);
   }, [searchParams]);
-  /* ---------- RHF ---------- */
+
   const {
     register,
     control,
@@ -60,6 +86,8 @@ export default function AddTechnician() {
       workingDays: [],
       startTime: "",
       endTime: "",
+      breakStart: "",
+      breakEnd: "",
       image: null,
     },
   });
@@ -74,7 +102,6 @@ export default function AddTechnician() {
     return () => URL.revokeObjectURL(url);
   }, [file]);
 
-  /* auth / salonId retrieval */
   /* ---------- submit ---------- */
   const onSubmit = async (data) => {
     try {
@@ -82,16 +109,37 @@ export default function AddTechnician() {
       fd.append("salonId", salonId);
       fd.append("email", data.email);
       fd.append("fullName", data.fullName);
-      fd.append("phoneNumber", data.phoneNumber);
+      const cleanedPhoneNumber = data.phoneNumber.replace(/\D/g, '');
+      fd.append("phoneNumber", cleanedPhoneNumber);
       fd.append("description", data.description);
       fd.append("designation", data.designation);
 
-      const dayPayload = data.workingDays.map((d) => ({
-        day: d,
-        isActive: true,
-        openingTime: data.startTime,
-        closeingTime: data.endTime,
+      // Ensure all 7 days included
+      const ALL_DAYS = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday",
+      ];
+      const formatTo12Hour = (timeStr) => {
+        if (!timeStr) return "";
+        const [h, m] = timeStr.split(":").map(Number);
+        const period = h >= 12 ? "PM" : "AM";
+        const hour = h % 12 || 12; // convert 0 -> 12
+        return `${hour.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")} ${period}`;
+      };
+      const dayPayload = ALL_DAYS.map((day) => ({
+        day,
+        isActive: data.workingDays.includes(day),
+        startTime: formatTo12Hour(data.startTime),
+        endTime: formatTo12Hour(data.endTime),
+        breakStart: formatTo12Hour(data.breakStart),
+        breakEnd: formatTo12Hour(data.breakEnd),
       }));
+
       fd.append("workingDays", JSON.stringify(dayPayload));
       fd.append("image", data.image);
 
@@ -99,36 +147,67 @@ export default function AddTechnician() {
         method: "POST",
         body: fd,
       });
+
       const result = await res.json();
       if (!res.ok || !result.success) throw new Error(result.message || "Creation failed");
-
+      showSuccessToast(result?.message || "Technician Created Successful")
       router.push(`/auth/uploadservice?salonId=${salonId}`);
     } catch (err) {
       alert(err.message ?? "Something went wrong");
+      showSuccessToast(err.message || "Something went wrong")
     }
   };
-
   /* ---------- UI ---------- */
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form className="tech_form" onSubmit={handleSubmit(onSubmit)}>
       <h3>Add Your Technician</h3>
 
+      {/* Basic fields */}
       {[
         { label: "Full Name", name: "fullName", ph: "Full name" },
-        { label: "Phone Number", name: "phoneNumber", ph: "+1 415 555 0132" },
         { label: "Email", name: "email", ph: "abc@gmail.com" },
         { label: "Description/Bio", name: "description", ph: "Description..." },
         { label: "Designation", name: "designation", ph: "Stylist" },
       ].map(({ label, name, ph }) => (
         <div key={name}>
-          <label>{label}</label>
+          <label className="form-label fw-semibold">{label}</label>
           <InputField {...register(name)} placeholder={ph} />
           {errors[name] && <p className="text-danger">{errors[name].message}</p>}
         </div>
       ))}
 
-      <label>Select Working Days</label>
-      <div className="d-flex mt-1 mb-2" style={{ gap: 10 }}>
+      {/* Phone */}
+      <label className="form-label fw-semibold">Phone Number</label>
+      <InputField
+        {...register("phoneNumber")}
+        placeholder="+1 (175) 959-5268"
+        onChange={(e) => {
+          // Format as user types
+          const value = e.target.value;
+          const cleaned = value.replace(/\D/g, '');
+          let formatted = cleaned;
+
+          if (cleaned.length > 0) {
+            formatted = `+${cleaned.substring(0, 1)}`;
+            if (cleaned.length > 1) {
+              formatted += ` (${cleaned.substring(1, 4)}`;
+              if (cleaned.length > 4) {
+                formatted += `) ${cleaned.substring(4, 7)}`;
+                if (cleaned.length > 7) {
+                  formatted += `-${cleaned.substring(7, 11)}`;
+                }
+              }
+            }
+          }
+
+          e.target.value = formatted;
+        }}
+      />
+      {errors.phoneNumber && <p className="text-danger">{errors.phoneNumber.message}</p>}
+
+      {/* Days */}
+      <label className="form-label fw-semibold">Select Working Days</label>
+      <div className="d-flex mt-1 mb-2 workDays">
         {DAYS.map((d) => (
           <div key={d} className="calender_item">
             <input type="checkbox" value={d} {...register("workingDays")} />
@@ -139,7 +218,8 @@ export default function AddTechnician() {
       </div>
       {errors.workingDays && <p className="text-danger">{errors.workingDays.message}</p>}
 
-      <label>Operating Hours</label>
+      {/* Work Hours */}
+      {/* <label>Operating Hours</label>
       <div className="cs-form time_picker mt-1 mb-2 d-flex gap-3 align-items-center">
         <input type="time" className="form-control" {...register("startTime")} />
         <span>to</span>
@@ -151,37 +231,141 @@ export default function AddTechnician() {
         </p>
       )}
 
-      <label>Upload Image</label>
-      <div className="input_file">
-        <p>Choose image</p>
-        <span><FiPlusCircle /></span>
-        <Controller
-          control={control}
-          name="image"
-          render={({ field }) => (
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => field.onChange(e.target.files[0] || null)}
-            />
-          )}
-        />
+      <label>Break Time</label>
+      <div className="cs-form time_picker mt-1 mb-2 d-flex gap-3 align-items-center">
+        <input type="time" className="form-control" {...register("breakStart")} />
+        <span>to</span>
+        <input type="time" className="form-control" {...register("breakEnd")} />
       </div>
-      {errors.image && <p className="text-danger">{errors.image.message}</p>}
-
-      {preview && (
-        <div className="my-3">
-          <Image
-            src={preview}
-            alt="preview"
-            width={120}
-            height={120}
-            className="rounded border object-fit-cover"
+      {(errors.breakStart || errors.breakEnd) && (
+        <p className="text-danger">
+          {errors.breakStart?.message || errors.breakEnd?.message}
+        </p>
+      )} */}
+      <div className="row g-2 gx-3">
+        <div className="col-md-6">
+          <label htmlFor="startTime" className="form-label fw-semibold">Start Time</label>
+          <input
+            type="time"
+            {...register("startTime")}
+            className="form-control"
           />
+          <div className="text-danger small mt-1">
+            {errors.startTime && <p className="text-danger text-sm mt-1">{errors.startTime.message}</p>}
+          </div>
         </div>
-      )}
+
+        <div className="col-md-6">
+          <label htmlFor="endTime" className="form-label fw-semibold">End Time</label>
+          <input
+            type="time"
+            {...register("endTime")}
+            className="form-control"
+          />
+          <div className="text-danger small mt-1">
+            {errors.endTime && <p className="text-danger text-sm mt-1">{errors.endTime.message}</p>}
+
+          </div>
+        </div>
+
+        <div className="col-md-6">
+          <label htmlFor="breakStart" className="form-label fw-semibold">Break Start</label>
+          <input
+            type="time"
+            {...register("breakStart")}
+            className="form-control"
+          />
+          <div className="text-danger small mt-1">
+            {errors.breakStart && <p className="text-danger text-sm mt-1">{errors.breakStart.message}</p>}
+          </div>
+        </div>
+
+        <div className="col-md-6">
+          <label htmlFor="breakEnd" className="form-label fw-semibold">Break End</label>
+          <input
+            type="time"
+            {...register("breakEnd")}
+            className="form-control"
+          />
+          <div className="text-danger small mt-1">
+            {errors.breakEnd && <p className="text-danger text-sm mt-1">{errors.breakEnd.message}</p>}
+          </div>
+        </div>
+      </div>
+
+      {/* Image */}
+      <Controller
+        control={control}
+        name="image"
+        render={({ field }) => (
+          <>
+            <label className="form-label fw-semibold">Upload Image</label>
+            <div className="input_file mt-1">
+              <p>Choose image</p>
+              <span>
+                <FiPlusCircle />
+              </span>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files[0] || null;
+                  field.onChange(file);
+                  if (file) {
+                    const url = URL.createObjectURL(file);
+                    setPreview(url);
+                  }
+                  e.target.value = "";
+                }}
+              />
+            </div>
+            {errors.image && <p className="text-danger">{errors.image.message}</p>}
+            {preview && (
+              <div className="my-3" style={{ position: "relative", width: "fit-content" }}>
+                <Image
+                  src={preview}
+                  alt="preview"
+                  width={100}
+                  height={100}
+                  className="rounded border object-fit-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    field.onChange(null);
+                    setPreview(null);
+                  }}
+                  style={{
+                    position: "absolute",
+                    top: -6,
+                    right: -6,
+                    background: "#fff",
+                    border: "1px solid #ccc",
+                    borderRadius: "50%",
+                    padding: "2px 5px",
+                    cursor: "pointer",
+                    lineHeight: 1,
+                  }}
+                  aria-label="Remove image"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      />
 
       <AuthBtn title="Continue" type="submit" disabled={isSubmitting} />
     </form>
+    
+  );
+};
+
+export default function WrappedAddTechnician() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AddTechnician />
+    </Suspense>
   );
 }

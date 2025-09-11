@@ -146,7 +146,7 @@ export default function AddNewService() {
       const result = await res.json();
       if (!res.ok || !result.success) throw new Error(result.message);
       showSuccessToast(result.success && "Service created successful!");
-
+      router.push("/dashboard/services")
       // Reset form fields after successful submission
       setValue("serviceName", "");
       setValue("servicePrice", "");
@@ -238,33 +238,6 @@ export default function AddNewService() {
                 </span>
               )}
             </div>
-            {/* Category select */}
-            {/* Category select */}
-            {/* <label>Assign Category</label>
-        <select
-          className="form-select input_field2"
-          {...register("category")}
-        >
-          <option value="">-- choose --</option>
-          {CATEGORY_OPTIONS.map((cat) => (
-            <option key={cat.id} value={cat.id}>
-              {cat.label}
-            </option>
-          ))}
-        </select>
-        {errors.category && <p className="text-danger">{errors.category.message}</p>}
-
-        <div className="d-flex flex-wrap my-2 gap-2">
-          {watch("category") && (
-            <span
-              className="tags_category"
-              onClick={() => setValue("category", "", { shouldValidate: true })}
-            >
-              {CATEGORY_OPTIONS.find((c) => c.id === watch("category"))?.label || "Unknown"}
-              <RxCross2 />
-            </span>
-          )}
-        </div> */}
 
             {/* image upload */}
             <label className="mt-0">Upload Images (max 3)</label>
@@ -307,10 +280,10 @@ export default function AddNewService() {
                 ))}
               </div>
             )}
-            <AuthBtn title="Create Service" type="submit" disabled={isSubmitting} />
-            {/* <button type="sumbit">
-          create service
-        </button> */}
+            <div className="d-flex align-items-center justify-content-between gap-5">
+              <AuthBtn title="Back" type="button" onClick={() => router.back()} />
+              <AuthBtn title="Create Service" type="submit" disabled={isSubmitting} />
+            </div>
           </form>
         </div>
       </div>

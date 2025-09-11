@@ -17,7 +17,7 @@
   grid-column: 2 / 3;
   padding: 20px;
   overflow-y: auto;
-  align-items: start;
+  align-items: flex-start;
 }
 
 .auth_form {
@@ -63,4 +63,28 @@
   color: #000;
   font-family: 'Inter', sans-serif;
   font-size: 14.5px;
+}
+
+.chakra-modal__content-container {
+  width: 50vw !important;
+}
+
+
+@media only screen and (max-width: 768px) {
+  .auth_container {
+    grid-template-columns: unset;
+  }
+
+  .auth_image {
+    display: none;
+  }
+
+  .auth_form_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-column: 1;
+    padding: 20px;
+  }
+
 }

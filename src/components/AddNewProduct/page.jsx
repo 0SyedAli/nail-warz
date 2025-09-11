@@ -95,7 +95,7 @@ export const AddNewProduct = ({ title, btntitle }) => {
             />
           </div>
           {btntitle && (
-            <button type="button" className="themebtn4 green btn">
+            <button type="button" className="btn themebtn4 green">
               {btntitle}
             </button>
           )}

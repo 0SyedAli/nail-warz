@@ -43,7 +43,7 @@ export default function EditService() {
   const [categoryList, setCategoryList] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
   const [initialValues, setInitialValues] = useState(null);
-
+  const IMG_BASE = process.env.NEXT_PUBLIC_IMAGE_URL;
   /* -------- Check cookie / auth -------- */
   useEffect(() => {
     const cookie = Cookies.get("user");
@@ -80,14 +80,14 @@ export default function EditService() {
         if (serviceRes.data.success) {
           const serviceData = serviceRes.data.data;
           setExistingImages(serviceData.images || []);
-          
+
           // Store initial values for comparison
           const initialData = {
             serviceName: serviceData.serviceName,
             servicePrice: serviceData.price,
             description: serviceData.description,
-            technicians: Array.isArray(serviceData.technicianId) 
-              ? serviceData.technicianId 
+            technicians: Array.isArray(serviceData.technicianId)
+              ? serviceData.technicianId
               : [],
             category: serviceData.categoryId,
             images: serviceData.images.map(img => ({
@@ -95,7 +95,7 @@ export default function EditService() {
               preview: `${process.env.NEXT_PUBLIC_IMAGE_URL}/${img}`
             }))
           };
-          
+
           setInitialValues(initialData);
           reset(initialData);
         }
@@ -159,19 +159,19 @@ export default function EditService() {
       if (data.serviceName !== initialValues.serviceName) {
         fd.append("serviceName", data.serviceName);
       }
-      
+
       if (data.servicePrice !== initialValues.servicePrice) {
         fd.append("price", data.servicePrice);
       }
-      
+
       if (data.description !== initialValues.description) {
         fd.append("description", data.description);
       }
-      
+
       if (JSON.stringify(data.technicians) !== JSON.stringify(initialValues.technicians)) {
         fd.append("technicianId", JSON.stringify(data.technicians));
       }
-      
+
       if (data.category !== initialValues.category) {
         fd.append("categoryId", data.category);
       }
@@ -179,14 +179,14 @@ export default function EditService() {
       // Handle images - only send new ones
       const newImages = data.images
         .filter(img => img instanceof File);
-      
+
       newImages.forEach((file) => fd.append("images", file));
 
       // Add names of existing images to keep
-      const existingImageNames = data.images
-        .filter(img => img.name && !(img instanceof File))
-        .map(img => img.name);
-      fd.append("existingImages", JSON.stringify(existingImageNames));
+      // const existingImageNames = data.images
+      //   .filter(img => img.name && !(img instanceof File))
+      //   .map(img => img.name);
+      // fd.append("existingImages", JSON.stringify(existingImageNames));
 
       const res = await api.post("/updateService", fd, {
         headers: {
@@ -222,13 +222,13 @@ export default function EditService() {
           {/* basic fields */}
           <label>Service Name</label>
           <InputField {...register("serviceName")} placeholder="Haircut Basic" />
-          
+
           <label>Service Price (PKR)</label>
           <InputField {...register("servicePrice")} placeholder="1500" type="number" />
-          
+
           <label>Description</label>
           <InputField {...register("description")} placeholder="Describe the service..." />
-          
+
           {/* technicians select */}
           <label>Assign Technicians</label>
           <select
@@ -316,12 +316,14 @@ export default function EditService() {
           </div>
 
           {/* previews */}
+
           {previews.length > 0 && (
             <div className="my-3 d-flex gap-2 flex-wrap">
               {previews.map((src, i) => (
                 <div key={i} style={{ position: "relative" }}>
+                  {console.log(`${src}`)}
                   <Image
-                    src={src}
+                    src={`${src}`}
                     alt=""
                     width={100}
                     height={100}

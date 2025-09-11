@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect, useMemo } from "react";
 import Cookies from "js-cookie";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const PAGE_SIZE = 10;                         // items per page
 
@@ -10,7 +12,7 @@ const Technicians = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [salonId, setSalonId] = useState("");
-
+  const router = useRouter();
   useEffect(() => {
     const cookie = Cookies.get("user");
     if (!cookie) return router.push("/auth/login");
@@ -22,6 +24,7 @@ const Technicians = () => {
       router.push("/auth/login");
     }
   }, []);
+
   /* ──────────────── Fetch once on mount ──────────────── */
   useEffect(() => {
     if (!salonId) return;
@@ -74,12 +77,22 @@ const Technicians = () => {
     return (
       <div className="page">
         <p className="m-4">No technicians found for this salon.</p>
+        <Link href="addnewtechnician" className="btn dash_btn2 mt-3">
+          Add New Technician
+        </Link>
       </div>
+
+
     );
 
   return (
     <div className="page">
-      <div className="dashboard_panel_inner">
+      <div className="dashboard_panel_inner pt-2">
+        <div className="text-end">
+          <Link href="addnewtechnician" className="btn dash_btn2 mt-3">
+            Add New Technician
+          </Link>
+        </div>
         <div className="py-4 dash_list">
           <div className="table-responsive">
             <table className="table caption-top">
@@ -89,18 +102,31 @@ const Technicians = () => {
                   <th scope="col">Full Name</th>
                   <th scope="col">Email</th>
                   <th scope="col">Start Date</th>
+                  <th scope="col">Phone Number</th>
                   <th scope="col">Designation</th>
+                  <th scope="col">Action</th>
                 </tr>
               </thead>
 
               <tbody>
                 {currentSlice.map((t) => (
                   <tr key={t._id}>
-                    <td>{t._id.slice(-5)}</td>
+                    <td># {t._id.slice(-5)}</td>
                     <td>{t.fullName}</td>
                     <td>{t.email}</td>
                     <td>{new Date(t.createdAt).toLocaleDateString()}</td>
+                    <td>{t.phoneNumber || "-"}</td>
                     <td>{t.designation || "-"}</td>
+                    <td>
+                      <button
+                        className="btn btn-outline-secondary btn-sm text-nowrap"
+                        onClick={() => {
+                          router.push(`technicians/${t._id}`)
+                        }}
+                      >
+                        View Detail
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

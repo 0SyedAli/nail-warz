@@ -4,6 +4,15 @@ const nextConfig = {
         domains: ["predemo.site"],
 
     },
+    async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/auth/login',
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

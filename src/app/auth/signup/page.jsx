@@ -12,6 +12,9 @@ import { showErrorToast, showSuccessToast } from "src/lib/toast";
 import Cookies from "js-cookie"; // ✅ Import js-cookie
 import api from "../../../lib/axios";
 import Link from "next/link";
+import AuthRedirectHandler from "@/utils/AuthHandler";
+import SpinnerLoading from "@/components/Spinner/SpinnerLoading";
+import BallsLoading from "@/components/Spinner/BallsLoading";
 // ✅ Yup validation schema
 const schema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
@@ -21,6 +24,7 @@ const schema = Yup.object().shape({
 export default function LoginPage() {
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const router = useRouter();
 
   const {
@@ -42,22 +46,23 @@ export default function LoginPage() {
       }
 
       // ✅ Save token and user data in cookies
-      Cookies.set("token", result.token, {
-        expires: 7,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Strict",
-      });
+      // Cookies.set("token", result.token, {
+      //   expires: 7,
+      //   secure: process.env.NODE_ENV === "production",
+      //   sameSite: "Strict",
+      // });
 
-      Cookies.set("user", JSON.stringify(result.data), {
-        expires: 7,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Strict",
-      });
-
+      // Cookies.set("user", JSON.stringify(result.data), {
+      //   expires: 7,
+      //   secure: process.env.NODE_ENV === "production",
+      //   sameSite: "Strict",
+      // });
+      sessionStorage.setItem("token", result?.token);
+      setSuccess(true)
       showSuccessToast(result?.message || "Signup Successful");
 
       // ✅ Redirect to business profile
-      router.push("/auth/bussinessprofile");
+      router.push("/auth/otp");
     } catch (err) {
       const message = err?.response?.data?.message || err.message || "Signup error";
       showErrorToast(message);
@@ -68,40 +73,46 @@ export default function LoginPage() {
 
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="d-flex align-items-center justify-content-center mb-3">
-        <Image src="/images/logo.png" width={120} height={150} alt="Logo" />
-      </div>
+    <>
+      <AuthRedirectHandler />
+      {success ? <BallsLoading borderWidth="mx-auto" /> : (
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="d-flex align-items-center justify-content-center mb-3">
+            <Image src="/images/logo.png" width={120} height={150} alt="Logo" />
+          </div>
 
-      <label htmlFor="email">Enter your email</label>
-      <InputField
-        id="email"
-        type="email"
-        classInput="classInput"
-        placeholder="you@example.com"
-        {...register("email")}
-      />
-      {errors.email && <p style={{ color: "red" }}>{errors.email.message}</p>}
+          <label htmlFor="email">Enter your email</label>
+          <InputField
+            id="email"
+            type="email"
+            classInput="classInput"
+            placeholder="you@example.com"
+            {...register("email")}
+          />
+          {errors.email && <p style={{ color: "red" }}>{errors.email.message}</p>}
 
-      <label htmlFor="password">Enter your password</label>
-      <InputField
-        id="password"
-        type={show ? "text" : "password"}
-        classInput="classInput"
-        placeholder="Enter password"
-        show={show}
-        handleClick={() => setShow(!show)}
-        {...register("password")}
-      />
-      {errors.password && <p style={{ color: "red" }}>{errors.password.message}</p>}
+          <label htmlFor="password">Enter your password</label>
+          <InputField
+            id="password"
+            type={show ? "text" : "password"}
+            classInput="classInput"
+            placeholder="Enter password"
+            show={show}
+            handleClick={() => setShow(!show)}
+            {...register("password")}
+          />
+          {errors.password && <p style={{ color: "red" }}>{errors.password.message}</p>}
 
-      <AuthBtn title={"Signup"} type="submit" disabled={loading} />
-      <div className="register_link">
-        <h5>
-          {"Already have an account? "}
-          <Link href="login">Login</Link>
-        </h5>
-      </div>
-    </form>
+          <AuthBtn title={"Signup"} type="submit" disabled={loading} />
+          <div className="register_link">
+            <h5>
+              {"Already have an account? "}
+              <Link href="login">Login</Link>
+            </h5>
+          </div>
+        </form>
+      )}
+    </>
+
   );
 }

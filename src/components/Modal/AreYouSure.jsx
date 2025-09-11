@@ -22,7 +22,7 @@ function AreYouSure({ isOpen, onClose }) {
             <p className="mb-4">Your profile is live. You can now start receiving appointments.</p>
           </div>
           <div className="aus_btns d-flex align-items-center justify-content-center gap-3">
-            <button className="themebtn4 green btn w-100" style={{ borderRadius: "12px" }} onClick={() => {
+            <button className="btn themebtn4 green w-100" style={{ borderRadius: "12px" }} onClick={() => {
               router.push("/dsahboard")
             }}>Go To Dashboard</button>
           </div>

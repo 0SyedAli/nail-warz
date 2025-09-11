@@ -1,0 +1,97 @@
+.chakra-modal__content-container {
+    width: 80vw !important;
+}
+
+.chakra-modal__overlay {
+    width: 80vw !important;
+}
+
+.sidebar_header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit_textarea textarea {
+    width: 100%;
+    padding: 0 15px;
+    border-radius: 4.3px;
+    border: 1px solid #041e5e !important;
+    font-size: 14px;
+    color: #000;
+}
+
+.time_fields input {
+    padding: 0 15px;
+    border-radius: 4.3px;
+    border: 1px solid #041e5e !important;
+    font-size: 14px;
+    color: #000;
+    width: 150px;
+}
+
+.edit_textarea textarea:focus-visible {
+    border-color: #3182ce !important;
+    box-shadow: 0 0 0 1px #3182ce !important;
+}
+
+.edit_textarea textarea::placeholder {
+    color: #757575;
+}
+
+.chakra-modal__content {
+    max-width: 800px !important;
+    margin-top: 2rem !important;
+}
+
+.close_tech {
+    position: absolute;
+    top: 28px;
+    right: 29px;
+    border-radius: 100%;
+    min-width: 30px;
+    min-height: 30px;
+    padding: 0;
+    border: 2px solid #C11111;
+    font-family: "Poppins";
+    font-weight: 600;
+}
+
+.chakra-modal__content-container {
+    align-items: start !important;
+}
+
+@media only screen and (max-width: 992px) {
+    .modal_container {
+        padding: 20px;
+    }
+
+    .chakra-modal__content-container,
+    .chakra-modal__overlay {
+        width: 90vw !important;
+    }
+}
+
+@media only screen and (max-width: 769px) {
+
+    .modal_container {
+        padding: 0;
+    }
+
+    .chakra-modal__content-container,
+    .chakra-modal__overlay {
+        width: 86vw !important;
+    }
+}
+
+@media only screen and (max-width: 480px) {
+
+    .modal_container {
+        padding: 0;
+    }
+
+    .chakra-modal__content-container,
+    .chakra-modal__overlay {
+        width: 83vw !important;
+    }
+}
