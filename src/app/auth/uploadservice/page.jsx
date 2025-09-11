@@ -104,33 +104,33 @@ function UploadService() {
 
   /* submit */
   const onSubmit = async (data) => {
-    try {
-      const fd = new FormData();
-      fd.append("salonId", salonId);
-      fd.append("serviceName", data.serviceName);
-      fd.append("price", data.servicePrice);
-      fd.append("description", data.description);
-      fd.append("technicianId", JSON.stringify(data.technicians));
-      data.images.forEach((file) => fd.append("images", file));
+  try {
+    const fd = new FormData();
+    fd.append("salonId", salonId);
+    fd.append("serviceName", data.serviceName);
+    fd.append("price", data.servicePrice);
+    fd.append("description", data.description);
+    fd.append("technicianId", JSON.stringify(data.technicians));
+    data.images.forEach((file) => fd.append("images", file));
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/createService`, {
-        method: "POST",
-        body: fd,
-      });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/createService`, {
+      method: "POST",
+      body: fd,
+    });
 
-      const result = await res.json();
-      if (!res.ok || !result.success) throw new Error(result.message);
+    const result = await res.json();
+    if (!res.ok || !result.success) throw new Error(result.message);
 
-      // ✅ Clear cookies before redirect
-      Cookies.remove("token");
-      Cookies.remove("user");
+    // ✅ Clear cookies before redirect
+    Cookies.remove("token");
+    Cookies.remove("user");
 
-      // ✅ Redirect to login
-      router.push("login");
-    } catch (e) {
-      showErrorToast(e.message ?? "Failed to create service");
-    }
-  };
+    // ✅ Redirect to login
+    router.push("/login");
+  } catch (e) {
+    showErrorToast(e.message ?? "Failed to create service");
+  }
+};
 
   /* ------------- UI ------------- */
   return (
