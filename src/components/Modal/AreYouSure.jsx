@@ -23,7 +23,7 @@ function AreYouSure({ isOpen, onClose }) {
           </div>
           <div className="aus_btns d-flex align-items-center justify-content-center gap-3">
             <button className="btn themebtn4 green w-100" style={{ borderRadius: "12px" }} onClick={() => {
-              router.push("/dsahboard")
+              router.push("/dashboard")
             }}>Go To Dashboard</button>
           </div>
         </div>

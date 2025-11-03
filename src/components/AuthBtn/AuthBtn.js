@@ -1,7 +1,7 @@
 import Image from "next/image";
 import styles from "./AuthBtn.module.css";
 const loadingSvg = "/images/tube-spinner.svg";
-export const AuthBtn = ({ disabled, title, type, onClick, location_btn }) => {
+export const AuthBtn = ({ disabled, title, type, onClick, location_btn, style_btn }) => {
   return (
     <button
       className={`${styles.btntheme1} ${location_btn ? location_btn : ""}`}

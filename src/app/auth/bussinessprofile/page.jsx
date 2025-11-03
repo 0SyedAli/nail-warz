@@ -212,7 +212,7 @@ export default function BussinessProfile() {
           {/* basic fields */}
           {[
             { label: "Salon Name", name: "salonName", ph: "Enter name" },
-            { label: "Location Name", name: "locationName", ph: "New York" },
+            { label: "Location", name: "locationName", ph: "New York" },
             { label: "Business Address", name: "bussinessAddress", ph: "123 Main St." },
             { label: "Description/Bio", name: "description", ph: "Describe your business..." },
           ].map(({ label, name, ph }) => (

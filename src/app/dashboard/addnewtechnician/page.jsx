@@ -25,35 +25,35 @@ const schema = Yup.object({
   description: Yup.string().required("Description is required"),
   designation: Yup.string().required("Designation is required"),
 
-  workingDays: Yup.array()
-    .of(Yup.string().oneOf(DAYS))
-    .min(1, "Select at least one working day"),
+  // workingDays: Yup.array()
+  //   .of(Yup.string().oneOf(DAYS))
+  //   .min(1, "Select at least one working day"),
 
-  startTime: Yup.string().required("Start time is required"),
-  endTime: Yup.string()
-    .required("End time is required")
-    .test("is-after-start", "End time must be after start time", function (value) {
-      const { startTime } = this.parent;
-      return !startTime || !value || value > startTime;
-    }),
+  // startTime: Yup.string().required("Start time is required"),
+  // endTime: Yup.string()
+  //   .required("End time is required")
+  //   .test("is-after-start", "End time must be after start time", function (value) {
+  //     const { startTime } = this.parent;
+  //     return !startTime || !value || value > startTime;
+  //   }),
 
-  breakStart: Yup.string()
-    .nullable()
-    .test("break-after-start", "Break must be after work start", function (value) {
-      const { startTime } = this.parent;
-      return !value || !startTime || value > startTime;
-    }),
+  // breakStart: Yup.string()
+  //   .nullable()
+  //   .test("break-after-start", "Break must be after work start", function (value) {
+  //     const { startTime } = this.parent;
+  //     return !value || !startTime || value > startTime;
+  //   }),
 
-  breakEnd: Yup.string()
-    .nullable()
-    .test("break-after-breakstart", "Break end must be after break start", function (value) {
-      const { breakStart } = this.parent;
-      return !value || !breakStart || value > breakStart;
-    })
-    .test("break-before-end", "Break must end before work end", function (value) {
-      const { endTime } = this.parent;
-      return !value || !endTime || value < endTime;
-    }),
+  // breakEnd: Yup.string()
+  //   .nullable()
+  //   .test("break-after-breakstart", "Break end must be after break start", function (value) {
+  //     const { breakStart } = this.parent;
+  //     return !value || !breakStart || value > breakStart;
+  //   })
+  //   .test("break-before-end", "Break must end before work end", function (value) {
+  //     const { endTime } = this.parent;
+  //     return !value || !endTime || value < endTime;
+  //   }),
 
   image: Yup.mixed()
     .required("Image is required")
@@ -166,7 +166,7 @@ const AddTechnician = () => {
       const result = await res.json();
       if (!res.ok || !result.success) throw new Error(result.message || "Creation failed");
       showSuccessToast(result?.message || "Technician Created Successful")
-      router.push(`/auth/uploadservice?salonId=${salonId}`);
+      router.push(`/dashboard/technicians`);
     } catch (err) {
       alert(err.message ?? "Something went wrong");
       showErrorToast(err.message || "Something went wrong")
@@ -177,25 +177,98 @@ const AddTechnician = () => {
   return (
     <>
       <div className="page">
-        <div className="addNewService">
+        <div className="addNewService add_form">
           <form className="" onSubmit={handleSubmit(onSubmit)}>
+            <Controller
+              control={control}
+              name="image"
+              render={({ field }) => (
+                <>
+                  <label className="form-label mb-1">Upload Profile Image</label>
+                  {!preview && (
+                    <>
+                      <div className="add_upload_image mb-1" style={{ height: "120px", width: "120px" }}>
+                        <div className="aui_content">
+                          <Image src="/images/upload_icon.png" width={40} height={40} alt="" />
+                          <span>Upload Image</span>
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files[0] || null;
+                            field.onChange(file);
+                            if (file) {
+                              const url = URL.createObjectURL(file);
+                              setPreview(url);
+                            }
+                            e.target.value = "";
+                          }}
+                        />
+                      </div>
+                    </>
+                  )}
+                  {/* <div className="input_file mt-1">
+                    <p>Choose image</p>
+                    <span>
+                      <FiPlusCircle />
+                    </span>
+                    
+                  </div> */}
+                  {errors.image && <p className="text-danger">{errors.image.message}</p>}
+                  {preview && (
+                    <div className="mb-1" style={{ position: "relative", width: "120px", height: "120px" }}>
+                      <Image
+                        src={preview}
+                        alt="preview"
+                        width={120}
+                        height={120}
+                        className=" border object-fit-cover h-100 w-100"
+                        style={{ borderRadius: "10px" }}
 
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          field.onChange(null);
+                          setPreview(null);
+                        }}
+                        style={{
+                          position: "absolute",
+                          top: -6,
+                          right: -6,
+                          background: "#fff",
+                          border: "1px solid #ccc",
+                          borderRadius: "50%",
+                          padding: "2px 5px",
+                          cursor: "pointer",
+                          lineHeight: 1,
+                        }}
+                        aria-label="Remove image"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            />
             {/* Basic fields */}
             {[
               { label: "Full Name", name: "fullName", ph: "Full name" },
               { label: "Email", name: "email", ph: "abc@gmail.com" },
               { label: "Description/Bio", name: "description", ph: "Description..." },
-              { label: "Designation", name: "designation", ph: "Stylist" },
+              { label: "Designation", name: "designation", ph: "Designation" },
             ].map(({ label, name, ph }) => (
               <div key={name}>
-                <label className="form-label fw-semibold">{label}</label>
+                <label className="form-label ">{label}</label>
                 <InputField {...register(name)} placeholder={ph} />
                 {errors[name] && <p className="text-danger">{errors[name].message}</p>}
               </div>
             ))}
 
             {/* Phone */}
-            <label className="form-label fw-semibold">Phone Number</label>
+            <label className="form-label ">Phone Number</label>
             <InputField
               {...register("phoneNumber")}
               placeholder="+1 (175) 959-5268"
@@ -224,7 +297,7 @@ const AddTechnician = () => {
             {errors.phoneNumber && <p className="text-danger">{errors.phoneNumber.message}</p>}
 
             {/* Days */}
-            <label className="form-label fw-semibold">Select Working Days</label>
+            <label className="form-label ">Select Working Days</label>
             <div className="d-flex mt-1 mb-2 col-12 col-lg-6 workDays">
               {DAYS.map((d) => (
                 <div key={d} className="calender_item">
@@ -238,7 +311,7 @@ const AddTechnician = () => {
 
             <div className="row g-2 gx-3">
               <div className="col-md-6">
-                <label htmlFor="startTime" className="form-label fw-semibold">Start Time</label>
+                <label htmlFor="startTime" className="form-label ">Start Time</label>
                 <input
                   type="time"
                   {...register("startTime")}
@@ -250,7 +323,7 @@ const AddTechnician = () => {
               </div>
 
               <div className="col-md-6">
-                <label htmlFor="endTime" className="form-label fw-semibold">End Time</label>
+                <label htmlFor="endTime" className="form-label ">End Time</label>
                 <input
                   type="time"
                   {...register("endTime")}
@@ -262,8 +335,8 @@ const AddTechnician = () => {
                 </div>
               </div>
 
-              <div className="col-md-6">
-                <label htmlFor="breakStart" className="form-label fw-semibold">Break Start</label>
+              {/* <div className="col-md-6">
+                <label htmlFor="breakStart" className="form-label ">Break Start</label>
                 <input
                   type="time"
                   {...register("breakStart")}
@@ -275,7 +348,7 @@ const AddTechnician = () => {
               </div>
 
               <div className="col-md-6">
-                <label htmlFor="breakEnd" className="form-label fw-semibold">Break End</label>
+                <label htmlFor="breakEnd" className="form-label ">Break End</label>
                 <input
                   type="time"
                   {...register("breakEnd")}
@@ -284,73 +357,14 @@ const AddTechnician = () => {
                 <div className="text-danger small mt-1">
                   {errors.breakEnd && <p className="text-danger text-sm mt-1">{errors.breakEnd.message}</p>}
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* Image */}
-            <Controller
-              control={control}
-              name="image"
-              render={({ field }) => (
-                <>
-                  <label className="form-label fw-semibold">Upload Image</label>
-                  <div className="input_file mt-1">
-                    <p>Choose image</p>
-                    <span>
-                      <FiPlusCircle />
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files[0] || null;
-                        field.onChange(file);
-                        if (file) {
-                          const url = URL.createObjectURL(file);
-                          setPreview(url);
-                        }
-                        e.target.value = "";
-                      }}
-                    />
-                  </div>
-                  {errors.image && <p className="text-danger">{errors.image.message}</p>}
-                  {preview && (
-                    <div className="my-3" style={{ position: "relative", width: "fit-content" }}>
-                      <Image
-                        src={preview}
-                        alt="preview"
-                        width={100}
-                        height={100}
-                        className="rounded border object-fit-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          field.onChange(null);
-                          setPreview(null);
-                        }}
-                        style={{
-                          position: "absolute",
-                          top: -6,
-                          right: -6,
-                          background: "#fff",
-                          border: "1px solid #ccc",
-                          borderRadius: "50%",
-                          padding: "2px 5px",
-                          cursor: "pointer",
-                          lineHeight: 1,
-                        }}
-                        aria-label="Remove image"
-                      >
-                        ×
-                      </button>
-                    </div>
-                  )}
-                </>
-              )}
-            />
-
-            <AuthBtn title="Continue" type="submit" disabled={isSubmitting} />
+            <div className="d-flex align-items-center gap-4 mt-4" >
+              <AuthBtn title="Continue" type="submit" disabled={isSubmitting} />
+              <AuthBtn title="Back" type="button" location_btn={"back_btn"} onClick={() => router.back()} />
+            </div>
           </form>
         </div>
       </div>

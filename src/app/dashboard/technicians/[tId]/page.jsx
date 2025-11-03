@@ -9,12 +9,15 @@ import Image from "next/image";
 import EditTechnician from "@/components/Modal/EditTechnician";
 import { useDisclosure } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
+import { showErrorToast, showSuccessToast } from "src/lib/toast";
+import DeleteConfirm from "@/components/Modal/DeleteConfirm";
 
 export default function TechnicianPage({ params }) {
     const router = useRouter();
     const { tId } = use(params);
     console.log(tId);
-    const { isOpen, onOpen, onClose } = useDisclosure();
+    const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
+    const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
     const [technicianData, setTechnicianData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -50,6 +53,32 @@ export default function TechnicianPage({ params }) {
         fetchTechnician();
     }, [tId]);
 
+    const handleDelete = async (id) => {
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/deleteTechnician`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ technicianId: id }),
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                showSuccessToast(data.message || "Technician successfully deleted!");
+                onDeleteClose(); // ✅ close modal here
+                router.back(); // ✅ go back after closing
+            } else {
+                showErrorToast(data.message || "Failed to delete");
+                onDeleteClose(); // close even if failed
+            }
+        } catch (err) {
+            showErrorToast("Server error while deleting");
+            onDeleteClose(); // ✅ also close in error case
+        }
+    };
+
     if (loading) {
         return (
             <div className=" py-4 text-center">
@@ -81,6 +110,7 @@ export default function TechnicianPage({ params }) {
                                         src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${technicianData.image}` || "/images/profile-avatar.jpg"}
                                         alt={technicianData.fullName || "Unknown"}
                                         className="rounded-circle"
+                                        style={{height:"120px", width:"120px"}}
                                         width={120}
                                         height={120}
                                     />
@@ -141,7 +171,7 @@ export default function TechnicianPage({ params }) {
                                     {technicianData.workingDays &&
                                         <div className="d-flex align-items-center gap-2">
                                             <FaRegClock color="#C11111" />
-                                            <span className="small">Available Days: {technicianData.workingDays?.filter(d => d.isActive).map(d => d.day).join(", ")}</span>
+                                            <span className="small">Available Days: {technicianData.workingDays?.filter(d => d.isActive).map(d => d.day).join(", ") || "N/A"}</span>
                                         </div>
                                     }
                                     {technicianData.phoneNumber &&
@@ -152,11 +182,16 @@ export default function TechnicianPage({ params }) {
                                     }
                                 </div>
                                 <div className="d-grid gap-3 pt-3">
-                                    <button className="btn btn_tech" onClick={handleContinueClick} >Edit Profile</button>
-                                    <button className="btn btn_tech" onClick={() => {
-                                        router.push(`/dashboard/technicians/manage-availability/${tId}`)
-                                    }}>Manage Availability</button>
-
+                                    <button className="btn btn_tech" onClick={onEditOpen}>Edit Profile</button>
+                                    <button
+                                        className="btn btn_tech"
+                                        onClick={() => router.push(`/dashboard/technicians/manage-availability/${tId}`)}
+                                    >
+                                        Manage Availability
+                                    </button>
+                                    <button className="btn btn_tech" onClick={onDeleteOpen}>
+                                        Delete Technician
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -177,7 +212,13 @@ export default function TechnicianPage({ params }) {
                     </div>
                 </div>
             </div>
-            <EditTechnician isOpen={isOpen} onClose={onClose} techId={technicianData?._id} />
+            <EditTechnician isOpen={isEditOpen} onClose={onEditClose} techId={technicianData?._id} />
+
+            <DeleteConfirm
+                isOpen={isDeleteOpen}
+                onClose={onDeleteClose}
+                onConfirm={() => handleDelete(technicianData?._id)}
+            />
         </>
     );
 }

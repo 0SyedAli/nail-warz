@@ -223,7 +223,7 @@ export default function EditService() {
           <label>Service Name</label>
           <InputField {...register("serviceName")} placeholder="Haircut Basic" />
 
-          <label>Service Price (PKR)</label>
+          <label>Service Price</label>
           <InputField {...register("servicePrice")} placeholder="1500" type="number" />
 
           <label>Description</label>

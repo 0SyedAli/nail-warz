@@ -121,15 +121,18 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
                 <h4 className="mb-2">{userId?.username}</h4>
                 <h5 className="mb-0"><strong>ID:</strong>#{userId?._id?.slice(-6)}</h5>
               </div>
-              <Image
-                className="rounded"
-                src={userId?.image && `${process.env.NEXT_PUBLIC_IMAGE_URL}/${userId?.image || "default.jpg"}`}
-                width={60}
-                height={60}
-                alt="User"
-                unoptimized
+              {userId?.image &&
+                <Image
+                  className="rounded"
+                  src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${userId?.image || "/images/avatar.png"}`}
+                  width={60}
+                  height={60}
+                  style={{ width: "60px", height: "60px", objectFit:"cover" }}
+                  alt="User"
+                  unoptimized
 
-              />
+                />
+              }
             </div>
             <div className="mt-4 row">
               <h5 className="mb-3 col-12"><strong>Email:</strong> {userId?.email}</h5>

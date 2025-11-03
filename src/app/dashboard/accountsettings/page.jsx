@@ -14,7 +14,7 @@ const schema = Yup.object({
     salonName: Yup.string().required("Salon name is required"),
     phoneNumber: Yup.string().required("Phone number is required"),
     bussinessAddress: Yup.string().required("Business address is required"),
-    locationName: Yup.string().required("Location name is required"),
+    locationName: Yup.string().required("Location is required"),
     description: Yup.string(),
     workingDays: Yup.array().min(1, "Select at least one working day"),
     startTime: Yup.string().required("Start time is required"),
@@ -282,6 +282,7 @@ const EditProfile = () => {
                                             src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${img}`}
                                             width={80}
                                             height={80}
+                                            style={{height:"80px", width:"80px"}}
                                             alt={`Salon Image ${index + 1}`}
                                             className="rounded border object-fit-cover"
                                         />
@@ -380,10 +381,10 @@ const EditProfile = () => {
                                 </div>
                             </div>
 
-                            {/* Location Name */}
+                            {/* Location  */}
                             <div className="col-md-4">
                                 <div className="am_field">
-                                    <label>Location Name*</label>
+                                    <label>Location*</label>
                                     <input
                                         type="text"
                                         {...register("locationName")}

@@ -54,17 +54,20 @@ const DashboardPanel = ({ activeTab }) => {
         if (!res.ok) throw new Error(json.message || "Network error");
 
         if (json.success) {
-          /* normal data path */
-          const mapped = json.data.map(item => ({
-            employeeName: item?.technicianId?.fullName || "N/A",
-            category: item?.serviceId?.serviceName || "N/A",
-            date: `${item?.date} ${item?.time}`,
-            price: `$ ${item?.serviceId?.price ?? 0}`,
-            salesRevenue: `${item?.serviceId?.price ?? 0} AZN`,
-            status: item?.status || "Pending",
-          }));
-          setOrders(mapped);
-          setEmpty(mapped.length === 0);
+          // already sorted like in manage page
+          const parseDateTime = (dateStr, timeStr) => {
+            const [day, month, year] = dateStr.split("-");
+            return new Date(`${year}-${month}-${day} ${timeStr}`);
+          };
+
+          const sortedData = [...json.data].sort((a, b) => {
+            const dateA = parseDateTime(a.date, a.time);
+            const dateB = parseDateTime(b.date, b.time);
+            return dateB - dateA;
+          });
+
+          setOrders(sortedData);
+          setEmpty(sortedData.length === 0);
           setError(null);
         } else {
           /* success=false → treat as empty, not fatal */
@@ -89,7 +92,40 @@ const DashboardPanel = ({ activeTab }) => {
       ? order.status.toLowerCase().includes(activeTab.toLowerCase())
       : true
   );
+  const formatDateTimeUS = (dateStr, timeStr) => {
+    try {
+      // Convert "10-10-2025" → "2025-10-10"
+      const [day, month, year] = dateStr.split("-");
+      const formatted = `${year}-${month}-${day} ${timeStr}`;
+      const date = new Date(formatted);
 
+      return date.toLocaleString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      });
+    } catch {
+      return `${dateStr} ${timeStr}`;
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    switch (status.toLowerCase()) {
+      case "completed":
+        return <span className="badge py-2 bg-success">Completed</span>;
+      case "pending":
+        return <span className="badge py-2 bg-secondary">Pending</span>;
+      case "canceled":
+        return <span className="badge py-2 bg-danger">Canceled</span>;
+      case "accepted":
+        return <span className="badge py-2 bg-warning text-dark">Accepted</span>;
+      default:
+        return <span className="badge py-2 bg-secondary">{status}</span>;
+    }
+  };
   return (
     <div className="page">
       <div className="dashboard_panel_inner">
@@ -114,9 +150,11 @@ const DashboardPanel = ({ activeTab }) => {
         </div>
 
         {/* Booking List */}
-        <div className="py-4 dash_list">
-          <h2 className="mb-3">Activity</h2>
 
+        <div className="card dash_list">
+          <div className="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2 py-3">
+            <h5 className="fw-bolder mb-0">Activity</h5>
+          </div>
           {loading ? (
             <SpinnerLoading />
           ) : error ? (
@@ -124,40 +162,43 @@ const DashboardPanel = ({ activeTab }) => {
           ) : empty ? (
             <p>No bookings found for this salon.</p>
           ) : (
-            <div className="table-responsive">
-              <table className="table caption-top">
-                <thead>
-                  <tr>
-                    <th scope="col">Employee Name</th>
-                    <th scope="col">Category</th>
-                    <th scope="col">Date</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">Sales Revenue</th>
-                    <th scope="col">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredOrders.slice(0, 4).map((order, index) => (
-                    <tr key={index}>
-                      <td>{order.employeeName}</td>
-                      <td className="user_td">{order.category}</td>
-                      <td>{order.date}</td>
-                      <td
-                        className={`dollar_td ${parseFloat(order.price.replace(/[^\d.-]/g, "")) < 0
-                          ? "loss"
-                          : ""
-                          }`}
-                      >
-                        {order.price}
-                      </td>
-                      <td>{order.salesRevenue}</td>
-                      <td className={`status_td ${order.status.toLowerCase()}`}>
-                        <span>{order.status}</span>
-                      </td>
+            <div className="dash_list card-body p-0">
+              <div className="table-responsive">
+                <table className="table caption-top table-hover mb-0">
+                  <thead className="table-light">
+                    <tr>
+                      <th>Customer</th>
+                      <th>Service</th>
+                      <th>Technician</th>
+                      <th>Date & Time</th>
+                      <th>Total</th>
+                      <th>Status</th>
+                      <th>Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {filteredOrders.slice(0, 4).map((order, index) => (
+                      <tr key={index}>
+                        <td>{order.userId?.username || "Unknown"}</td>
+                        <td>{order.serviceId?.serviceName || "-"}</td>
+                        <td>{order.technicianId?.fullName || "-"}</td>
+                        <td>{formatDateTimeUS(order.date, order.time)}</td>
+                        <td>${order.totalAmount}</td>
+                        <td>{getStatusBadge(order.status)}</td>
+                        <td>
+                          <button
+                            className="btn btn-outline-primary btn-sm"
+                            onClick={() => router.push(`/super-admin/dashboard/manage-appointments/${order._id}`)}
+                          >
+                            View Details
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                    }
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

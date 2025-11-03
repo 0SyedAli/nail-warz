@@ -87,38 +87,33 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
         if (!res.ok) throw new Error("Failed to fetch technician");
         const result = await res.json();
 
-        setOriginalData(result);
+        const technician = result.data.technician;
 
-        // populate form
+        setOriginalData(technician);
+
         reset({
-          fullName: result.fullName || "",
-          phoneNumber: result.phoneNumber || "",
-          email: result.email || "",
-          description: result.description || "",
-          designation: result.designation || "",
-          workingDays: result.workingDays
-            ? result.workingDays.filter((d) => d.isActive).map((d) => d.day)
+          fullName: technician.fullName || "",
+          phoneNumber: technician.phoneNumber || "",
+          email: technician.email || "",
+          description: technician.description || "",
+          designation: technician.designation || "",
+          workingDays: technician.workingDays
+            ? technician.workingDays.filter((d) => d.isActive).map((d) => d.day)
             : [],
-          startTime:
-            result.workingDays && result.workingDays[0]?.startTime
-              ? convertTo24Hour(result.workingDays[0].startTime)
-              : "",
-          endTime:
-            result.workingDays && result.workingDays[0]?.endTime
-              ? convertTo24Hour(result.workingDays[0].endTime)
-              : "",
-          breakStart:
-            result.workingDays && result.workingDays[0]?.breakStart
-              ? convertTo24Hour(result.workingDays[0].breakStart)
-              : "",
-          breakEnd:
-            result.workingDays && result.workingDays[0]?.breakEnd
-              ? convertTo24Hour(result.workingDays[0].breakEnd)
-              : "",
+          startTime: technician.workingDays?.[0]?.startTime
+            ? convertTo24Hour(technician.workingDays[0].startTime)
+            : "",
+          endTime: technician.workingDays?.[0]?.endTime
+            ? convertTo24Hour(technician.workingDays[0].endTime)
+            : "",
+          // same for breakStart / breakEnd if needed
           image: null,
         });
 
-        if (result.imageUrl) setPreview(result.imageUrl);
+        if (technician.image) {
+          setPreview(`${process.env.NEXT_PUBLIC_IMAGE_URL}/${technician.image}`);
+        }
+
         setLoading(false);
       } catch (err) {
         alert(err.message);
@@ -218,6 +213,70 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
         x
       </button>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* Upload Image */}
+        <Controller
+          control={control}
+          name="image"
+          render={({ field }) => (
+            <>
+              <label className="form-label mb-1">Upload Profile Image</label>
+
+              {!preview ? (
+                <div className="add_upload_image mb-1" style={{ height: "120px", width: "120px" }}>
+                  <div className="aui_content">
+                    <Image src="/images/upload_icon.png" width={40} height={40} alt="" />
+                    <span>Upload Image</span>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files[0] || null;
+                      field.onChange(file);
+                      if (file) {
+                        const url = URL.createObjectURL(file);
+                        setPreview(url);
+                      }
+                      e.target.value = "";
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="mb-1" style={{ position: "relative", width: "120px", height: "120px" }}>
+                  <Image
+                    src={preview}
+                    alt="preview"
+                    width={120}
+                    height={120}
+                    className=" border object-fit-cover h-100 w-100"
+                    style={{ borderRadius: "10px" }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      field.onChange(null);
+                      setPreview(null);
+                    }}
+                    style={{
+                      position: "absolute",
+                      top: -6,
+                      right: -6,
+                      background: "#fff",
+                      border: "1px solid #ccc",
+                      borderRadius: "50%",
+                      padding: "2px 5px",
+                      cursor: "pointer",
+                      lineHeight: 1,
+                    }}
+                    aria-label="Remove image"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Full Name</label>
@@ -239,7 +298,7 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
 
           <div>
             <label className="block text-sm font-medium mb-1">Designation</label>
-            <InputField {...register("designation")} placeholder="Stylist" />
+            <InputField {...register("designation")} placeholder="Designation" />
           </div>
           <div className="edit_textarea">
             <label className="block text-sm font-medium mb-1">Description</label>
@@ -286,7 +345,7 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
             />
           </div>
 
-          <div className="col-md-6">
+          {/* <div className="col-md-6">
             <label className="block text-sm font-medium mb-1">
               Break Start
             </label>
@@ -306,73 +365,11 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
               {...register("breakEnd")}
               className="ms-3 w-full p-2 border rounded-md"
             />
-          </div>
+          </div> */}
         </div>
 
-        {/* Upload Image */}
-        <Controller
-          control={control}
-          name="image"
-          render={({ field }) => (
-            <>
-              <label>Upload Image</label>
-              <div className="input_file mt-1">
-                <p>Choose image</p>
-                <span>
-                  <FiPlusCircle />
-                </span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files[0] || null;
-                    field.onChange(file);
-                    if (file) {
-                      const url = URL.createObjectURL(file);
-                      setPreview(url);
-                    }
-                    e.target.value = "";
-                  }}
-                />
-              </div>
-              {preview && (
-                <div
-                  className="my-3"
-                  style={{ position: "relative", width: "fit-content" }}
-                >
-                  <Image
-                    src={preview}
-                    alt="preview"
-                    width={100}
-                    height={100}
-                    className="rounded border object-fit-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      field.onChange(null);
-                      setPreview(null);
-                    }}
-                    style={{
-                      position: "absolute",
-                      top: -6,
-                      right: -6,
-                      background: "#fff",
-                      border: "1px solid #ccc",
-                      borderRadius: "50%",
-                      padding: "2px 5px",
-                      cursor: "pointer",
-                      lineHeight: 1,
-                    }}
-                    aria-label="Remove image"
-                  >
-                    ×
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        />
+
+
 
         <div className="flex justify-end gap-3 pt-4">
           <AuthBtn

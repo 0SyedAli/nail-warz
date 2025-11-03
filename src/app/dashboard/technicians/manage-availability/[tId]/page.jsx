@@ -237,7 +237,7 @@ export default function ManageAvailabilityPage({ params }) {
 
     const handleSlotClick = (dayIndex, timeSlot) => {
         if (!isDayActive(dayIndex)) {
-            alert("This day is not available for booking")
+            showErrorToast("This day is not available for booking")
             return
         }
 
@@ -282,9 +282,9 @@ export default function ManageAvailabilityPage({ params }) {
                 setSelectedRange((prev) => ({ ...prev, end: { dayIndex, timeSlot } }))
                 setAvailability((prev) => ({ ...prev, [slotKey]: true }))
             } else if (dayIndex !== selectedRange.start.dayIndex) {
-                alert("Please select end time on the same day and after the start time")
+                showErrorToast("Please select end time on the same day and after the start time")
             } else {
-                alert("End time must be after start time")
+                showErrorToast("End time must be after start time")
             }
         } else {
             setSelectedRange({ start: { dayIndex, timeSlot }, end: null })
@@ -567,7 +567,13 @@ export default function ManageAvailabilityPage({ params }) {
                                 </div>
                             )}
 
-                            <div className="d-flex justify-content-end mt-4">
+                            <div className="d-flex justify-content-end mt-4 gap-3">
+                                <button
+                                    className="btn btn-outline-danger bg-white hover-danger px-4"
+                                    onClick={() => router.back()}
+                                >
+                                    Back
+                                </button>
                                 <button
                                     className="btn btn-danger px-4"
                                     onClick={handleUpdate}

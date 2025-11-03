@@ -143,7 +143,7 @@ function UploadService() {
         <InputField {...register("serviceName")} placeholder="Haircut Basic" />
         {errors.serviceName && <p className="text-danger">{errors.serviceName.message}</p>}
 
-        <label>Service Price (PKR)</label>
+        <label>Service Price</label>
         <InputField {...register("servicePrice")} placeholder="1500" type="number" />
         {errors.servicePrice && <p className="text-danger">{errors.servicePrice.message}</p>}
 

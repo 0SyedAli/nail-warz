@@ -13,9 +13,10 @@ export default function Dashboard({ children }) {
 
   const content = {
     dashboard: { title: "Dashboard" },
-    technicians: { title: "Technicians List" },
-    technicianDetails: { title: "Technician Details" },
+    technicians: { title: "Manage Technicians" },
+    technicianDetails: { title: "Technician Availability" },
     services: { title: "Manage Services" },
+    serviceDetails: { title: "Edit Service" },
     addnewservice: { title: "Add New Service" },
     addnewtechnician: { title: "Add New Technician" },
     appointments: { title: "Appointment Management" },
@@ -31,6 +32,9 @@ export default function Dashboard({ children }) {
     // if route looks like /dashboard/technicians/[id]
     if (parts[1] === "technicians" && parts.length > 2) {
       headerKey = "technicianDetails";
+    }
+    if (parts[1] === "services" && parts.length > 2) {
+      headerKey = "serviceDetails";
     }
 
     setHeader(content[headerKey]);

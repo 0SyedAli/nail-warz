@@ -8,6 +8,8 @@ const TopBar = ({ header }) => {
   const router = useRouter();
   const [salonName, setSalonName] = useState();
   const [location, setLocation] = useState();
+  const [image, setImage] = useState();
+  
   useEffect(() => {
     const cookie = Cookies.get("user");
     if (!cookie) return router.push("/auth/login");
@@ -15,7 +17,10 @@ const TopBar = ({ header }) => {
       const u = JSON.parse(cookie);
       if (u?.salonName) setSalonName(u?.salonName);
       if (u?.location?.locationName) setLocation(u?.location?.locationName);
+      if (u?.image) setImage(u?.image);
+      
       else router.push("/auth/login");
+      
     } catch {
       router.push("/auth/login");
     }
@@ -36,9 +41,10 @@ const TopBar = ({ header }) => {
             <h5>{location || ""}</h5>
           </div>
           <Image
-            src="/images/avatar.png"
+            src={image ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}` : "/images/avatar.png"}
             width={50}
             height={50}
+            style={{borderRadius:"100%", minWidth:"50px", minHeight: "50px"}}
             alt=""
           />
         </div>

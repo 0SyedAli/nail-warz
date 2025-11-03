@@ -169,12 +169,91 @@ export default function AddNewService() {
       <div className="page">
         <div className="addNewService">
           <form onSubmit={handleSubmit(onSubmit)}>
+
+            <Controller
+              control={control}
+              name="images"
+              render={({ field }) => (
+                <>
+                  <label className="form-label mb-1">Upload Images (max 3)</label>
+
+                  {/* hide this div if any image exists */}
+                  {previews.length === 0 && (
+                    <div className="add_upload_image my-2" style={{ height: "120px", width: "120px" }}>
+                      <div className="aui_content">
+                        <Image src="/images/upload_icon.png" width={40} height={40} alt="upload icon" />
+                        <span>Upload Image</span>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files || []).slice(0, MAX_IMAGES);
+                          field.onChange(files);
+
+                          // Generate previews
+                          const urls = files.map((f) => URL.createObjectURL(f));
+                          setPreviews(urls);
+
+                          e.target.value = "";
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {errors.images && <p className="text-danger">{errors.images.message}</p>}
+
+                  {/* previews */}
+                  {previews.length > 0 && (
+                    <div className="my-2 d-flex gap-2 flex-wrap">
+                      {previews.map((src, i) => (
+                        <div key={i} style={{ position: "relative", width: "120px", height: "120px" }}>
+                          <Image
+                            src={src}
+                            alt={`preview-${i}`}
+                            width={120}
+                            height={120}
+                            className="border object-fit-cover w-100 h-100 rounded"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updatedFiles = field.value.filter((_, idx) => idx !== i);
+                              const updatedPreviews = previews.filter((_, idx) => idx !== i);
+                              field.onChange(updatedFiles);
+                              setPreviews(updatedPreviews);
+                            }}
+                            style={{
+                              position: "absolute",
+                              top: -6,
+                              right: -6,
+                              background: "#fff",
+                              border: "1px solid #ccc",
+                              borderRadius: "50%",
+                              padding: "2px 5px",
+                              cursor: "pointer",
+                              lineHeight: 1,
+                            }}
+                            aria-label="Remove image"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            />
+
+
             {/* basic fields */}
             <label>Service Name</label>
             <InputField {...register("serviceName")} placeholder="Haircut Basic" />
             {errors.serviceName && <p className="text-danger">{errors.serviceName.message}</p>}
 
-            <label>Service Price (PKR)</label>
+            <label>Service Price</label>
             <InputField {...register("servicePrice")} placeholder="1500" type="number" />
             {errors.servicePrice && <p className="text-danger">{errors.servicePrice.message}</p>}
 
@@ -240,46 +319,7 @@ export default function AddNewService() {
             </div>
 
             {/* image upload */}
-            <label className="mt-0">Upload Images (max 3)</label>
-            <div className="input_file mt-1 mb-4">
-              <p>Upload image(s)</p>
-              <span><FiPlusCircle /></span>
-              <Controller
-                control={control}
-                name="images"
-                render={({ field }) => (
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files || []).slice(0, MAX_IMAGES);
-                      field.onChange(files);
-                      e.target.value = "";
-                    }}
-                  />
-                )}
-              />
-            </div>
-            {errors.images && <p className="text-danger">{errors.images.message}</p>}
 
-            {/* previews */}
-            {previews.length > 0 && (
-              <div className="my-3 d-flex gap-2 flex-wrap">
-                {previews.map((src, i) => (
-                  <div key={i} style={{ position: "relative" }}>
-                    <Image src={src} alt="" width={100} height={100} className="rounded border object-fit-cover" />
-                    <button
-                      type="button"
-                      onClick={() => removeChip("images", i)}
-                      style={{ position: "absolute", top: 2, right: 2, background: "white", borderRadius: "50%" }}
-                    >
-                      <RxCross2 size={12} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
             <div className="d-flex align-items-center justify-content-between gap-5">
               <AuthBtn title="Back" type="button" onClick={() => router.back()} />
               <AuthBtn title="Create Service" type="submit" disabled={isSubmitting} />
