@@ -315,7 +315,7 @@ const AddTechnician = () => {
                 <input
                   type="time"
                   {...register("startTime")}
-                  className="form-control"
+                  className="form-control at_time"
                 />
                 <div className="text-danger small mt-1">
                   {errors.startTime && <p className="text-danger text-sm mt-1">{errors.startTime.message}</p>}
@@ -327,7 +327,7 @@ const AddTechnician = () => {
                 <input
                   type="time"
                   {...register("endTime")}
-                  className="form-control"
+                  className="form-control at_time"
                 />
                 <div className="text-danger small mt-1">
                   {errors.endTime && <p className="text-danger text-sm mt-1">{errors.endTime.message}</p>}
@@ -362,8 +362,8 @@ const AddTechnician = () => {
 
             {/* Image */}
             <div className="d-flex align-items-center gap-4 mt-4" >
-              <AuthBtn title="Continue" type="submit" disabled={isSubmitting} />
               <AuthBtn title="Back" type="button" location_btn={"back_btn"} onClick={() => router.back()} />
+              <AuthBtn title="Continue" type="submit" disabled={isSubmitting} />
             </div>
           </form>
         </div>

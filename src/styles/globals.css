@@ -324,6 +324,11 @@ input::placeholder {
   opacity: 0;
 }
 
+.at_time {
+  height: 44px;
+  border: 1px solid #000;
+}
+
 .calender_item .calender_spot {
   height: 10px;
   width: 10px;
@@ -1977,7 +1982,12 @@ button.reset_btn svg {
   align-items: center;
   gap: 10px;
 }
-
+.wd_table .table-bordered>:not(caption)>*>*  {
+ width: fit-content!important;
+}
+.wd_table input {
+font-size: 13px;
+}
 .ast_item img {
   border-radius: 10px;
 }

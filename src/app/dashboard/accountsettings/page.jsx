@@ -10,28 +10,28 @@ import { showErrorToast, showSuccessToast } from "src/lib/toast";
 import api from "../../../lib/axios";
 import Cookies from "js-cookie";
 
-const schema = Yup.object({
-    salonName: Yup.string().required("Salon name is required"),
-    phoneNumber: Yup.string().required("Phone number is required"),
-    bussinessAddress: Yup.string().required("Business address is required"),
-    locationName: Yup.string().required("Location is required"),
-    description: Yup.string(),
-    workingDays: Yup.array().min(1, "Select at least one working day"),
-    startTime: Yup.string().required("Start time is required"),
-    endTime: Yup.string().required("End time is required"),
-    images: Yup.array()
-        .of(
-            Yup.mixed()
-                .test("fileSize", "File too large", (value) =>
-                    !value || (value.size <= 2 * 1024 * 1024)
-                )
-                .test("fileType", "Unsupported file format", (value) =>
-                    !value || ["image/jpeg", "image/png", "image/webp"].includes(value.type)
-                )
-        )
-        .max(5, "Maximum 5 images allowed"),
-    category: Yup.string().required("Category is required"),
-});
+// const schema = Yup.object({
+//     salonName: Yup.string().required("Salon name is required"),
+//     phoneNumber: Yup.string().required("Phone number is required"),
+//     bussinessAddress: Yup.string().required("Business address is required"),
+//     locationName: Yup.string().required("Location is required"),
+//     description: Yup.string(),
+//     workingDays: Yup.array().min(1, "Select at least one working day"),
+//     startTime: Yup.string().required("Start time is required"),
+//     endTime: Yup.string().required("End time is required"),
+//     images: Yup.array()
+//         .of(
+//             Yup.mixed()
+//                 .test("fileSize", "File too large", (value) =>
+//                     !value || (value.size <= 2 * 1024 * 1024)
+//                 )
+//                 .test("fileType", "Unsupported file format", (value) =>
+//                     !value || ["image/jpeg", "image/png", "image/webp"].includes(value.type)
+//                 )
+//         )
+//         .max(5, "Maximum 5 images allowed"),
+//     category: Yup.string().required("Category is required"),
+// });
 
 const DAYS_OF_WEEK = [
     "Monday",
@@ -60,7 +60,6 @@ const EditProfile = () => {
         reset,
         formState: { errors, isSubmitting },
     } = useForm({
-        resolver: yupResolver(schema),
         defaultValues: {
             workingDays: [],
             startTime: "",
@@ -127,7 +126,16 @@ const EditProfile = () => {
                         day.endTime === firstDay?.endTime
                     );
                     setHasCommonTimes(allSameTimes);
+                    const workingDaysObj = {};
 
+                    DAYS_OF_WEEK.forEach(day => {
+                        const found = profileData.workingDays?.find(d => d.day === day);
+                        workingDaysObj[day] = {
+                            isActive: found?.isActive || false,
+                            startTime: found?.startTime || "",
+                            endTime: found?.endTime || "",
+                        };
+                    });
                     // Set form values
                     reset({
                         salonName: profileData.salonName || "",
@@ -135,7 +143,8 @@ const EditProfile = () => {
                         bussinessAddress: profileData.bussinessAddress || "",
                         locationName: profileData.locationName || "",
                         description: profileData.description || "",
-                        workingDays: profileData.workingDays?.map(d => d.day) || [],
+                        // workingDays: profileData.workingDays?.map(d => d.day) || [],
+                        workingDays: workingDaysObj,   // <-- set here
                         startTime: allSameTimes ? firstDay?.startTime : "",
                         endTime: allSameTimes ? firstDay?.endTime : "",
                         category: profileData.categoryId?.[0]?._id || "",
@@ -174,13 +183,24 @@ const EditProfile = () => {
             formData.append("longitude", existingData?.longitude?.toString() || "95.7029");
 
             // Working days payload
-            const days = data.workingDays.map((day) => ({
-                day,
-                isActive: true,
-                startTime: data.startTime,
-                endTime: data.endTime,
-            }));
-            formData.append("workingDays", JSON.stringify(days));
+            // const days = data.workingDays.map((day) => ({
+            //     day,
+            //     isActive: true,
+            //     startTime: data.startTime,
+            //     endTime: data.endTime,
+            // }));
+            // Build workingDays payload correctly
+            const daysPayload = DAYS_OF_WEEK.map(day => {
+                const item = data.workingDays?.[day] || {};
+                return {
+                    day,
+                    isActive: !!item.isActive,
+                    startTime: item.startTime || "",
+                    endTime: item.endTime || ""
+                };
+            });
+            formData.append("workingDays", JSON.stringify(daysPayload));
+            // formData.append("workingDays", JSON.stringify(days));
 
             // Category IDs
             formData.append("categoryId", JSON.stringify([data.category]));
@@ -253,11 +273,11 @@ const EditProfile = () => {
             <div className="m_tabs_main mt-5">
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="ast_main">
-                        <h3 className="mb-4">Update Salon</h3>
+                        <h3 className="mb-4">Update Salon Account Settings</h3>
 
                         {/* Services Images */}
                         <div className="ast_item">
-                            <div className="ast_file">
+                            <div className="ast_file px-2" style={{ width: "fit-content" }}>
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -266,7 +286,7 @@ const EditProfile = () => {
                                     id="profileImage"
                                 />
                                 <label htmlFor="profileImage" style={{ cursor: "pointer" }}>
-                                    <h5>Upload Images</h5>
+                                    <h5>Update Profile Image</h5>
                                     <span><FaRegEdit /></span>
                                 </label>
                             </div>
@@ -282,7 +302,7 @@ const EditProfile = () => {
                                             src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${img}`}
                                             width={80}
                                             height={80}
-                                            style={{height:"80px", width:"80px"}}
+                                            style={{ height: "80px", width: "80px" }}
                                             alt={`Salon Image ${index + 1}`}
                                             className="rounded border object-fit-cover"
                                         />
@@ -314,6 +334,7 @@ const EditProfile = () => {
                                             src={src}
                                             width={80}
                                             height={80}
+                                            style={{ height: "80px", width: "80px" }}
                                             alt={`New Image ${index + 1}`}
                                             className="rounded border object-fit-cover"
                                         />
@@ -339,7 +360,7 @@ const EditProfile = () => {
                             {/* Salon Name */}
                             <div className="col-md-4">
                                 <div className="am_field">
-                                    <label>Salon Name*</label>
+                                    <label>Salon Name</label>
                                     <input
                                         type="text"
                                         {...register("salonName")}
@@ -354,7 +375,7 @@ const EditProfile = () => {
                             {/* Phone Number */}
                             <div className="col-md-4">
                                 <div className="am_field">
-                                    <label>Phone Number*</label>
+                                    <label>Phone Number</label>
                                     <input
                                         type="text"
                                         {...register("phoneNumber")}
@@ -369,7 +390,7 @@ const EditProfile = () => {
                             {/* Business Address */}
                             <div className="col-md-4">
                                 <div className="am_field">
-                                    <label>Business Address*</label>
+                                    <label>Business Address</label>
                                     <input
                                         type="text"
                                         {...register("bussinessAddress")}
@@ -384,7 +405,7 @@ const EditProfile = () => {
                             {/* Location  */}
                             <div className="col-md-4">
                                 <div className="am_field">
-                                    <label>Location*</label>
+                                    <label>Location</label>
                                     <input
                                         type="text"
                                         {...register("locationName")}
@@ -399,7 +420,7 @@ const EditProfile = () => {
                             {/* Description */}
                             <div className="col-md-4">
                                 <div className="am_field">
-                                    <label>Description</label>
+                                    <label>Business Bio</label>
                                     <input
                                         type="text"
                                         {...register("description")}
@@ -407,9 +428,28 @@ const EditProfile = () => {
                                     />
                                 </div>
                             </div>
-
-                            {/* Working Days */}
+                            {/* Category */}
                             <div className="col-md-4">
+                                <div className="am_field">
+                                    <label>Category</label>
+                                    <select
+                                        {...register("category")}
+                                        className={`form-control ${errors.category ? "is-invalid" : ""}`}
+                                    >
+                                        <option value="">Select Category</option>
+                                        {categoryList.map((cat) => (
+                                            <option key={cat._id} value={cat._id}>
+                                                {cat.categoryName}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {errors.category && (
+                                        <div className="invalid-feedback">{errors.category.message}</div>
+                                    )}
+                                </div>
+                            </div>
+                            {/* Working Days */}
+                            {/* <div className="col-md-4">
                                 <div className="am_field">
                                     <label>Working Days*</label>
                                     {!hasCommonTimes && (
@@ -428,7 +468,7 @@ const EditProfile = () => {
                                                     : "btn-outline-primary"
                                                     }`}
                                             >
-                                                {day.substring(0, 3)} {/* Show abbreviated day names */}
+                                                {day.substring(0, 3)}
                                             </button>
                                         ))}
                                     </div>
@@ -436,12 +476,12 @@ const EditProfile = () => {
                                         <div className="text-danger small mt-1">{errors.workingDays.message}</div>
                                     )}
                                 </div>
-                            </div>
+                            </div> */}
 
                             {/* Working Hours */}
-                            <div className="col-md-4">
+                            {/* <div className="col-md-4">
                                 <div className="am_field">
-                                    <label>Start Time*</label>
+                                    <label>Start Time</label>
                                     <input
                                         type="time"
                                         {...register("startTime")}
@@ -455,7 +495,7 @@ const EditProfile = () => {
 
                             <div className="col-md-4">
                                 <div className="am_field">
-                                    <label>End Time*</label>
+                                    <label>End Time</label>
                                     <input
                                         type="time"
                                         {...register("endTime")}
@@ -465,28 +505,59 @@ const EditProfile = () => {
                                         <div className="invalid-feedback">{errors.endTime.message}</div>
                                     )}
                                 </div>
-                            </div>
+                            </div> */}
 
-                            {/* Category */}
-                            <div className="col-md-4">
-                                <div className="am_field">
-                                    <label>Category*</label>
-                                    <select
-                                        {...register("category")}
-                                        className={`form-control ${errors.category ? "is-invalid" : ""}`}
-                                    >
-                                        <option value="">Select Category</option>
-                                        {categoryList.map((cat) => (
-                                            <option key={cat._id} value={cat._id}>
-                                                {cat.categoryName}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    {errors.category && (
-                                        <div className="invalid-feedback">{errors.category.message}</div>
-                                    )}
+                            <div className="col-12 wd_table">
+                                <label className="mb-2" style={{ fontSize: "13px", fontWeight:700, color: "#606060" }}>Working days & timing</label>
+
+                                <div className="table-responsive">
+                                    <table className="table table-bordered ">
+                                        <thead>
+                                            <tr>
+                                                <th>Day</th>
+                                                <th>Active</th>
+                                                <th style={{ width: 120 }}>Start</th>
+                                                <th style={{ width: 120 }}>End</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {DAYS_OF_WEEK.map((day) => {
+                                                const wd = watch(`workingDays.${day}`) || {};
+                                                return (
+                                                    <tr key={day}>
+                                                        <td>{day}</td>
+                                                        <td>
+                                                            <input
+                                                                type="checkbox"
+                                                                {...register(`workingDays.${day}.isActive`)}
+                                                            />
+                                                        </td>
+                                                        <td>
+                                                            <input
+                                                                type="time"
+                                                                className="form-control"
+                                                                {...register(`workingDays.${day}.startTime`)}
+                                                                disabled={!wd.isActive}
+                                                            />
+                                                        </td>
+                                                        <td>
+                                                            <input
+                                                                type="time"
+                                                                className="form-control"
+                                                                {...register(`workingDays.${day}.endTime`)}
+                                                                disabled={!wd.isActive}
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
+
+
+
 
                             {/* Submit Button */}
                             <div className="col-12">

@@ -80,7 +80,7 @@ export default function Dashboard() {
 
     if (loading) {
         return (
-            <div className="row gy-4 w-100">
+            <div className="row gy-4 gx-0 w-100">
                 <div className="col-12">
                     <div className="chart-card">
                         <div className="overview-header d-flex align-items-center justify-content-between mb-4">
@@ -129,7 +129,7 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="row g-4 w-100">
+        <div className="row gy-4 gx-0 w-100">
             <div className="col-12">
                 <div className="chart-card">
                     <div className="overview-header d-flex align-items-center justify-content-center justify-content-sm-between gap-2 mb-4 flex-wrap">

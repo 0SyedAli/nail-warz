@@ -135,11 +135,17 @@ export default function Services() {
   return (
     <>
       <div className="page">
+
         <div className="dashboard_panel_inner">
-          <div className="py-4 dash_list">
-            <div className="table-responsive pb-3">
-              <table className="table caption-top">
-                <thead>
+          <div className="d-flex justify-content-end mb-3 me-3">
+            <Link href="addnewservice" className="btn dash_btn2">
+              Add New Service
+            </Link>
+          </div>
+          <div className="dash_list card">
+            <div className="table-responsive p-0 card-body">
+              <table className="table caption-top table-hover mb-0">
+                <thead className="table-light">
                   <tr>
                     <th>ID #</th>
                     <th>Service</th>
@@ -176,12 +182,12 @@ export default function Services() {
                         <td>${Number(s.price).toFixed(2)}</td>
                         <td>{category}</td>
                         <td>{technician}</td>
-                        <td style={{width:"310px"}}>
+                        <td style={{ width: "310px" }}>
                           <div className="d-flex gap-2">
                             <AuthBtn
                               title="Assign Technicain"
                               location_btn="btn  addTechBtn red"
-                              
+
                               onClick={() => {
                                 setSelectedService(s); // ✅ set selected service
                                 onTechOpen();        // ✅ open modal
@@ -248,11 +254,7 @@ export default function Services() {
               )}
 
               {/* Add Service Button */}
-              <div className="d-flex justify-content-end mt-4">
-                <Link href="addnewservice" className="btn dash_btn2">
-                  Add New Service
-                </Link>
-              </div>
+
             </div>
           </div>
         </div>
@@ -269,7 +271,7 @@ export default function Services() {
         isOpen={isTechOpen}
         onClose={onTechClose}
         service_id={selectedService?._id}
-        // onSuccess={() => fetchServices()} // optional refresh callback
+      // onSuccess={() => fetchServices()} // optional refresh callback
       />
 
     </>

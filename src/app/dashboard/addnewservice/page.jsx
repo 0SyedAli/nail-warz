@@ -250,12 +250,12 @@ export default function AddNewService() {
 
             {/* basic fields */}
             <label>Service Name</label>
-            <InputField {...register("serviceName")} placeholder="Haircut Basic" />
+            <InputField {...register("serviceName")} placeholder="Nail Care Service" />
             {errors.serviceName && <p className="text-danger">{errors.serviceName.message}</p>}
 
-            <label>Service Price</label>
+            <label>Service Price (USD)</label>
             <InputField {...register("servicePrice")} placeholder="1500" type="number" />
-            {errors.servicePrice && <p className="text-danger">{errors.servicePrice.message}</p>}
+            {errors.servicePrice && <p className="text-danger">Enter Service Price</p>}
 
             <label>Description</label>
             <InputField {...register("description")} placeholder="Describe the service..." />
@@ -321,7 +321,7 @@ export default function AddNewService() {
             {/* image upload */}
 
             <div className="d-flex align-items-center justify-content-between gap-5">
-              <AuthBtn title="Back" type="button" onClick={() => router.back()} />
+              <AuthBtn title="Back" type="button" location_btn={"back_btn"} onClick={() => router.back()} />
               <AuthBtn title="Create Service" type="submit" disabled={isSubmitting} />
             </div>
           </form>

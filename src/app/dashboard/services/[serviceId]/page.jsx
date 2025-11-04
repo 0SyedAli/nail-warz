@@ -292,7 +292,7 @@ export default function EditService() {
 
           {/* image upload */}
           <label className="mt-0">Upload Images (max 3)</label>
-          <div className="input_file mt-1 mb-4">
+          <div className="input_file mt-1 mb-2">
             <p>Upload image(s)</p>
             <span><FiPlusCircle /></span>
             <Controller
@@ -318,7 +318,7 @@ export default function EditService() {
           {/* previews */}
 
           {previews.length > 0 && (
-            <div className="my-3 d-flex gap-2 flex-wrap">
+            <div className="mb-3 d-flex gap-2 flex-wrap">
               {previews.map((src, i) => (
                 <div key={i} style={{ position: "relative" }}>
                   {console.log(`${src}`)}
@@ -327,6 +327,7 @@ export default function EditService() {
                     alt=""
                     width={100}
                     height={100}
+                    style={{ width: "100px", height: "100px" }}
                     className="rounded border object-fit-cover"
                   />
                   <button
@@ -346,12 +347,15 @@ export default function EditService() {
               ))}
             </div>
           )}
+          <div className="d-flex align-items-center gap-4 mt-4">
+            <AuthBtn title="Back" type="button" location_btn={"back_btn"} onClick={() => router.back()} />
 
-          <AuthBtn
-            title="Update Service"
-            type="submit"
-            disabled={isSubmitting}
-          />
+            <AuthBtn
+              title="Update Service"
+              type="submit"
+              disabled={isSubmitting}
+            />
+          </div>
         </form>
       </div>
     </div>
