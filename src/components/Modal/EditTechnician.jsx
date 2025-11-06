@@ -91,23 +91,41 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
 
         setOriginalData(technician);
 
+        // reset({
+        //   fullName: technician.fullName || "",
+        //   phoneNumber: technician.phoneNumber || "",
+        //   email: technician.email || "",
+        //   description: technician.description || "",
+        //   designation: technician.designation || "",
+        //   workingDays: technician.workingDays
+        //     ? technician.workingDays.filter((d) => d.isActive).map((d) => d.day)
+        //     : [],
+        //   startTime: technician.workingDays?.[0]?.startTime
+        //     ? convertTo24Hour(technician.workingDays[0].startTime)
+        //     : "",
+        //   endTime: technician.workingDays?.[0]?.endTime
+        //     ? convertTo24Hour(technician.workingDays[0].endTime)
+        //     : "",
+        //   // same for breakStart / breakEnd if needed
+        //   image: null,
+        // });
+        const workingDaysObj = {};
+        ALL_DAYS.forEach(day => {
+          const found = technician.workingDays?.find(d => d.day === day);
+          workingDaysObj[day] = {
+            isActive: !!found?.isActive,
+            startTime: found?.startTime ? convertTo24Hour(found.startTime) : "",
+            endTime: found?.endTime ? convertTo24Hour(found.endTime) : "",
+          };
+        });
         reset({
-          fullName: technician.fullName || "",
-          phoneNumber: technician.phoneNumber || "",
-          email: technician.email || "",
-          description: technician.description || "",
-          designation: technician.designation || "",
-          workingDays: technician.workingDays
-            ? technician.workingDays.filter((d) => d.isActive).map((d) => d.day)
-            : [],
-          startTime: technician.workingDays?.[0]?.startTime
-            ? convertTo24Hour(technician.workingDays[0].startTime)
-            : "",
-          endTime: technician.workingDays?.[0]?.endTime
-            ? convertTo24Hour(technician.workingDays[0].endTime)
-            : "",
-          // same for breakStart / breakEnd if needed
-          image: null,
+          fullName: technician.fullName,
+          phoneNumber: technician.phoneNumber,
+          email: technician.email,
+          description: technician.description,
+          designation: technician.designation,
+          workingDays: workingDaysObj,
+          image: null
         });
 
         if (technician.image) {
@@ -149,24 +167,37 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
       if (dirtyFields.description) fd.append("description", data.description);
       if (dirtyFields.designation) fd.append("designation", data.designation);
 
-      if (
-        dirtyFields.workingDays ||
-        dirtyFields.startTime ||
-        dirtyFields.endTime ||
-        dirtyFields.breakStart ||
-        dirtyFields.breakEnd
-      ) {
-        const dayPayload = ALL_DAYS.map((day) => ({
-          day,
-          isActive: data.workingDays.includes(day),
-          startTime: convertTo12Hour(data.startTime),
-          endTime: convertTo12Hour(data.endTime),
-          breakStart: convertTo12Hour(data.breakStart),
-          breakEnd: convertTo12Hour(data.breakEnd),
-        }));
+      // if (
+      //   dirtyFields.workingDays ||
+      //   dirtyFields.startTime ||
+      //   dirtyFields.endTime ||
+      //   dirtyFields.breakStart ||
+      //   dirtyFields.breakEnd
+      // ) {
+      //   const dayPayload = ALL_DAYS.map((day) => ({
+      //     day,
+      //     isActive: data.workingDays.includes(day),
+      //     startTime: convertTo12Hour(data.startTime),
+      //     endTime: convertTo12Hour(data.endTime),
+      //     breakStart: convertTo12Hour(data.breakStart),
+      //     breakEnd: convertTo12Hour(data.breakEnd),
+      //   }));
 
+      //   fd.append("workingDays", JSON.stringify(dayPayload));
+      // }
+      if (dirtyFields.workingDays) {
+        const dayPayload = ALL_DAYS.map(day => {
+          const d = data.workingDays[day];
+          return {
+            day,
+            isActive: !!d.isActive,
+            startTime: convertTo12Hour(d.startTime),
+            endTime: convertTo12Hour(d.endTime),
+          };
+        });
         fd.append("workingDays", JSON.stringify(dayPayload));
       }
+
 
       if (imageChanged && data.image) {
         fd.append("image", data.image);
@@ -312,7 +343,7 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
         </div>
 
         {/* Working Days */}
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium mb-1">Working Days</label>
           <div className="d-flex mt-1 mb-2 workDays">
             {ALL_DAYS.map((d) => (
@@ -323,11 +354,11 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
 
         {/* Working Hours */}
-        <div className="row gy-4 py-3 time_fields">
-          <div className="col-md-6">
+        {/* <div className="row gy-4 py-3 time_fields"> */}
+        {/* <div className="col-md-6">
             <label className="block text-sm font-medium mb-1">Start Time</label>
             <input
               type="time"
@@ -343,9 +374,9 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
               {...register("endTime")}
               className="ms-3 w-full p-2 border rounded-md"
             />
-          </div>
+          </div> */}
 
-          {/* <div className="col-md-6">
+        {/* <div className="col-md-6">
             <label className="block text-sm font-medium mb-1">
               Break Start
             </label>
@@ -366,7 +397,46 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
               className="ms-3 w-full p-2 border rounded-md"
             />
           </div> */}
-        </div>
+        {/* </div> */}
+        <table className="table table-bordered wd_table">
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Active</th>
+              <th style={{ width: 120 }}>Start</th>
+              <th style={{ width: 120 }}>End</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ALL_DAYS.map(day => {
+              const wd = watch(`workingDays.${day}`) || {};
+              return (
+                <tr key={day}>
+                  <td>{day}</td>
+                  <td>
+                    <input type="checkbox" {...register(`workingDays.${day}.isActive`)} />
+                  </td>
+                  <td>
+                    <input
+                      type="time"
+                      className="form-control"
+                      {...register(`workingDays.${day}.startTime`)}
+                      disabled={!wd.isActive}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="time"
+                      className="form-control"
+                      {...register(`workingDays.${day}.endTime`)}
+                      disabled={!wd.isActive}
+                    />
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
 
 
 

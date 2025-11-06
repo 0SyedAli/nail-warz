@@ -3,11 +3,13 @@
 import { useState, useEffect, use } from "react"
 import "bootstrap/dist/css/bootstrap.min.css"
 import { FaCheck, FaChevronLeft, FaChevronRight } from "react-icons/fa"
-import { showErrorToast, showSuccessToast } from "src/lib/toast";
+import { showErrorToast, showSuccessToast } from "src/lib/toast"
+import { useRouter } from "next/navigation"
+import BallsLoading from "@/components/Spinner/BallsLoading"
 
 export default function ManageAvailabilityPage({ params }) {
     const { tId } = use(params);
-
+    const router = useRouter();
     const [currentMonth, setCurrentMonth] = useState(new Date())
     const [currentStartDate, setCurrentStartDate] = useState(new Date())
     const [availability, setAvailability] = useState({})
@@ -16,8 +18,8 @@ export default function ManageAvailabilityPage({ params }) {
         end: null,
     })
     const [technicianData, setTechnicianData] = useState(null)
-    const [workingDays, setWorkingDays] = useState([])
     const [loading, setLoading] = useState(true)
+    const [loading2, setLoading2] = useState(false)
     const [error, setError] = useState(null)
 
     const generateTimeSlots = (startTime, endTime) => {
@@ -26,7 +28,7 @@ export default function ManageAvailabilityPage({ params }) {
         const end = convertTo24Hour(endTime)
 
         let current = start
-        while (current <= end) {
+        while (current < end) {
             slots.push(convertTo12Hour(current))
             current += 100 // Add 1 hour (100 in HHMM format)
             if (current % 100 >= 60) {
@@ -77,62 +79,21 @@ export default function ManageAvailabilityPage({ params }) {
 
                 if (result.success && result.data.technician) {
                     setTechnicianData(result.data.technician)
-                    setWorkingDays(result.data.technician.workingDays || [])
-
-                    const today = new Date()
-                    const dayOfWeek = today.getDay()
-                    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
-                    const mondayOfWeek = new Date(today)
-                    mondayOfWeek.setDate(today.getDate() - daysToMonday)
-                    mondayOfWeek.setHours(0, 0, 0, 0)
-
-                    const timeSlots =
-                        result.data.technician.workingDays.length > 0
-                            ? generateTimeSlots(
-                                result.data.technician.workingDays[0].startTime,
-                                result.data.technician.workingDays[0].endTime,
-                            )
-                            : [
-                                "08:00 AM",
-                                "09:00 AM",
-                                "10:00 AM",
-                                "11:00 AM",
-                                "12:00 PM",
-                                "01:00 PM",
-                                "02:00 PM",
-                                "03:00 PM",
-                                "04:00 PM",
-                                "05:00 PM",
-                                "06:00 PM",
-                            ]
 
                     const existingAvailability = {}
                     if (result.data.technician.notAvailable) {
                         result.data.technician.notAvailable.forEach((slot) => {
+                            // Convert date format from DD-MM-YY to match our format
                             const [day, month, year] = slot.date.split("-")
                             const fullYear = year.length === 2 ? `20${year}` : year
                             const slotDate = new Date(`${fullYear}-${month}-${day}`)
-                            slotDate.setHours(0, 0, 0, 0)
 
-                            const today = new Date()
-                            today.setHours(0, 0, 0, 0)
-                            const dayIndex = Math.floor((slotDate - today) / (1000 * 60 * 60 * 24))
-
-                            console.log("[v0] Processing slot - Date:", slot.date, "Parsed:", slotDate, "DayIndex:", dayIndex)
+                            // Find which day index this date corresponds to in our current view
+                            const dayIndex = Math.floor((slotDate - currentStartDate) / (1000 * 60 * 60 * 24))
 
                             if (dayIndex >= 0 && dayIndex < 7) {
-                                const startTimeIndex = timeSlots.indexOf(slot.startTime)
-                                const endTimeIndex = timeSlots.indexOf(slot.endTime)
-
-                                console.log("[v0] Start index:", startTimeIndex, "End index:", endTimeIndex)
-
-                                for (let i = startTimeIndex; i <= endTimeIndex; i++) {
-                                    if (i >= 0 && i < timeSlots.length) {
-                                        const slotKey = `${dayIndex}-${timeSlots[i]}`
-                                        existingAvailability[slotKey] = true
-                                        console.log("[v0] Marked slot as unavailable:", slotKey)
-                                    }
-                                }
+                                const slotKey = `${dayIndex}-${slot.startTime}`
+                                existingAvailability[slotKey] = true
                             }
                         })
                     }
@@ -151,7 +112,7 @@ export default function ManageAvailabilityPage({ params }) {
         if (tId) {
             fetchTechnicianData()
         }
-    }, [tId])
+    }, [tId, currentStartDate])
 
     const timeSlots =
         technicianData && technicianData.workingDays.length > 0
@@ -170,34 +131,61 @@ export default function ManageAvailabilityPage({ params }) {
                 "06:00 PM",
             ]
 
-    const getDayLabels = () => {
-        const labels = []
-        const today = new Date()
-        const dayOfWeek = today.getDay()
-        const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
-        const mondayOfWeek = new Date(today)
-        mondayOfWeek.setDate(today.getDate() - daysToMonday)
+    const isDayActive = (dayIndex) => {
+        if (!technicianData || !technicianData.workingDays) return true
 
-        const startDate = today
+        const currentDate = new Date(currentStartDate)
+        currentDate.setDate(currentStartDate.getDate() + dayIndex)
+        const dayName = currentDate.toLocaleDateString("en-US", { weekday: "long" })
+
+        const workingDay = technicianData.workingDays.find((wd) => wd.day === dayName)
+        return workingDay ? workingDay.isActive : false
+    }
+
+    const getDayLabels = () => {
+        const dayLabels = []
+        const dayNames = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+
         for (let i = 0; i < 7; i++) {
-            const date = new Date(startDate)
-            date.setDate(startDate.getDate() + i)
-            const dayName = date.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase()
-            labels.push(dayName)
+            const date = new Date(currentStartDate)
+            date.setDate(currentStartDate.getDate() + i)
+            // Convert Sunday (0) to 6, and shift others down by 1
+            const dayIndex = date.getDay() === 0 ? 6 : date.getDay() - 1
+            dayLabels.push(dayNames[dayIndex])
         }
-        return labels
+        return dayLabels
     }
 
     const getWeekDates = () => {
         const weekDates = []
-        const today = new Date()
 
         for (let i = 0; i < 7; i++) {
-            const date = new Date(today)
-            date.setDate(today.getDate() + i)
+            const date = new Date(currentStartDate)
+            date.setDate(currentStartDate.getDate() + i)
             weekDates.push(date.getDate())
         }
         return weekDates
+    }
+
+    const weekDates = getWeekDates()
+    const daysOfWeek = getDayLabels()
+
+    const navigateDays = (direction) => {
+        const newStartDate = new Date(currentStartDate)
+        if (direction === "prev") {
+            newStartDate.setDate(currentStartDate.getDate() - 7)
+        } else {
+            newStartDate.setDate(currentStartDate.getDate() + 7)
+        }
+
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        newStartDate.setHours(0, 0, 0, 0)
+
+        if (newStartDate >= today) {
+            setCurrentStartDate(newStartDate)
+            setCurrentMonth(new Date(newStartDate.getFullYear(), newStartDate.getMonth(), 1))
+        }
     }
 
     const navigateMonth = (direction) => {
@@ -223,11 +211,13 @@ export default function ManageAvailabilityPage({ params }) {
 
         const startDate = firstDayOfMonth >= todayDate ? firstDayOfMonth : todayDate
 
+        // Find the Monday of the week containing startDate
         const dayOfWeek = startDate.getDay()
-        const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+        const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1 // Sunday = 6 days back, others = dayOfWeek - 1
         const mondayOfWeek = new Date(startDate)
         mondayOfWeek.setDate(startDate.getDate() - daysToMonday)
 
+        // Don't go before today
         if (mondayOfWeek >= todayDate) {
             setCurrentStartDate(mondayOfWeek)
         } else {
@@ -303,6 +293,7 @@ export default function ManageAvailabilityPage({ params }) {
     }
 
     const updateTechnicianAvailability = async (notAvailableSlots) => {
+        setLoading2(true);
         try {
             const formData = new FormData()
             formData.append("id", tId)
@@ -322,11 +313,8 @@ export default function ManageAvailabilityPage({ params }) {
     }
 
     const formatDate = (dayIndex) => {
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-
-        const currentDate = new Date(today)
-        currentDate.setDate(today.getDate() + dayIndex)
+        const currentDate = new Date(currentStartDate)
+        currentDate.setDate(currentStartDate.getDate() + dayIndex)
         const date = currentDate.getDate()
         const month = String(currentDate.getMonth() + 1).padStart(2, "0")
         const year = currentDate.getFullYear()
@@ -335,25 +323,24 @@ export default function ManageAvailabilityPage({ params }) {
 
     const handleUpdate = async () => {
         if (selectedRange.start && selectedRange.end) {
-            const newSlot = {
-                date: formatDate(selectedRange.start.dayIndex),
-                startTime: selectedRange.start.timeSlot,
-                endTime: selectedRange.end.timeSlot,
-            }
-
-            const notAvailableSlots = [newSlot]
+            const notAvailableSlots = [
+                {
+                    date: formatDate(selectedRange.start.dayIndex),
+                    startTime: selectedRange.start.timeSlot,
+                    endTime: selectedRange.end.timeSlot,
+                },
+            ]
 
             try {
                 const result = await updateTechnicianAvailability(notAvailableSlots)
 
                 if (result.success || result.message === "success") {
+
                     showSuccessToast("Availability updated successfully!")
-                    setTechnicianData((prev) => ({
-                        ...prev,
-                        notAvailable: [...(prev.notAvailable || []), newSlot],
-                    }))
                     setSelectedRange({ start: null, end: null })
                     setAvailability({})
+                    setLoading2(false)
+                    router.push(`/dashboard/technicians/${tId}`)
                 } else {
                     showErrorToast(`Error: ${result.message || "Failed to update availability"}`)
                 }
@@ -366,66 +353,30 @@ export default function ManageAvailabilityPage({ params }) {
         }
     }
 
-    const isDayActive = (dayIndex) => {
-        if (!workingDays || workingDays.length === 0) return true
-
+    useEffect(() => {
         const today = new Date()
-        today.setHours(0, 0, 0, 0)
+        const dayOfWeek = today.getDay()
+        const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+        const mondayOfWeek = new Date(today)
+        mondayOfWeek.setDate(today.getDate() - daysToMonday)
 
-        const currentDate = new Date(today)
-        currentDate.setDate(today.getDate() + dayIndex)
-        const dayName = currentDate.toLocaleDateString("en-US", { weekday: "long" })
-
-        const workingDay = workingDays.find((wd) => wd.day === dayName)
-        return workingDay ? workingDay.isActive : false
-    }
-
-    const handleDayToggle = (dayIndex) => {
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-
-        const currentDate = new Date(today)
-        currentDate.setDate(today.getDate() + dayIndex)
-        const dayName = currentDate.toLocaleDateString("en-US", { weekday: "long" })
-
-        const updatedWorkingDays = workingDays.map((wd) => {
-            if (wd.day === dayName) {
-                return { ...wd, isActive: !wd.isActive }
-            }
-            return wd
-        })
-
-        setWorkingDays(updatedWorkingDays)
-    }
-
-    const updateWorkingDays = async (updatedDays) => {
-        try {
-            const formData = new FormData()
-            formData.append("id", tId)
-            formData.append("workingDays", JSON.stringify(updatedDays))
-
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/updateTechnician`, {
-                method: "POST",
-                body: formData,
-            })
-
-            const data = await response.json()
-            return data
-        } catch (error) {
-            console.error("Error updating working days:", error)
-            throw error
+        // Don't go before today
+        if (mondayOfWeek >= today) {
+            setCurrentStartDate(mondayOfWeek)
+        } else {
+            setCurrentStartDate(today)
         }
-    }
+    }, [])
 
     if (loading) {
         return (
             <div className="container-fluid py-4">
                 <div className="row justify-content-center">
-                    <div className="col-12 col-lg-10">
+                    <div className="col-12 col-xxl-10">
                         <div className="card shadow-sm">
                             <div className="card-body p-4 text-center">
-                                <div className="spinner-border text-danger" role="status">
-                                    <span className="visually-hidden">Loading...</span>
+                                <div className="d-flex justify-content-center">
+                                    <BallsLoading />
                                 </div>
                                 <p className="mt-3">Loading technician data...</p>
                             </div>
@@ -440,7 +391,7 @@ export default function ManageAvailabilityPage({ params }) {
         return (
             <div className="container-fluid py-4">
                 <div className="row justify-content-center">
-                    <div className="col-12 col-lg-10">
+                    <div className="col-12 col-xxl-10">
                         <div className="card shadow-sm">
                             <div className="card-body p-4 text-center">
                                 <div className="alert alert-danger">
@@ -459,33 +410,77 @@ export default function ManageAvailabilityPage({ params }) {
     }
 
     return (
-        <div className="container-fluid py-4">
+        <div className="container-fluid px-0 px-sm-3 py-4">
             <div className="row justify-content-center">
-                <div className="col-12 col-lg-10">
+                <div className="col-12 col-xxl-10 px-0">
+                    {/* {technicianData && (
+            <div className="card shadow-sm mb-4">
+              <div className="card-body p-3">
+                <div className="d-flex align-items-center">
+                  <div className="me-3">
+                    <img
+                      src={
+                        technicianData.image
+                          ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/${technicianData.image}`
+                          : "/diverse-technician-team.png"
+                      }
+                      alt={technicianData.fullName}
+                      className="rounded-circle"
+                      style={{ width: "60px", height: "60px", objectFit: "cover" }}
+                    />
+                  </div>
+                  <div>
+                    <h5 className="mb-1">{technicianData.fullName}</h5>
+                    <p className="text-muted mb-1">{technicianData.designation}</p>
+                    <small className="text-muted">{technicianData.email}</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )} */}
 
                     <div className="card shadow-sm">
-                        <div className="card-body p-4">
-                            <div className="d-flex align-items-center justify-content-center mb-4">
-                                {/* <button className="btn btn-outline-danger btn-sm me-3" onClick={() => navigateMonth("prev")}>
-                  <FaChevronLeft />
-                </button> */}
-                                <h4 className="mb-0 mx-4">
+                        <div className="card-body px-2 py-4 p-sm-4">
+                            <div className="d-flex align-items-center justify-content-center mb-4 change_month">
+                                <button className="btn btn-outline-danger btn-sm me-2 me-sm-3" onClick={() => navigateMonth("prev")}>
+                                    <FaChevronLeft />
+                                </button>
+                                <h4 className="mb-0 mx-2 mx-sm-4  text-nowrap">
                                     {currentMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
                                 </h4>
-                                {/* <button className="btn btn-outline-danger btn-sm ms-3" onClick={() => navigateMonth("next")}>
-                  <FaChevronRight />
-                </button> */}
+                                <button className="btn btn-outline-danger btn-sm ms-2 ms-sm-3" onClick={() => navigateMonth("next")}>
+                                    <FaChevronRight />
+                                </button>
                             </div>
 
-                            <div className="text-center mb-3">
+                            <div className="d-flex align-items-center justify-content-center mb-3 change_week">
+                                <button
+                                    className="btn btn-outline-secondary btn-sm me-3 d-flex align-items-center gap-2"
+                                    onClick={() => navigateDays("prev")}
+                                    disabled={(() => {
+                                        const prevWeekStart = new Date(currentStartDate)
+                                        prevWeekStart.setDate(currentStartDate.getDate() - 7)
+                                        const today = new Date()
+                                        today.setHours(0, 0, 0, 0)
+                                        prevWeekStart.setHours(0, 0, 0, 0)
+                                        return prevWeekStart < today
+                                    })()}
+                                >
+                                    <FaChevronLeft /> <span>Previous Week</span>
+                                </button>
                                 <span className="text-muted small">
-                                    Today to Next 7 Days • {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })} -{" "}
-                                    {(() => {
-                                        const endDate = new Date()
-                                        endDate.setDate(new Date().getDate() + 6)
+                                    {currentStartDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })} - {(() => {
+                                        const endDate = new Date(currentStartDate)
+                                        endDate.setDate(currentStartDate.getDate() + 6)
                                         return endDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })
                                     })()}
                                 </span>
+                                <button
+                                    className="btn btn-outline-secondary btn-sm ms-3 d-flex align-items-center gap-2"
+                                    onClick={() => navigateDays("next")}
+                                >
+                                    <span>Next Week</span> <FaChevronRight />
+                                </button>
                             </div>
 
                             <div className="table-responsive">
@@ -493,26 +488,20 @@ export default function ManageAvailabilityPage({ params }) {
                                     <thead>
                                         <tr>
                                             <th className="text-center" style={{ width: "100px" }}></th>
-                                            {getDayLabels().map((day, index) => (
+                                            {daysOfWeek.map((day, index) => (
                                                 <th
                                                     key={day}
                                                     className={`text-center position-relative ${!isDayActive(index) ? "bg-light text-muted" : ""}`}
                                                 >
-                                                    <div className="d-flex flex-column align-items-center gap-2 top_checks">
-                                                        <div className="form-check">
-                                                            <input
-                                                                className="form-check-input"
-                                                                type="checkbox"
-                                                                id={`day-${index}`}
-                                                                checked={isDayActive(index)}
-                                                                onChange={() => handleDayToggle(index)}
-                                                            />
-                                                            <label className="form-check-label small fw-bold" htmlFor={`day-${index}`}>
-                                                                {day}
-                                                            </label>
-                                                        </div>
-                                                        <small className="text-muted">{getWeekDates()[index]}</small>
-                                                        {!isDayActive(index) && <small className="text-danger">(Day Off)</small>}
+                                                    <div className="d-flex flex-column align-items-center">
+                                                        <button
+                                                            className={`btn btn-link p-0 text-decoration-none fw-bold ${!isDayActive(index) ? "text-muted" : "text-dark"}`}
+                                                            disabled={!isDayActive(index)}
+                                                        >
+                                                            {day}
+                                                            {!isDayActive(index) && <small className="d-block">(Inactive)</small>}
+                                                        </button>
+                                                        <small className="text-muted mt-1">{weekDates[index]}</small>
                                                     </div>
                                                 </th>
                                             ))}
@@ -521,8 +510,8 @@ export default function ManageAvailabilityPage({ params }) {
                                     <tbody>
                                         {timeSlots.map((timeSlot) => (
                                             <tr key={timeSlot}>
-                                                <td className="text-center fw-bold align-middle bg-light">{timeSlot}</td>
-                                                {getDayLabels().map((_, dayIndex) => {
+                                                <td className="text-center text-nowrap fw-bold align-middle bg-light">{timeSlot}</td>
+                                                {daysOfWeek.map((_, dayIndex) => {
                                                     const slotKey = getSlotKey(dayIndex, timeSlot)
                                                     const isSelected = availability[slotKey] || false
                                                     const dayActive = isDayActive(dayIndex)
@@ -563,8 +552,8 @@ export default function ManageAvailabilityPage({ params }) {
                                     <strong>Selection:</strong>
                                     {selectedRange.start && (
                                         <span className="ms-2">
-                                            Start: {selectedRange.start.timeSlot} on {getDayLabels()[selectedRange.start.dayIndex]}{" "}
-                                            {getWeekDates()[selectedRange.start.dayIndex]}
+                                            Start: {selectedRange.start.timeSlot} on {daysOfWeek[selectedRange.start.dayIndex]}{" "}
+                                            {weekDates[selectedRange.start.dayIndex]}
                                         </span>
                                     )}
                                     {selectedRange.end && <span className="ms-2">End: {selectedRange.end.timeSlot}</span>}
@@ -578,30 +567,30 @@ export default function ManageAvailabilityPage({ params }) {
                                 </div>
                             )}
 
-                            <div className="d-flex justify-content-end gap-3 mt-4">
+                            <div className="d-flex justify-content-end mt-4 gap-3">
                                 <button
-                                    className="btn btn-outline-secondary px-4"
-                                    onClick={async () => {
-                                        try {
-                                            const result = await updateWorkingDays(workingDays)
-                                            if (result.success || result.message === "success") {
-                                                showSuccessToast("Working days updated successfully!")
-                                            } else {
-                                                showErrorToast(`Error: ${result.message || "Failed to update working days"}`)
-                                            }
-                                        } catch (error) {
-                                            showErrorToast("Error updating working days")
-                                        }
-                                    }}
+                                    className="btn btn-outline-danger bg-white hover-danger px-4"
+                                    onClick={() => router.back()}
                                 >
-                                    Save Days
+                                    Back
                                 </button>
                                 <button
                                     className="btn btn-danger px-4"
                                     onClick={handleUpdate}
                                     disabled={!selectedRange.start || !selectedRange.end}
                                 >
-                                    Update Availability
+                                    {loading2 ? (
+                                        <>
+                                            <span
+                                                className="spinner-border spinner-border-sm me-2"
+                                                role="status"
+                                                aria-hidden="true"
+                                            ></span>
+                                            Updating...
+                                        </>
+                                    ) : (
+                                        "Update"
+                                    )}
                                 </button>
                             </div>
                         </div>
@@ -614,12 +603,12 @@ export default function ManageAvailabilityPage({ params }) {
           cursor: pointer;
           transition: all 0.2s ease;
         }
-
+        
         .availability-slot.disabled {
           cursor: not-allowed;
           opacity: 0.5;
         }
-
+        
         .slot-circle {
           width: 24px;
           height: 24px;
@@ -632,50 +621,41 @@ export default function ManageAvailabilityPage({ params }) {
           transition: all 0.2s ease;
           background-color: white;
         }
-
+        
         .slot-circle:hover:not(.disabled) {
           border-color: #dc3545;
           transform: scale(1.1);
         }
-
+        
         .slot-circle.checked {
           background-color: #dc3545;
           border-color: #dc3545;
           color: white;
         }
-
+        
         .slot-circle.disabled {
           background-color: #f8f9fa;
           border-color: #dee2e6;
           cursor: not-allowed;
         }
-
+        
         .availability-slot:hover:not(.disabled) .slot-circle {
           border-color: #dc3545;
         }
-
+        
         th {
           background-color: #f8f9fa;
           font-weight: 600;
         }
-
+        
         .table td {
           vertical-align: middle;
         }
-
+        
         .btn-outline-danger:hover {
           background-color: #dc3545;
           border-color: #dc3545;
         }
-        .top_checks .form-check-input[type=checkbox] {
-            border-radius: 1.25em;
-            width:20px;
-            height:20px
-        }
-            .top_checks .form-check label {
-                margin-top: 5px;
-    margin-left: 5px;
-            }
       `}</style>
         </div>
     )

@@ -1,37 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as Yup from "yup";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { FaRegEdit, FaTimes } from "react-icons/fa";
 import { showErrorToast, showSuccessToast } from "src/lib/toast";
 import api from "../../../lib/axios";
 import Cookies from "js-cookie";
-
-// const schema = Yup.object({
-//     salonName: Yup.string().required("Salon name is required"),
-//     phoneNumber: Yup.string().required("Phone number is required"),
-//     bussinessAddress: Yup.string().required("Business address is required"),
-//     locationName: Yup.string().required("Location is required"),
-//     description: Yup.string(),
-//     workingDays: Yup.array().min(1, "Select at least one working day"),
-//     startTime: Yup.string().required("Start time is required"),
-//     endTime: Yup.string().required("End time is required"),
-//     images: Yup.array()
-//         .of(
-//             Yup.mixed()
-//                 .test("fileSize", "File too large", (value) =>
-//                     !value || (value.size <= 2 * 1024 * 1024)
-//                 )
-//                 .test("fileType", "Unsupported file format", (value) =>
-//                     !value || ["image/jpeg", "image/png", "image/webp"].includes(value.type)
-//                 )
-//         )
-//         .max(5, "Maximum 5 images allowed"),
-//     category: Yup.string().required("Category is required"),
-// });
 
 const DAYS_OF_WEEK = [
     "Monday",

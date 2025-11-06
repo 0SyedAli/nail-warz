@@ -45,7 +45,6 @@ export default function LoginPage() {
         throw new Error(result?.message || "Login failed");
       }
 
-
       Cookies.set("token", result.token, {
         expires: 7,
         secure: process.env.NODE_ENV === "production",
