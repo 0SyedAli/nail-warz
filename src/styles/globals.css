@@ -770,9 +770,9 @@ table.table.caption-top th {
 }
 
 .dash_btn2 {
-  background-color: #C11111;
+  background-color: #C11111 !important;
   border-radius: 6px;
-  color: #FFF;
+  color: #FFF !important;
   font-family: var(--font-inter);
   font-size: 13px;
   padding: 10px 20px;
@@ -1080,11 +1080,12 @@ table.table.caption-top th {
 }
 
 .themebtn4.red {
-  background: #ff2e2e;
+  background-color: #ff2e2e;
 }
 
 .themebtn4.green {
-  background: #C11111;
+  background-color: #C11111;
+  color: #FFF;
 }
 
 .upload_btn {
@@ -1982,12 +1983,15 @@ button.reset_btn svg {
   align-items: center;
   gap: 10px;
 }
-.wd_table .table-bordered>:not(caption)>*>*  {
- width: fit-content!important;
+
+.wd_table .table-bordered>:not(caption)>*>* {
+  width: fit-content !important;
 }
+
 .wd_table input {
-font-size: 13px;
+  font-size: 13px;
 }
+
 .ast_item img {
   border-radius: 10px;
 }
@@ -2004,9 +2008,11 @@ font-size: 13px;
   justify-content: center;
   position: relative;
 }
+
 input[type="checkbox"]:checked {
   background-color: #4CAF50;
 }
+
 .ast_file label {
   display: flex;
   align-items: center;
@@ -2533,6 +2539,61 @@ button.hamburger {
   position: absolute;
   cursor: pointer;
 
+}
+
+#googleSignInDiv .nsm7Bb-HzV7m-LgbsSe.hJDwNd-SxQuSe.i5vt6e-Ia7Qfc.uaxL4e-RbRzK {
+  margin: 0 auto;
+}
+
+.ms_wrapper {
+  position: relative;
+  width: 100%;
+}
+
+
+.ms_tag {
+  background: #007bff;
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ms_tag button {
+  border: none;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+.ms_dropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 9999;
+  box-shadow: 0 0 6px 1px #ccc;
+}
+
+.ms_option {
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.ms_option:hover {
+  background: #f1f1f1;
+}
+
+.ms_option.selected {
+  background: #007bff;
+  color: white;
 }
 
 /* chart css */

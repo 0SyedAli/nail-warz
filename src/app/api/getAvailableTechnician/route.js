@@ -14,9 +14,9 @@ export async function POST(request) {
 
     // Here you would typically save to your database
     // For now, we'll just log and return success
-    console.log("Received technician availability update:", {
-      notAvailable: notAvailableSlots,
-    })
+    // console.log("Received technician availability update:", {
+    //   notAvailable: notAvailableSlots,
+    // })
 
     // Simulate API processing
     await new Promise((resolve) => setTimeout(resolve, 500))

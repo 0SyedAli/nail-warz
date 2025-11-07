@@ -15,7 +15,7 @@ import DeleteConfirm from "@/components/Modal/DeleteConfirm";
 export default function TechnicianPage({ params }) {
     const router = useRouter();
     const { tId } = use(params);
-    console.log(tId);
+    // console.log(tId);
     const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
     const [technicianData, setTechnicianData] = useState(null);

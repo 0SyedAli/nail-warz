@@ -19,22 +19,22 @@ const DashboardPanel = ({ activeTab }) => {
 
   useEffect(() => {
     const cookie = Cookies.get("user");
-    console.log("Raw cookie:", cookie);
+    // console.log("Raw cookie:", cookie);
 
     if (!cookie) return router.push("/auth/login");
 
     try {
       const u = JSON.parse(cookie);
-      console.log("Parsed user from cookie:", u);
+      // console.log("Parsed user from cookie:", u);
 
       if (u?._id) {
         setSalonId(u._id);
       } else {
-        console.warn("User has no _id:", u);
+        // console.warn("User has no _id:", u);
         router.push("/auth/login");
       }
     } catch (err) {
-      console.error("Cookie parse error:", err);
+      // console.error("Cookie parse error:", err);
       router.push("/auth/login");
     }
   }, []);

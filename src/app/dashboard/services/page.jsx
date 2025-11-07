@@ -172,11 +172,11 @@ export default function Services() {
                       <tr key={s._id}>
                         <td>{s._id}</td>
                         <td className="user_td">
-                          <img
+                          {/* <img
                             src={imageSrc}
                             alt="Service"
                             onError={(e) => (e.currentTarget.src = fallbackImg)}
-                          />
+                          /> */}
                           {s.serviceName}
                         </td>
                         <td>${Number(s.price).toFixed(2)}</td>

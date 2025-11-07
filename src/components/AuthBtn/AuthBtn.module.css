@@ -1,7 +1,7 @@
 .btntheme1 {
   width: 100%;
   height: 50px;
-  background: #C11111;
+  background-color: #C11111!important;
   border-radius: 10px;
   color: #FAF0D1;
   font-size: 18px;
@@ -14,16 +14,16 @@
 }
 
 .btntheme1:hover {
-  background: #f73434;
+  background-color: #f73434!important;
 }
 
 .location_btn {
-  background: transparent !important;
+  background-color: transparent !important;
   border: 1px solid #C11111 !important;
   color: #000;
 }
 
 .location_btn:hover {
-  background: #C11111;
+  background-color: #C11111!important;
   color: #FFF;
 }

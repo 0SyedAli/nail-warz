@@ -60,20 +60,20 @@ export default function ManageAvailabilityPage({ params }) {
         const fetchTechnicianData = async () => {
             try {
                 setLoading(true)
-                console.log("[v0] Fetching technician data for ID:", tId)
-                console.log("[v0] API URL:", process.env.NEXT_PUBLIC_API_URL)
+                // console.log("[v0] Fetching technician data for ID:", tId)
+                // console.log("[v0] API URL:", process.env.NEXT_PUBLIC_API_URL)
 
                 const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/getTechnicianById?id=${tId}`)
 
-                console.log("[v0] Response status:", response.status)
-                console.log("[v0] Response headers:", response.headers.get("content-type"))
+                // console.log("[v0] Response status:", response.status)
+                // console.log("[v0] Response headers:", response.headers.get("content-type"))
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`)
                 }
 
                 const result = await response.json()
-                console.log("[v0] API Response:", result)
+                // console.log("[v0] API Response:", result)
 
                 if (result.success && result.data.technician) {
                     setTechnicianData(result.data.technician)
@@ -118,19 +118,19 @@ export default function ManageAvailabilityPage({ params }) {
                             today.setHours(0, 0, 0, 0)
                             const dayIndex = Math.floor((slotDate - today) / (1000 * 60 * 60 * 24))
 
-                            console.log("[v0] Processing slot - Date:", slot.date, "Parsed:", slotDate, "DayIndex:", dayIndex)
+                            // console.log("[v0] Processing slot - Date:", slot.date, "Parsed:", slotDate, "DayIndex:", dayIndex)
 
                             if (dayIndex >= 0 && dayIndex < 7) {
                                 const startTimeIndex = timeSlots.indexOf(slot.startTime)
                                 const endTimeIndex = timeSlots.indexOf(slot.endTime)
 
-                                console.log("[v0] Start index:", startTimeIndex, "End index:", endTimeIndex)
+                                // console.log("[v0] Start index:", startTimeIndex, "End index:", endTimeIndex)
 
                                 for (let i = startTimeIndex; i <= endTimeIndex; i++) {
                                     if (i >= 0 && i < timeSlots.length) {
                                         const slotKey = `${dayIndex}-${timeSlots[i]}`
                                         existingAvailability[slotKey] = true
-                                        console.log("[v0] Marked slot as unavailable:", slotKey)
+                                        // console.log("[v0] Marked slot as unavailable:", slotKey)
                                     }
                                 }
                             }
@@ -354,6 +354,7 @@ export default function ManageAvailabilityPage({ params }) {
                     }))
                     setSelectedRange({ start: null, end: null })
                     setAvailability({})
+                    window.location.reload();
                 } else {
                     showErrorToast(`Error: ${result.message || "Failed to update availability"}`)
                 }
@@ -586,6 +587,7 @@ export default function ManageAvailabilityPage({ params }) {
                                             const result = await updateWorkingDays(workingDays)
                                             if (result.success || result.message === "success") {
                                                 showSuccessToast("Working days updated successfully!")
+                                                window.location.reload();
                                             } else {
                                                 showErrorToast(`Error: ${result.message || "Failed to update working days"}`)
                                             }

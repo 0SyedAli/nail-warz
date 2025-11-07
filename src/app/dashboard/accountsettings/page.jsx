@@ -7,7 +7,8 @@ import { FaRegEdit, FaTimes } from "react-icons/fa";
 import { showErrorToast, showSuccessToast } from "src/lib/toast";
 import api from "../../../lib/axios";
 import Cookies from "js-cookie";
-
+import Select from "react-select";
+import MultiSelect from "@/components/MultiSelect";
 const DAYS_OF_WEEK = [
     "Monday",
     "Tuesday",
@@ -40,7 +41,7 @@ const EditProfile = () => {
             startTime: "",
             endTime: "",
             images: [],
-            category: "",
+            category: [],
             salonName: "",
             phoneNumber: "",
             bussinessAddress: "",
@@ -122,14 +123,17 @@ const EditProfile = () => {
                         workingDays: workingDaysObj,   // <-- set here
                         startTime: allSameTimes ? firstDay?.startTime : "",
                         endTime: allSameTimes ? firstDay?.endTime : "",
-                        category: profileData.categoryId?.[0]?._id || "",
+                        category: profileData.categoryId?.map(c => ({
+                            value: c._id,
+                            label: c.categoryName
+                        })) || [],
                         images: []
                     });
 
                     // Set existing image if available
                     if (profileData.image?.[0]) {
                         setPreviews([`${process.env.NEXT_PUBLIC_IMAGE_URL}/${profileData.image[0]}`]);
-                        console.log(`${process.env.NEXT_PUBLIC_IMAGE_URL}/${profileData.image[0]}`);
+                        // console.log(`${process.env.NEXT_PUBLIC_IMAGE_URL}/${profileData.image[0]}`);
                     }
                 }
 
@@ -143,60 +147,130 @@ const EditProfile = () => {
 
         fetchData();
     }, [router, reset]);
+    const [isClient, setIsClient] = useState(false);
+    useEffect(() => setIsClient(true), []);
+    // const onSubmit = async (data) => {
+    //     setIsLoading(true);
+    //     try {
+    //         const formData = new FormData();
+    //         formData.append("id", adminId);
+    //         formData.append("salonName", data.salonName);
+    //         formData.append("phoneNumber", data.phoneNumber);
+    //         formData.append("bussinessAddress", data.bussinessAddress);
+    //         formData.append("description", data.description);
+    //         formData.append("locationName", data.locationName);
+    //         formData.append("latitude", existingData?.latitude?.toString() || "37.0802");
+    //         formData.append("longitude", existingData?.longitude?.toString() || "95.7029");
+
+    //         // Working days payload
+    //         // const days = data.workingDays.map((day) => ({
+    //         //     day,
+    //         //     isActive: true,
+    //         //     startTime: data.startTime,
+    //         //     endTime: data.endTime,
+    //         // }));
+    //         // Build workingDays payload correctly
+    //         const daysPayload = DAYS_OF_WEEK.map(day => {
+    //             const item = data.workingDays?.[day] || {};
+    //             return {
+    //                 day,
+    //                 isActive: !!item.isActive,
+    //                 startTime: item.startTime || "",
+    //                 endTime: item.endTime || ""
+    //             };
+    //         });
+    //         formData.append("workingDays", JSON.stringify(daysPayload));
+    //         // formData.append("workingDays", JSON.stringify(days));
+
+    //         // Category IDs
+    //         // formData.append("categoryId", JSON.stringify([data.category]));
+    //         formData.append(
+    //             "categoryId",
+    //             JSON.stringify(data.category.map(c => c.value))
+    //         );
+    //         // Append new images
+    //         data.images.forEach((file) => formData.append("image", file));
+
+    //         const res = await api.post("/updateAdminProfile", formData, {
+    //             headers: {
+    //                 "Content-Type": "multipart/form-data",
+    //             },
+    //         });
+
+    //         if (res.data.success) {
+    //             showSuccessToast("Profile updated successfully!");
+    //             router.refresh();
+    //         } else {
+    //             throw new Error(res.data.message || "Profile update failed");
+    //         }
+    //     } catch (error) {
+    //         showErrorToast(error.message || "Failed to update profile");
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    // };
 
     const onSubmit = async (data) => {
         setIsLoading(true);
         try {
             const formData = new FormData();
+
             formData.append("id", adminId);
-            formData.append("salonName", data.salonName);
-            formData.append("phoneNumber", data.phoneNumber);
-            formData.append("bussinessAddress", data.bussinessAddress);
-            formData.append("description", data.description);
-            formData.append("locationName", data.locationName);
-            formData.append("latitude", existingData?.latitude?.toString() || "37.0802");
-            formData.append("longitude", existingData?.longitude?.toString() || "95.7029");
 
-            // Working days payload
-            // const days = data.workingDays.map((day) => ({
-            //     day,
-            //     isActive: true,
-            //     startTime: data.startTime,
-            //     endTime: data.endTime,
-            // }));
-            // Build workingDays payload correctly
-            const daysPayload = DAYS_OF_WEEK.map(day => {
-                const item = data.workingDays?.[day] || {};
-                return {
-                    day,
-                    isActive: !!item.isActive,
-                    startTime: item.startTime || "",
-                    endTime: item.endTime || ""
-                };
-            });
-            formData.append("workingDays", JSON.stringify(daysPayload));
-            // formData.append("workingDays", JSON.stringify(days));
-
-            // Category IDs
-            formData.append("categoryId", JSON.stringify([data.category]));
-
-            // Append new images
-            data.images.forEach((file) => formData.append("image", file));
-
-            const res = await api.post("/updateAdminProfile", formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-
-            if (res.data.success) {
-                showSuccessToast("Profile updated successfully!");
-                router.refresh();
-            } else {
-                throw new Error(res.data.message || "Profile update failed");
+            // only send salonName if changed
+            if (data.salonName !== existingData.salonName) {
+                formData.append("salonName", data.salonName);
             }
-        } catch (error) {
-            showErrorToast(error.message || "Failed to update profile");
+
+            if (data.phoneNumber !== existingData.phoneNumber?.toString()) {
+                formData.append("phoneNumber", data.phoneNumber);
+            }
+
+            if (data.bussinessAddress !== existingData.bussinessAddress) {
+                formData.append("bussinessAddress", data.bussinessAddress);
+            }
+
+            if (data.description !== existingData.description) {
+                formData.append("description", data.description);
+            }
+
+            if (data.locationName !== existingData.locationName) {
+                formData.append("locationName", data.locationName);
+            }
+
+            // category changed?
+            const oldCats = existingData.categoryId.map(c => c._id);
+            const newCats = data.category.map(c => c.value);
+
+            if (JSON.stringify(oldCats) !== JSON.stringify(newCats)) {
+                formData.append("categoryId", JSON.stringify(newCats));
+            }
+
+            // working days changed?
+            const oldWD = JSON.stringify(existingData.workingDays);
+            const newWD = JSON.stringify(DAYS_OF_WEEK.map(day => ({
+                day,
+                isActive: data.workingDays[day].isActive,
+                startTime: data.workingDays[day].startTime,
+                endTime: data.workingDays[day].endTime
+            })));
+            if (oldWD !== newWD) {
+                formData.append("workingDays", newWD);
+            }
+
+            // new image(s)
+            if (data.images.length > 0) {
+                data.images.forEach(f => formData.append("image", f));
+            }
+
+            const res = await api.post("/updateAdminProfile", formData);
+            if (res.data.success) {
+                showSuccessToast("Updated!");
+                router.refresh();
+            }
+
+        } catch (e) {
+            showErrorToast("Error Updating");
         } finally {
             setIsLoading(false);
         }
@@ -407,7 +481,7 @@ const EditProfile = () => {
                             <div className="col-md-4">
                                 <div className="am_field">
                                     <label>Category</label>
-                                    <select
+                                    {/* <select
                                         {...register("category")}
                                         className={`form-control ${errors.category ? "is-invalid" : ""}`}
                                     >
@@ -417,7 +491,49 @@ const EditProfile = () => {
                                                 {cat.categoryName}
                                             </option>
                                         ))}
-                                    </select>
+                                    </select> */}
+                                    {/* {isClient && (
+                                        <Select
+                                            isMulti
+                                            isSearchable
+                                            options={categoryList.map(c => ({ value: c._id, label: c.categoryName }))}
+                                            value={watch("category")}
+                                            onChange={(selected) => setValue("category", selected, { shouldValidate: true })}
+                                            placeholder="Select one or more categories..."
+                                            styles={{
+                                                control: (base) => ({
+                                                    ...base,
+                                                    minHeight: "45px",
+                                                    height: "45px",
+                                                    borderColor: "#ced4da",
+                                                    borderRadius: "10px",
+                                                    boxShadow: "none",
+                                                }),
+                                                valueContainer: (base) => ({
+                                                    ...base,
+                                                    height: "45px",
+                                                    padding: "0 8px",
+                                                    fontSize: "60%",
+                                                }),
+                                                input: (base) => ({
+                                                    ...base,
+                                                    margin: 0,
+                                                    padding: 0,
+                                                }),
+                                                indicatorsContainer: (base) => ({
+                                                    ...base,
+                                                    height: "45px",
+                                                }),
+                                            }}
+                                        />
+                                    )} */}
+                                    {isClient && (
+                                        <MultiSelect
+                                            options={categoryList.map(c => ({ value: c._id, label: c.categoryName }))}
+                                            value={watch("category")}
+                                            onChange={(val) => setValue("category", val, { shouldValidate: true })}
+                                        />
+                                    )}
                                     {errors.category && (
                                         <div className="invalid-feedback">{errors.category.message}</div>
                                     )}
@@ -483,7 +599,7 @@ const EditProfile = () => {
                             </div> */}
 
                             <div className="col-12 wd_table">
-                                <label className="mb-2" style={{ fontSize: "13px", fontWeight:700, color: "#606060" }}>Working days & timing</label>
+                                <label className="mb-2" style={{ fontSize: "13px", fontWeight: 700, color: "#606060" }}>Working days & timing</label>
 
                                 <div className="table-responsive">
                                     <table className="table table-bordered ">

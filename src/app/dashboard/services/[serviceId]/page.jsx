@@ -321,7 +321,7 @@ export default function EditService() {
             <div className="mb-3 d-flex gap-2 flex-wrap">
               {previews.map((src, i) => (
                 <div key={i} style={{ position: "relative" }}>
-                  {console.log(`${src}`)}
+                  {/* {console.log(`${src}`)} */}
                   <Image
                     src={`${src}`}
                     alt=""

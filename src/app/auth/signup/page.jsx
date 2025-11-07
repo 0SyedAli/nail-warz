@@ -7,15 +7,15 @@ import InputField from "@/components/Form/InputField";
 import { AuthBtn } from "@/components/AuthBtn/AuthBtn";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { showErrorToast, showSuccessToast } from "src/lib/toast";
-import Cookies from "js-cookie"; // ✅ Import js-cookie
+import Cookies from "js-cookie";
 import api from "../../../lib/axios";
 import Link from "next/link";
 import AuthRedirectHandler from "@/utils/AuthHandler";
-import SpinnerLoading from "@/components/Spinner/SpinnerLoading";
 import BallsLoading from "@/components/Spinner/BallsLoading";
-// ✅ Yup validation schema
+
+// ✅ Yup schema
 const schema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
   password: Yup.string().min(6, "Min 6 characters").required("Password is required"),
@@ -35,33 +35,18 @@ export default function LoginPage() {
     resolver: yupResolver(schema),
   });
 
+  // ✅ Handle normal signup
   const onSubmit = async (data) => {
     setLoading(true);
     try {
       const res = await api.post("/signUpAdmin", data);
-      const result = res.data; // Axios auto-parses response
+      const result = res.data;
 
-      if (!result?.success) {
-        throw new Error(result?.message || "Signup failed");
-      }
+      if (!result?.success) throw new Error(result?.message || "Signup failed");
 
-      // ✅ Save token and user data in cookies
-      // Cookies.set("token", result.token, {
-      //   expires: 7,
-      //   secure: process.env.NODE_ENV === "production",
-      //   sameSite: "Strict",
-      // });
-
-      // Cookies.set("user", JSON.stringify(result.data), {
-      //   expires: 7,
-      //   secure: process.env.NODE_ENV === "production",
-      //   sameSite: "Strict",
-      // });
       sessionStorage.setItem("token", result?.token);
-      setSuccess(true)
+      setSuccess(true);
       showSuccessToast(result?.message || "Signup Successful");
-
-      // ✅ Redirect to business profile
       router.push("/auth/otp");
     } catch (err) {
       const message = err?.response?.data?.message || err.message || "Signup error";
@@ -71,11 +56,72 @@ export default function LoginPage() {
     }
   };
 
+  // ✅ GOOGLE Signup/Login
+  useEffect(() => {
+    // load Google Identity SDK
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.onload = initializeGoogleSignIn;
+    document.body.appendChild(script);
+  }, []);
+
+  const initializeGoogleSignIn = () => {
+    if (!window.google) return;
+
+    window.google.accounts.id.initialize({
+      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID, // ✅ Set in .env.local
+      callback: handleGoogleResponse,
+    });
+
+    window.google.accounts.id.renderButton(
+      document.getElementById("googleSignInDiv"),
+      { theme: "outline", size: "large", width: 330 }
+    );
+  };
+
+  const handleGoogleResponse = async (response) => {
+    try {
+      // Decode Google JWT credential to get email
+      const payload = JSON.parse(atob(response.credential.split(".")[1]));
+      const email = payload.email;
+
+      if (!email) throw new Error("Unable to get email from Google");
+
+      const res = await api.post("/salonSignUpOrLoginWithGoogle", { email });
+      const result = res.data;
+
+      if (!result?.success) throw new Error(result?.message || "Google signup failed");
+
+      sessionStorage.setItem("token", result?.token);
+      Cookies.set("token", result?.token, {
+        expires: 7,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+      });
+      Cookies.set("user", JSON.stringify(result?.data), {
+        expires: 7,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+      });
+      showSuccessToast("Signed in with Google successfully!");
+      // ✅ Redirect based on isUpdated
+      if (result?.data?.isUpdated === true) {
+        router.push("/dashboard");
+      } else {
+        router.push("/auth/bussinessprofile");
+      }
+    } catch (error) {
+      showErrorToast(error.message || "Google Sign-in error");
+    }
+  };
 
   return (
     <>
       <AuthRedirectHandler />
-      {success ? <BallsLoading borderWidth="mx-auto" /> : (
+      {success ? (
+        <BallsLoading borderWidth="mx-auto" />
+      ) : (
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="d-flex align-items-center justify-content-center mb-3">
             <Image src="/images/logo.png" width={120} height={150} alt="Logo" />
@@ -85,7 +131,6 @@ export default function LoginPage() {
           <InputField
             id="email"
             type="email"
-            classInput="classInput"
             placeholder="you@example.com"
             {...register("email")}
           />
@@ -95,7 +140,6 @@ export default function LoginPage() {
           <InputField
             id="password"
             type={show ? "text" : "password"}
-            classInput="classInput"
             placeholder="Enter password"
             show={show}
             handleClick={() => setShow(!show)}
@@ -104,15 +148,17 @@ export default function LoginPage() {
           {errors.password && <p style={{ color: "red" }}>{errors.password.message}</p>}
 
           <AuthBtn title={"Signup"} type="submit" disabled={loading} />
+
+          {/* ✅ Google Signup/Login Button */}
+          <div id="googleSignInDiv" className="mt-3 text-center"></div>
+
           <div className="register_link">
             <h5>
-              {"Already have an account? "}
-              <Link href="login">Login</Link>
+              Already have an account? <Link href="login">Login</Link>
             </h5>
           </div>
         </form>
       )}
     </>
-
   );
 }

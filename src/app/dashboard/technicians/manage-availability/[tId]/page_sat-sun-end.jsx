@@ -60,13 +60,13 @@ export default function ManageAvailabilityPage({ params }) {
     const fetchTechnicianData = async () => {
       try {
         setLoading(true)
-        console.log("[v0] Fetching technician data for ID:", tId)
-        console.log("[v0] API URL:", process.env.NEXT_PUBLIC_API_URL)
+        // console.log("[v0] Fetching technician data for ID:", tId)
+        // console.log("[v0] API URL:", process.env.NEXT_PUBLIC_API_URL)
 
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/getTechnicianById?id=${tId}`)
 
-        console.log("[v0] Response status:", response.status)
-        console.log("[v0] Response headers:", response.headers.get("content-type"))
+        // console.log("[v0] Response status:", response.status)
+        // console.log("[v0] Response headers:", response.headers.get("content-type"))
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`)

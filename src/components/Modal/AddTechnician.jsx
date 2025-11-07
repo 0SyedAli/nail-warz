@@ -117,8 +117,8 @@ function AddTechnician({ isOpen, onClose, btntitle, onSuccess, service_id }) {
               options={technicianList}
               value={selectedTechs}
               onChange={(selected) => setSelectedTechs(selected || [])}
-              isLoading={loadingTechs}
               placeholder="Search and select technicians..."
+              // isLoading={loadingTechs}
               styles={{
                 control: (base) => ({
                   ...base,
