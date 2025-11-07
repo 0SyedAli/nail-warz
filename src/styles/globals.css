@@ -2541,8 +2541,9 @@ button.hamburger {
 
 }
 
-#googleSignInDiv .nsm7Bb-HzV7m-LgbsSe.hJDwNd-SxQuSe.i5vt6e-Ia7Qfc.uaxL4e-RbRzK {
-  margin: 0 auto;
+#googleSignInDiv .nsm7Bb-HzV7m-LgbsSe.hJDwNd-SxQuSe.i5vt6e-Ia7Qfc.uaxL4e-RbRzK,
+div#googleSignInDiv iframe {
+  margin: 0 auto !important;
 }
 
 .ms_wrapper {
