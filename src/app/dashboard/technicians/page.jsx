@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { showErrorToast, showSuccessToast } from "src/lib/toast";
 import { useDisclosure } from "@chakra-ui/react";
-import EditTechnician from "@/components/Modal/EditTechnician";
 import { BsSearch } from "react-icons/bs";
+import EditTechnician from "@/components/Modal/EditTechnician";
+import EditTechnicianAvailablity from "@/components/Modal/EditTechnicianAvailablity";
 
 const PAGE_SIZE = 10;
 
@@ -20,6 +21,7 @@ const Technicians = () => {
   const [selectedTechnician, setSelectedTechnician] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
+  const { isOpen: isEditAvailOpen, onOpen: onEditAvailOpen, onClose: onEditAvailClose } = useDisclosure();
   const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
   const router = useRouter();
 
@@ -77,7 +79,10 @@ const Technicians = () => {
     setSelectedTechnician(tech);
     onEditOpen();
   };
-
+  const handleEditAvailClick = (tech) => {
+    setSelectedTechnician(tech);
+    onEditAvailOpen();
+  };
   const handleUpdateSuccess = () => {
     showSuccessToast("Technician updated successfully!");
     onEditClose();
@@ -187,6 +192,12 @@ const Technicians = () => {
                           >
                             Edit
                           </button>
+                          <button
+                            className="btn btn-outline-danger btn-sm"
+                            onClick={() => handleEditAvailClick(t)}
+                          >
+                            Manage Availablity
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -226,13 +237,22 @@ const Technicians = () => {
 
       {/* ✅ Edit Modal */}
       {selectedTechnician && (
-        <EditTechnician
-          isOpen={isEditOpen}
-          onClose={onEditClose}
-          techId={selectedTechnician?._id}
-          onSuccess={handleUpdateSuccess}
-        />
+        <>
+          <EditTechnician
+            isOpen={isEditOpen}
+            onClose={onEditClose}
+            techId={selectedTechnician?._id}
+            onSuccess={handleUpdateSuccess}
+          />
+          <EditTechnicianAvailablity
+            isOpen={isEditAvailOpen}
+            onClose={onEditAvailClose}
+            techId={selectedTechnician?._id}
+            onSuccess={handleUpdateSuccess}
+          />
+        </>
       )}
+
     </div>
   );
 };

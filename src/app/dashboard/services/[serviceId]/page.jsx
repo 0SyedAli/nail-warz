@@ -74,7 +74,7 @@ export default function EditService() {
         const [serviceRes, techniciansRes, categoriesRes] = await Promise.all([
           api.get(`/getServiceById?id=${serviceId}`),
           api.get(`/getAllTechniciansBySalonId?salonId=${salonId}`),
-          api.get(`/getAllCategories`)
+          api.get(`/getSalonCategory?salonId=${salonId}`)
         ]);
 
         if (serviceRes.data.success) {

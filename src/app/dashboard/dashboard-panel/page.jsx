@@ -5,18 +5,24 @@ import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import SpinnerLoading from "@/components/Spinner/SpinnerLoading";
+import Link from "next/link";
+import AppointmentDetail from "@/components/Modal/AppointmentDetail";
+import { useDisclosure } from "@chakra-ui/react";
 const DashboardPanel = ({ activeTab }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [salonId, setSalonId] = useState("");
+  const [bookingDetail, setBookingDetail] = useState(null);
+
   const [empty, setEmpty] = useState(false);   // <- NEW
   const router = useRouter();
   // Sample order data
-  const pieData = [
-    { id: "Expenses", label: "Expenses", value: 40 },
-    { id: "Comes", label: "Comes", value: 25 },
-  ];
+  // const pieData = [
+  //   { id: "Expenses", label: "Expenses", value: 40 },
+  //   { id: "Comes", label: "Comes", value: 25 },
+  // ];
   // Filter orders based on the active tab
   useEffect(() => {
     const cookie = Cookies.get("user");
@@ -87,11 +93,16 @@ const DashboardPanel = ({ activeTab }) => {
   }, [salonId]);
 
   // Filter orders based on the active tab (e.g., Done, Pending, Accepted)
-  const filteredOrders = orders.filter((order) =>
-    activeTab
-      ? order.status.toLowerCase().includes(activeTab.toLowerCase())
-      : true
-  );
+  const filteredOrders = orders.filter((order) => {
+    const status = order.status.toLowerCase();
+    if (!activeTab) return true;
+
+    if (activeTab.toLowerCase() === "new") {
+      return status === "pending" || status === "accepted";
+    }
+
+    return status.includes(activeTab.toLowerCase());
+  });
   const formatDateTimeUS = (dateStr, timeStr) => {
     try {
       // Convert "10-10-2025" → "2025-10-10"
@@ -117,13 +128,25 @@ const DashboardPanel = ({ activeTab }) => {
       case "completed":
         return <span className="badge py-2 bg-success">Completed</span>;
       case "pending":
-        return <span className="badge py-2 bg-secondary">Pending</span>;
+      case "accepted":
+        return <span className="badge py-2 bg-primary">New</span>;
       case "canceled":
         return <span className="badge py-2 bg-danger">Canceled</span>;
-      case "accepted":
-        return <span className="badge py-2 bg-warning text-dark">Accepted</span>;
       default:
         return <span className="badge py-2 bg-secondary">{status}</span>;
+    }
+  };
+  const fetchBookingDetail = async (id) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/getBookingById?bookingId=${id}`
+      );
+      const json = await res.json();
+      if (!json.success) throw new Error("Failed to load booking");
+      setBookingDetail(json.data);
+      onOpen();
+    } catch (e) {
+      console.error("Booking Detail Error:", e.message);
     }
   };
   return (
@@ -154,6 +177,7 @@ const DashboardPanel = ({ activeTab }) => {
         <div className="card dash_list">
           <div className="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2 py-3">
             <h5 className="fw-bolder mb-0">Activity</h5>
+            <Link href="/dashboard/appointments" className="btn btn-outline-danger btn-sm">View All</Link>
           </div>
           {loading ? (
             <SpinnerLoading />
@@ -188,7 +212,7 @@ const DashboardPanel = ({ activeTab }) => {
                         <td>
                           <button
                             className="btn btn-outline-primary btn-sm"
-                            onClick={() => router.push(`/super-admin/dashboard/manage-appointments/${order._id}`)}
+                            onClick={() => fetchBookingDetail(order._id)}
                           >
                             View Details
                           </button>
@@ -203,6 +227,12 @@ const DashboardPanel = ({ activeTab }) => {
           )}
         </div>
       </div>
+      <AppointmentDetail
+        isOpen={isOpen}
+        onClose={onClose}
+        modalClass="appoint_detail_container"
+        booking={bookingDetail}
+      />
     </div>
   );
 };

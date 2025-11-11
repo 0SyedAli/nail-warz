@@ -14,7 +14,6 @@ import api from "../../../lib/axios";
 import Cookies from "js-cookie";
 
 const MAX_IMAGES = 3;
-const CategoryId = "6850659a42574e73b13e4090";
 
 const schema = Yup.object({
   serviceName: Yup.string().required("Service name is required"),
@@ -80,7 +79,7 @@ export default function AddNewService() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await api.get(`/getAllCategories`);
+        const res = await api.get(`/getSalonCategory?salonId=6850655e42574e73b13e4088`);
         if (res?.data?.success) {
           setCategoryList(res?.data?.data || []);
         } else {
@@ -136,7 +135,7 @@ export default function AddNewService() {
       fd.append("price", data.servicePrice);
       fd.append("description", data.description);
       fd.append("technicianId", JSON.stringify(data.technicians));
-      fd.append("categoryId", CategoryId);
+      fd.append("categoryId", data.category);
       data.images.forEach((file) => fd.append("images", file));
 
       const res = await fetch(

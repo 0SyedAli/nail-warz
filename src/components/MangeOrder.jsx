@@ -101,7 +101,8 @@ export default function ManageAppointments() {
                 acc.all++;
                 switch (appt.status.toLowerCase()) {
                     case "pending":
-                        acc.pending++;
+                    case "accepted":
+                        acc.new++;
                         break;
                     case "canceled":
                         acc.canceled++;
@@ -109,16 +110,14 @@ export default function ManageAppointments() {
                     case "completed":
                         acc.completed++;
                         break;
-                    case "accepted":
-                        acc.accepted++;
-                        break;
                 }
                 return acc;
             },
-            { all: 0, canceled: 0, completed: 0, pending: 0, accepted: 0 }
+            { all: 0, new: 0, canceled: 0, completed: 0 }
         );
         setStats(stats);
     };
+
 
     useEffect(() => {
         if (!salonId) return;
@@ -130,11 +129,10 @@ export default function ManageAppointments() {
             case "completed":
                 return <span className="badge py-2 bg-success">Completed</span>;
             case "pending":
-                return <span className="badge py-2 bg-secondary">Pending</span>;
+            case "accepted":
+                return <span className="badge py-2 bg-primary">New</span>;
             case "canceled":
                 return <span className="badge py-2 bg-danger">Canceled</span>;
-            case "accepted":
-                return <span className="badge py-2 bg-warning text-dark">Accepted</span>;
             default:
                 return <span className="badge py-2 bg-secondary">{status}</span>;
         }

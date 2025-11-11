@@ -11,19 +11,20 @@ import { useDisclosure } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { showErrorToast, showSuccessToast } from "src/lib/toast";
 import DeleteConfirm from "@/components/Modal/DeleteConfirm";
+import EditTechnicianAvailablity from "@/components/Modal/EditTechnicianAvailablity";
 
 export default function TechnicianPage({ params }) {
     const router = useRouter();
     const { tId } = use(params);
     // console.log(tId);
     const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
+    const { isOpen: isEditAvailOpen, onOpen: onEditAvailOpen, onClose: onEditAvailClose } = useDisclosure();
     const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
     const [technicianData, setTechnicianData] = useState(null);
+    const [selectedTechnician, setSelectedTechnician] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const handleContinueClick = () => {
-        onOpen(); // Open modal
-    };
+
     // Fetch Technician Data
     useEffect(() => {
         if (!tId) return;
@@ -78,7 +79,10 @@ export default function TechnicianPage({ params }) {
             onDeleteClose(); // ✅ also close in error case
         }
     };
-
+    const handleEditAvailClick = (tech) => {
+        setTechnicianData(tech);
+        onEditAvailOpen();
+    };
     if (loading) {
         return (
             <div className=" py-4 text-center">
@@ -110,7 +114,7 @@ export default function TechnicianPage({ params }) {
                                         src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${technicianData.image}` || "/images/profile-avatar.jpg"}
                                         alt={technicianData.fullName || "Unknown"}
                                         className="rounded-circle"
-                                        style={{height:"120px", width:"120px"}}
+                                        style={{ height: "120px", width: "120px" }}
                                         width={120}
                                         height={120}
                                     />
@@ -185,7 +189,8 @@ export default function TechnicianPage({ params }) {
                                     <button className="btn btn_tech" onClick={onEditOpen}>Edit Profile</button>
                                     <button
                                         className="btn btn_tech"
-                                        onClick={() => router.push(`/dashboard/technicians/manage-availability/${tId}`)}
+                                        // onClick={() => router.push(`/dashboard/technicians/manage-availability/${tId}`)}
+                                        onClick={() => handleEditAvailClick(technicianData)}
                                     >
                                         Manage Availability
                                     </button>
@@ -213,12 +218,10 @@ export default function TechnicianPage({ params }) {
                 </div>
             </div>
             <EditTechnician isOpen={isEditOpen} onClose={onEditClose} techId={technicianData?._id} />
-
-            <DeleteConfirm
-                isOpen={isDeleteOpen}
-                onClose={onDeleteClose}
-                onConfirm={() => handleDelete(technicianData?._id)}
+            <EditTechnicianAvailablity isOpen={isEditAvailOpen} onClose={onEditAvailClose} techId={technicianData?._id} />
+            <DeleteConfirm isOpen={isDeleteOpen} onClose={onDeleteClose} onConfirm={() => handleDelete(technicianData?._id)}
             />
+
         </>
     );
 }

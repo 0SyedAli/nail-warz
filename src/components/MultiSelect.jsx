@@ -29,7 +29,7 @@ export default function MultiSelect({ options, value, onChange }) {
             <div className="ms_control" onClick={() => setOpen((o) => !o)}>
                 <input placeholder="Select category..." readOnly />
 
-                <div className="d-flex align-items-center gap-2 mt-2">
+                <div className="d-flex align-items-center flex-wrap gap-2 mt-2">
                     {value.map((v) => (
                         <span className="ms_tag" key={v.value}>
                             {v.label}

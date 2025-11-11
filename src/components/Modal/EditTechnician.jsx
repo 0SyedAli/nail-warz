@@ -11,17 +11,9 @@ import { AuthBtn } from "@/components/AuthBtn/AuthBtn";
 import BallsLoading from "../Spinner/BallsLoading";
 
 /* ---------- Days ---------- */
-const ALL_DAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
 
-export default function EditTechnician({ isOpen, onClose, techId }) {
+
+export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
   const router = useRouter();
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -43,11 +35,6 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
       email: "",
       description: "",
       designation: "",
-      workingDays: [],
-      startTime: "",
-      endTime: "",
-      breakStart: "",
-      breakEnd: "",
       image: null,
     },
   });
@@ -55,24 +42,6 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
   // Watch image to handle preview
   const imageFile = watch("image");
 
-  /* ---------- Helpers ---------- */
-  const convertTo12Hour = useCallback((timeStr) => {
-    if (!timeStr) return "";
-    const [h, m] = timeStr.split(":").map(Number);
-    const period = h >= 12 ? "PM" : "AM";
-    const hour = h % 12 || 12;
-    return `${hour.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")} ${period}`;
-  }, []);
-
-  const convertTo24Hour = useCallback((timeStr) => {
-    if (!timeStr) return "";
-    const [time, modifier] = timeStr.split(" ");
-    let [hours, minutes] = time.split(":");
-    hours = parseInt(hours, 10);
-    if (modifier === "PM" && hours < 12) hours += 12;
-    if (modifier === "AM" && hours === 12) hours = 0;
-    return `${hours.toString().padStart(2, "0")}:${minutes}`;
-  }, []);
 
   /* ---------- Fetch technician data ---------- */
   useEffect(() => {
@@ -109,22 +78,13 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
         //   // same for breakStart / breakEnd if needed
         //   image: null,
         // });
-        const workingDaysObj = {};
-        ALL_DAYS.forEach(day => {
-          const found = technician.workingDays?.find(d => d.day === day);
-          workingDaysObj[day] = {
-            isActive: !!found?.isActive,
-            startTime: found?.startTime ? convertTo24Hour(found.startTime) : "",
-            endTime: found?.endTime ? convertTo24Hour(found.endTime) : "",
-          };
-        });
+
         reset({
           fullName: technician.fullName,
           phoneNumber: technician.phoneNumber,
           email: technician.email,
           description: technician.description,
           designation: technician.designation,
-          workingDays: workingDaysObj,
           image: null
         });
 
@@ -140,7 +100,7 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
     };
 
     fetchTechnician();
-  }, [techId, reset, isOpen, onClose, convertTo24Hour]);
+  }, [techId, reset, isOpen, onClose]);
 
   /* ---------- Handle image preview ---------- */
   useEffect(() => {
@@ -185,18 +145,7 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
 
       //   fd.append("workingDays", JSON.stringify(dayPayload));
       // }
-      if (dirtyFields.workingDays) {
-        const dayPayload = ALL_DAYS.map(day => {
-          const d = data.workingDays[day];
-          return {
-            day,
-            isActive: !!d.isActive,
-            startTime: convertTo12Hour(d.startTime),
-            endTime: convertTo12Hour(d.endTime),
-          };
-        });
-        fd.append("workingDays", JSON.stringify(dayPayload));
-      }
+
 
 
       if (imageChanged && data.image) {
@@ -220,9 +169,10 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
       if (!res.ok || !result.success) {
         throw new Error(result.message || "Update failed");
       }
+      // ✅ Trigger parent refresh
+      if (typeof onSuccess === "function") onSuccess();
 
       onClose();
-      router.refresh();
     } catch (err) {
       alert(err.message ?? "Something went wrong");
     }
@@ -398,7 +348,7 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
             />
           </div> */}
         {/* </div> */}
-        <table className="table table-bordered wd_table">
+        {/* <table className="table table-bordered wd_table">
           <thead>
             <tr>
               <th>Day</th>
@@ -437,7 +387,7 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
             })}
           </tbody>
         </table>
-
+ */}
 
 
 
@@ -452,3 +402,6 @@ export default function EditTechnician({ isOpen, onClose, techId }) {
     </Modal>
   );
 }
+
+
+
