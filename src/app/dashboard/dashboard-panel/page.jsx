@@ -184,7 +184,9 @@ const DashboardPanel = ({ activeTab }) => {
           ) : error ? (
             <p className="text-danger">Error: {error}</p>
           ) : empty ? (
-            <p>No bookings found for this salon.</p>
+            <div className="dash_list card-body">
+              <p>No bookings found for this salon.</p>
+            </div>
           ) : (
             <div className="dash_list card-body p-0">
               <div className="table-responsive">

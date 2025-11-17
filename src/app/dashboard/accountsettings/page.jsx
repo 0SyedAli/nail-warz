@@ -26,6 +26,8 @@ const EditProfile = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [existingData, setExistingData] = useState(null);
     const [hasCommonTimes, setHasCommonTimes] = useState(true);
+    const [vendorCategory, setVendorCategory] = useState([]);
+    const [vendorInput, setVendorInput] = useState("");
 
     const {
         register,
@@ -245,7 +247,9 @@ const EditProfile = () => {
             if (JSON.stringify(oldCats) !== JSON.stringify(newCats)) {
                 formData.append("categoryId", JSON.stringify(newCats));
             }
-
+            if (vendorCategory.length > 0) {
+                formData.append("vendorCategory", JSON.stringify(vendorCategory));
+            }
             // working days changed?
             const oldWD = JSON.stringify(existingData.workingDays);
             const newWD = JSON.stringify(DAYS_OF_WEEK.map(day => ({
@@ -316,7 +320,17 @@ const EditProfile = () => {
             setValue("workingDays", [...currentDays, day], { shouldValidate: true });
         }
     };
+    const handleAddVendorCategory = () => {
+        const trimmed = vendorInput.trim();
+        if (trimmed && !vendorCategory.includes(trimmed)) {
+            setVendorCategory([...vendorCategory, trimmed]);
+            setVendorInput("");
+        }
+    };
 
+    const handleRemoveVendorCategory = (index) => {
+        setVendorCategory(vendorCategory.filter((_, i) => i !== index));
+    };
     return (
         <div className="w-100">
             <div className="m_tabs_main mt-5">
@@ -481,52 +495,6 @@ const EditProfile = () => {
                             <div className="col-md-4">
                                 <div className="am_field">
                                     <label>Category</label>
-                                    {/* <select
-                                        {...register("category")}
-                                        className={`form-control ${errors.category ? "is-invalid" : ""}`}
-                                    >
-                                        <option value="">Select Category</option>
-                                        {categoryList.map((cat) => (
-                                            <option key={cat._id} value={cat._id}>
-                                                {cat.categoryName}
-                                            </option>
-                                        ))}
-                                    </select> */}
-                                    {/* {isClient && (
-                                        <Select
-                                            isMulti
-                                            isSearchable
-                                            options={categoryList.map(c => ({ value: c._id, label: c.categoryName }))}
-                                            value={watch("category")}
-                                            onChange={(selected) => setValue("category", selected, { shouldValidate: true })}
-                                            placeholder="Select one or more categories..."
-                                            styles={{
-                                                control: (base) => ({
-                                                    ...base,
-                                                    minHeight: "45px",
-                                                    height: "45px",
-                                                    borderColor: "#ced4da",
-                                                    borderRadius: "10px",
-                                                    boxShadow: "none",
-                                                }),
-                                                valueContainer: (base) => ({
-                                                    ...base,
-                                                    height: "45px",
-                                                    padding: "0 8px",
-                                                    fontSize: "60%",
-                                                }),
-                                                input: (base) => ({
-                                                    ...base,
-                                                    margin: 0,
-                                                    padding: 0,
-                                                }),
-                                                indicatorsContainer: (base) => ({
-                                                    ...base,
-                                                    height: "45px",
-                                                }),
-                                            }}
-                                        />
-                                    )} */}
                                     {isClient && (
                                         <MultiSelect
                                             options={categoryList.map(c => ({ value: c._id, label: c.categoryName }))}
@@ -539,66 +507,59 @@ const EditProfile = () => {
                                     )}
                                 </div>
                             </div>
-                            {/* Working Days */}
+                            {/* Vendor Category */}
                             {/* <div className="col-md-4">
                                 <div className="am_field">
-                                    <label>Working Days*</label>
-                                    {!hasCommonTimes && (
-                                        <div className="alert alert-warning">
-                                            Note: Your working days currently have different times. Setting new times will apply to all selected days.
-                                        </div>
-                                    )}
-                                    <div className="as_days d-flex flex-wrap gap-2 justify-content-start">
-                                        {DAYS_OF_WEEK.map((day) => (
-                                            <button
-                                                key={day}
-                                                type="button"
-                                                onClick={() => toggleWorkingDay(day)}
-                                                className={`btn btn-sm ${watch("workingDays")?.includes(day)
-                                                    ? "btn-primary"
-                                                    : "btn-outline-primary"
-                                                    }`}
+                                    <label>Vendor Category</label>
+                                    <div className="d-flex align-items-center gap-2">
+                                        <input
+                                            type="text"
+                                            value={vendorInput}
+                                            onChange={(e) => setVendorInput(e.target.value)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === "Enter") {
+                                                    e.preventDefault();
+                                                    handleAddVendorCategory();
+                                                }
+                                            }}
+                                            placeholder="Type and press Enter"
+                                            className="form-control"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={handleAddVendorCategory}
+                                            className="btn btn-success"
+                                        >
+                                            Add
+                                        </button>
+                                    </div>
+
+                                    <div className="d-flex flex-wrap gap-2 mt-2">
+                                        {vendorCategory.map((cat, index) => (
+                                            <span
+                                                key={index}
+                                                className="badge bg-primary d-flex align-items-center justify-content-center vc-badge"
+                                                style={{
+                                                    borderRadius: "5px",
+                                                    padding: "6px 10px",
+                                                    fontSize: "11px",
+                                                }}
                                             >
-                                                {day.substring(0, 3)}
-                                            </button>
+                                                {cat}
+                                                <FaTimes
+                                                    style={{
+                                                        marginLeft: "8px",
+                                                        cursor: "pointer",
+                                                    }}
+                                                    onClick={() => handleRemoveVendorCategory(index)}
+                                                />
+                                            </span>
                                         ))}
                                     </div>
-                                    {errors.workingDays && (
-                                        <div className="text-danger small mt-1">{errors.workingDays.message}</div>
-                                    )}
                                 </div>
                             </div> */}
 
-                            {/* Working Hours */}
-                            {/* <div className="col-md-4">
-                                <div className="am_field">
-                                    <label>Start Time</label>
-                                    <input
-                                        type="time"
-                                        {...register("startTime")}
-                                        className={`form-control ${errors.startTime ? "is-invalid" : ""}`}
-                                    />
-                                    {errors.startTime && (
-                                        <div className="invalid-feedback">{errors.startTime.message}</div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="col-md-4">
-                                <div className="am_field">
-                                    <label>End Time</label>
-                                    <input
-                                        type="time"
-                                        {...register("endTime")}
-                                        className={`form-control ${errors.endTime ? "is-invalid" : ""}`}
-                                    />
-                                    {errors.endTime && (
-                                        <div className="invalid-feedback">{errors.endTime.message}</div>
-                                    )}
-                                </div>
-                            </div> */}
-
-                            <div className="col-12 wd_table">
+                            <div className="col-8 wd_table">
                                 <label className="mb-2" style={{ fontSize: "13px", fontWeight: 700, color: "#606060" }}>Working days & timing</label>
 
                                 <div className="table-responsive">

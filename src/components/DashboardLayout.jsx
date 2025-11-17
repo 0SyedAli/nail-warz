@@ -21,6 +21,7 @@ export default function Dashboard({ children }) {
     addnewtechnician: { title: "Add New Technician" },
     appointments: { title: "Appointment Management" },
     accountsettings: { title: "Account Settings" },
+    categories: { title: "Manage Vendor Catagories" },
   };
 
   useEffect(() => {

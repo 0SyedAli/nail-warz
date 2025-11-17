@@ -5,6 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import LogoutButton from "./Logout";
 import { RxCross2 } from "react-icons/rx";
+import { IoLayersOutline } from "react-icons/io5";
+
 const SideBar = () => {
   const pathname = usePathname();
   const router = useRouter(); // Initialize the useRouter hook
@@ -31,6 +33,11 @@ const SideBar = () => {
       href: "/dashboard/services",
       icon: "/images/serv.png",
       text: "Services",
+    },
+    {
+      href: "/dashboard/categories",
+      icon: "/images/layer-icon.png",
+      text: "Categories",
     },
     {
       href: "/dashboard/accountsettings",
@@ -101,7 +108,9 @@ const SideBar = () => {
             >
               <Link href={item?.href} onClick={() => setIsSidebarOpen(false)}>
                 <span>
-                  <Image src={item.icon} alt={`${item.text} Icon`} width={18} height={18} />
+                  {item?.icon &&
+                    <Image src={item?.icon} alt={`${item?.text} Icon`} width={18} height={18} />
+                  }
                 </span>
                 {item.text}
               </Link>

@@ -9,7 +9,6 @@ const TopBar = ({ header }) => {
 
   const [salonId, setSalonId] = useState(null);
   const [token, setToken] = useState(null);
-
   const [salonName, setSalonName] = useState("");
   const [location, setLocation] = useState("");
   const [image, setImage] = useState("");
@@ -70,6 +69,7 @@ const TopBar = ({ header }) => {
         <h1>{header}</h1>
       </div>
       <div className="tc_profile">
+       
         <div>
           <h4>{salonName}</h4>
           <h5>{location}</h5>
@@ -82,6 +82,7 @@ const TopBar = ({ header }) => {
           alt=""
         />
       </div>
+      
     </div>
   );
 };

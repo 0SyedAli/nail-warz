@@ -897,8 +897,9 @@ table.table.caption-top th {
 
 .product_card h4 {
   margin: 0;
-  font-size: 18px;
-  font-family: "InterSemiBold";
+  font-size: 22px;
+  font-family: var(--font-inter);
+  font-weight: 600;
 }
 
 .product_card .product_image {
@@ -1986,6 +1987,18 @@ button.reset_btn svg {
 
 .wd_table .table-bordered>:not(caption)>*>* {
   width: fit-content !important;
+}
+
+.vc-badge {
+  position: relative;
+  padding-right: 20px !important;
+}
+
+.vc-badge svg {
+  position: absolute;
+  top: 50%;
+  right: 5px;
+  transform: translateY(-50%);
 }
 
 .wd_table input {
