@@ -77,6 +77,7 @@ export default function AddNewService() {
   }, [salonId]);
 
   useEffect(() => {
+     if (!salonId) return;       
     (async () => {
       try {
         const res = await api.get(`/getSalonCategory?salonId=${salonId}`);
@@ -89,7 +90,7 @@ export default function AddNewService() {
         showErrorToast("Failed to fetch technicians");
       }
     })();
-  }, []);
+  }, [salonId]);
 
   /* -------- React‑Hook‑Form setup -------- */
   const {
