@@ -79,7 +79,7 @@ export default function AddNewService() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await api.get(`/getSalonCategory?salonId=6850655e42574e73b13e4088`);
+        const res = await api.get(`/getSalonCategory?salonId=${salonId}`);
         if (res?.data?.success) {
           setCategoryList(res?.data?.data || []);
         } else {
