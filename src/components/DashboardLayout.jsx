@@ -20,6 +20,7 @@ export default function Dashboard({ children }) {
     addnewservice: { title: "Add New Service" },
     addnewtechnician: { title: "Add New Technician" },
     appointments: { title: "Appointment Management" },
+    appointmentslist: { title: "Appointment List" },
     accountsettings: { title: "Account Settings" },
     categories: { title: "Manage Vendor Catagories" },
   };

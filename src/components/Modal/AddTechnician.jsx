@@ -152,7 +152,7 @@ function AddTechnician({ isOpen, onClose, btntitle, onSuccess, service_id }) {
               value={selectedTechs}
               onChange={(val) => setSelectedTechs(val || [])}
               isLoading={loadingTechs}
-              placeholder="Search and select technicians..."
+              placeholder="select technicians..."
             />
 
             {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}

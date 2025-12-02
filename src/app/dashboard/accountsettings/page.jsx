@@ -500,6 +500,7 @@ const EditProfile = () => {
                                             options={categoryList.map(c => ({ value: c._id, label: c.categoryName }))}
                                             value={watch("category")}
                                             onChange={(val) => setValue("category", val, { shouldValidate: true })}
+                                            placeholder="Select Category"
                                         />
                                     )}
                                     {errors.category && (

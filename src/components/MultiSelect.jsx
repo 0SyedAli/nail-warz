@@ -1,7 +1,7 @@
 "use client"
 import { useState, useRef, useEffect } from "react";
 
-export default function MultiSelect({ options, value, onChange }) {
+export default function MultiSelect({ options, value, onChange, placeholder }) {
     const [open, setOpen] = useState(false);
     const wrapperRef = useRef(null);
 
@@ -27,7 +27,7 @@ export default function MultiSelect({ options, value, onChange }) {
     return (
         <div className="ms_wrapper" ref={wrapperRef}>
             <div className="ms_control" onClick={() => setOpen((o) => !o)}>
-                <input placeholder="Select category..." readOnly />
+                <input placeholder={placeholder || "Select"} readOnly />
 
                 <div className="d-flex align-items-center flex-wrap gap-2 mt-2">
                     {value.map((v) => (

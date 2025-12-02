@@ -230,7 +230,7 @@ export default function BussinessProfile() {
           {/* working days */}
           <label>Select Working Days</label>
           <div className="d-flex mt-1 mb-2 workDays">
-            {["Monday", "Tuesday", "Wednesday", "Thursday", "Saturday", "Sunday"].map((d) => (
+            {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((d) => (
               <div key={d} className="calender_item">
                 <input type="checkbox" value={d} {...register("workingDays")} />
                 <label>{d.slice(0, 3)}</label>

@@ -660,15 +660,15 @@ input::placeholder {
   font-weight: 300;
 }
 
-table tr th,
-table tr td {
+.dash_list tr th,
+.dash_list tr td {
   font-size: 12px !important;
   font-family: "Inter";
   padding: 13px !important;
   vertical-align: middle;
 }
 
-table tr td.user_td img {
+.dash_list tr td.user_td img {
   display: inline;
   margin-right: 10px;
   border-radius: 100%;
@@ -2634,6 +2634,211 @@ div#googleSignInDiv iframe {
 .ms_option.selected {
   background: #007bff;
   color: white;
+}
+
+/* MAIN CALENDAR WRAPPER */
+.rbc-calendar {
+  /* background: transparent !important; */
+  /* color: #fff !important; */
+}
+
+/* WEEK HEADER (Mon, Tue...) */
+/* .rbc-header {
+  background: rgba(255, 0, 0, 0.18) !important;
+  color: white !important;
+  font-weight: 600;
+  padding: 12px 0 !important;
+  border: none !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+} */
+
+/* TODAY CELL */
+/* .rbc-today {
+  background: rgba(255, 0, 0, 0.28) !important;
+} */
+
+/* TIME COLUMN BACKGROUND */
+.rbc-time-gutter {
+  background: rgba(0, 0, 0, 0.6) !important;
+  color: #fff !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* TIME SLOTS */
+.rbc-time-slot {
+  border-color: #FFF !important;
+  font-size: 15px;
+}
+
+/* FIX COLUMN CRACKING & OVERFLOW */
+.rbc-time-view {
+  border-radius: 12px;
+  overflow: hidden !important;
+  border: 1px solid rgba(255, 0, 0, 0.4) !important;
+  /* background: rgba(0, 0, 0, 0.4) !important; */
+}
+
+.rbc-day-slot .rbc-event-content,
+.rbc-day-slot .rbc-event-label {
+  font-size: 0.7vw;
+}
+
+/* EVENT STYLING (Beautiful Neon Red Buttons) */
+.rbc-event {
+  background: linear-gradient(to right, #9b0000, #ff0000) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  color: white !important;
+  font-size: 13px !important;
+  padding: 6px !important;
+  text-align: center !important;
+  box-shadow: 0 2px 6px rgba(255, 0, 0, 0.6) !important;
+  transition: transform 0.15s ease-in-out;
+}
+
+.rbc-event:hover {
+  transform: scale(1.05);
+}
+
+/* WEEK GRID FIX (no shake, no break) */
+.rbc-time-content {
+  display: flex !important;
+  position: relative !important;
+  border-top: none !important;
+}
+
+.rbc-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+.rbc-day-slot .rbc-event,
+.rbc-day-slot .rbc-background-event {
+  /* display: inline-block!important; */
+  flex-flow: unset !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+}
+
+/* Calendar grid styling */
+.fc {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* Header toolbar */
+.fc .fc-toolbar.fc-header-toolbar {
+  color: #ffffff;
+}
+
+.fc .fc-toolbar-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #000;
+  font-size: 24px;
+}
+
+/* Toolbar buttons */
+.fc .fc-button {
+  background: transparent !important;
+  border: 1px solid rgba(255, 0, 0, 0.4);
+  color: #000;
+  border-radius: 999px;
+  padding: 4px 10px;
+  transition: all .3s ease;
+}
+
+.fc .fc-button:focus {
+  box-shadow: none;
+}
+
+button.fc-viewAppointments-button.fc-button {
+  font-size: 13px;
+
+}
+
+.fc .fc-button:hover {
+  border: 1px solid #9b0000 !important;
+  background: #9b0000 !important;
+}
+
+.fc table thead .fc-scroller {
+  overflow: hidden !important;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+  background: #d5006d;
+  border-color: #d5006d;
+}
+
+/* Title center – no uppercase */
+.fc .fc-toolbar-title {
+  text-transform: none;
+}
+
+/* Week grid */
+.fc-theme-standard .fc-scrollgrid {
+  /* background: rgba(0, 0, 0, 0.6); */
+  border-radius: 12px;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Time column & horizontal lines */
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+/* Today highlight */
+.fc .fc-day-today {
+  background: rgba(255, 0, 0, 0.22);
+}
+
+/* Events */
+.fc-event {
+  border-radius: 8px;
+  border: none;
+  padding: 2px 4px;
+  font-size: 12px;
+}
+
+/* New vs old appointments */
+.fc-event-new {
+  background: linear-gradient(to right, #9b0000, #ff0000);
+  color: #ffffff;
+  box-shadow: 0 2px 5px rgba(255, 0, 0, 0.5);
+  cursor: pointer;
+  transition: all .3s ease;
+  height: fit-content;
+  margin: auto;
+  padding: 5px;
+}
+
+.fc-event-new:hover {
+  transform: scale(1.02);
+}
+
+.fc-event-old {
+  background: #9ca3af;
+  color: #111827;
+}
+
+.fc .fc-timegrid-slot {
+  height: 3.5rem;
+}
+
+/* .rbc-allday-cell {
+  display: none !important;
+} */
+
+.dashboard_panel .fc {
+  background: #FFF;
+  border-radius: 12px;
+  padding: 10px;
+}
+
+.fc .fc-button {
+  background: #9b0000;
 }
 
 /* chart css */
