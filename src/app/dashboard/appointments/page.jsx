@@ -69,7 +69,7 @@ export default function WeeklyCalendar() {
     const handleEventClick = (info) => {
         const timing = info.event.extendedProps.time;
         if (timing) {
-            router.push(`appointmentslist?timing=${encodeURIComponent(timing)}`);
+            router.push(`appointmentslist?timing=${timing.replace(/\s+/g, "")}`);
         } else {
             router.push(`appointmentslist`);
         }
@@ -155,7 +155,7 @@ export default function WeeklyCalendar() {
                         click: handleNext,
                     },
                     viewAppointments: {
-                        text: "View Appointments →",
+                        text: "List View",
                         click: handleViewAppointments,
                     },
                 }}

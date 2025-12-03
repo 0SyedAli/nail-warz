@@ -1,4 +1,7 @@
-import styles from "./form.module.css"; // Assuming you have a CSS module for styling
+'use client';
+
+import { useState, useEffect } from "react";
+import styles from "./form.module.css";
 import {
   Input,
   InputGroup,
@@ -7,17 +10,30 @@ import {
   Stack,
   InputLeftElement,
 } from "@chakra-ui/react";
-import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import the icons
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+
 const InputField = ({
   type,
   icon: Icon,
   imageSrc,
-  show,
+  show: initialShow = false,
   handleClick,
   classInput,
   placeholder,
   ...rest
 }) => {
+  const [isClient, setIsClient] = useState(false);
+  const [showPassword, setShowPassword] = useState(initialShow);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const handleToggle = () => {
+    setShowPassword(!showPassword);
+    if (handleClick) handleClick();
+  };
+
   return (
     <div className={`inputField ${styles.inputField}`}>
       <Stack>
@@ -28,17 +44,17 @@ const InputField = ({
 
           {/* Input field */}
           <Input
-            type={show ? "text" : type} // ✅ use show toggle here
+            type={showPassword && type === "password" ? "text" : type}
             {...rest}
             className={`${classInput ? classInput : ""}`}
             placeholder={placeholder}
           />
 
-          {/* Conditionally render the show/hide button only for password fields */}
-          {type === "password" ? (
+          {/* Only render on client side to avoid hydration mismatch */}
+          {isClient && type === "password" ? (
             <InputRightElement width="4.5rem" className={styles.icon2}>
-              <Button h="1.75rem" size="sm" onClick={handleClick}>
-                {show ? <FaEyeSlash /> : <FaEye />} {/* Toggle icons */}
+              <Button h="1.75rem" size="sm" onClick={handleToggle}>
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
               </Button>
             </InputRightElement>
           ) : null}
