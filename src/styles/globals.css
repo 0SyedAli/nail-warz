@@ -2734,7 +2734,7 @@ div#googleSignInDiv iframe {
   font-size: 1.1rem;
   font-weight: 600;
   color: #000;
-  font-size: 24px;
+  font-size: 20px;
 }
 
 /* Toolbar buttons */
@@ -2752,8 +2752,10 @@ div#googleSignInDiv iframe {
 }
 
 button.fc-viewAppointments-button.fc-button {
-  font-size: 13px;
-
+  font-size: 15px;
+  padding: 4px 30px;
+  font-weight: 600;
+  font-family: var(--font-inter);
 }
 
 .fc .fc-button:hover {
@@ -2827,6 +2829,10 @@ button.fc-viewAppointments-button.fc-button {
   height: 3.5rem;
 }
 
+.fc .fc-timegrid-col.fc-day-today {
+  background-color: transparent;
+}
+
 /* .rbc-allday-cell {
   display: none !important;
 } */
@@ -2840,6 +2846,8 @@ button.fc-viewAppointments-button.fc-button {
 .fc .fc-button {
   background: #9b0000;
 }
+
+
 
 /* chart css */
 @keyframes page-popup {
@@ -2865,6 +2873,10 @@ button.fc-viewAppointments-button.fc-button {
   .sidebar_container ul li.active a {
     font-size: 14px;
     padding: 12px 10px;
+  }
+
+  .fc-event-title {
+    font-size: 10px !important;
   }
 }
 
@@ -2910,6 +2922,18 @@ button.fc-viewAppointments-button.fc-button {
   }
 
   .sidebar_container ul li.active a {
+    font-size: 12px;
+  }
+
+  .fc-event-title {
+    font-size: 8px !important;
+  }
+
+  .fc-col-header .fc-day {
+    font-size: 14px;
+  }
+
+  .fc .fc-timegrid-slot {
     font-size: 12px;
   }
 }

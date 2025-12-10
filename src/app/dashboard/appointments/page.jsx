@@ -160,7 +160,15 @@ export default function WeeklyCalendar() {
                     },
                 }}
                 allDaySlot={false}
-                slotDuration="01:00:00"
+                slotLabelInterval="00:30"
+                slotDuration="00:30:00"
+                /* ⭐ THIS MAKES LABELS SHOW AS 12:00, 12:30, 01:00, 01:30 */
+                slotLabelFormat={{
+                    hour: "numeric",
+                    minute: "2-digit",
+                    hour12: true,
+                }}
+
                 events={events}
                 eventClick={handleEventClick}
                 height="100%"

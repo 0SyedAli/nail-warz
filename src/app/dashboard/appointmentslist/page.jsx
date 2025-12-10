@@ -275,13 +275,14 @@
 // export default Appointments;
 
 
-import MangeOrder from '@/components/MangeOrder'
+import ManageAppointments from '@/components/MangeOrder'
 import React from 'react'
 
-const Appoitment = () => {
+const AppointmentList = () => {
+
   return (
-    <MangeOrder />
+    <ManageAppointments />
   )
 }
 
-export default Appoitment
+export default AppointmentList

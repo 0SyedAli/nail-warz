@@ -5,13 +5,15 @@ import { FaCalendarAlt } from "react-icons/fa";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "../styles/refund.css";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import SpinnerLoading from "./Spinner/SpinnerLoading";
 import AppointmentDetail from "./Modal/AppointmentDetail";
 import Cookies from "js-cookie";
 import { useDisclosure } from "@chakra-ui/react";
 
 export default function ManageAppointments() {
+    const searchParams = useSearchParams();
+    const timing = searchParams.get("timing");  // "09:30AM"
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -50,7 +52,16 @@ export default function ManageAppointments() {
             setLoading(true);
             setError(null);
 
+            // let url = `${process.env.NEXT_PUBLIC_API_URL}/getBookingsBySalonId?salonId=${salonId}&timing=${timing}`;
+
+            if (!salonId) return;
+
             let url = `${process.env.NEXT_PUBLIC_API_URL}/getBookingsBySalonId?salonId=${salonId}`;
+
+            // Add timing if available
+            if (timing) {
+                url += `&time=${timing}`;
+            }
 
             if (date) {
                 // Convert JS Date object → "dd-mm-yyyy"
@@ -122,7 +133,7 @@ export default function ManageAppointments() {
     useEffect(() => {
         if (!salonId) return;
         fetchAppointments();
-    }, [salonId]);
+    }, [salonId, timing]);
 
     const getStatusBadge = (status) => {
         switch (status.toLowerCase()) {

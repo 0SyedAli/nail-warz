@@ -25,8 +25,8 @@ export function groupAppointments(appointments) {
       new Date()
     );
 
-    const end = new Date(start.getTime() + 60 * 60 * 1000);
-
+    // const end = new Date(start.getTime() + 60 * 60 * 1000);
+    const end = new Date(start.getTime() + 30 * 60 * 1000); // 30 minutes
     return {
       id: `${first.date}-${first.time}`,
       title: "New Appointment",
