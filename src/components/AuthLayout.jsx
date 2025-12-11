@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import "../styles/auth.module.css";
-import styles from "../styles/auth.module.css";
+import "@/styles/auth.module.css";
+import styles from "@/styles/auth.module.css";
 import { usePathname, useSearchParams } from "next/navigation";
 
 export default function AuthLayout({ children }) {

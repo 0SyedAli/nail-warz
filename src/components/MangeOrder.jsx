@@ -4,7 +4,7 @@ import { BsSearch, BsChevronLeft, BsChevronRight } from "react-icons/bs";
 import { FaCalendarAlt } from "react-icons/fa";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import "../styles/refund.css";
+import "@/styles/refund.css";
 import { useRouter, useSearchParams } from "next/navigation";
 import SpinnerLoading from "./Spinner/SpinnerLoading";
 import AppointmentDetail from "./Modal/AppointmentDetail";

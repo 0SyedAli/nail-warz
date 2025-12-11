@@ -1,7 +1,7 @@
 "use client"
 import SideBar from "@/components/SideBar";
 import TopBar from "@/components/TopBar";
-import '../styles/dashboard.css';
+import '@/styles/dashboard.css';
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import CancelBooking from "./CancelBooking";
