@@ -8,7 +8,7 @@ import { FiPlusCircle } from "react-icons/fi";
 import { RxCross2 } from "react-icons/rx";
 import Image from "next/image";
 import { showErrorToast, showSuccessToast } from "src/lib/toast";
-import api from "../../../../lib/axios";
+import api from "@/lib/axios";
 import Cookies from "js-cookie";
 
 const MAX_IMAGES = 3;
