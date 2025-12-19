@@ -26,8 +26,8 @@ export default function LogoutButton() {
         <Image
           src="/images/logout.png"
           alt="icon"
-          width={24}
-          height={24}
+          width={18}
+          height={18}
         />
       </span>
       Logout

@@ -133,8 +133,8 @@ export default function Dashboard() {
             <div className="col-12">
                 <div className="chart-card">
                     <div className="overview-header d-flex align-items-center justify-content-center justify-content-sm-between gap-2 mb-4 flex-wrap">
-                        <div className="d-flex align-items-center gap-4 flex-wrap">
-                            <div className="d-flex align-items-center gap-2 flex-wrap" style={{
+                        <div className="d-flex align-items-center gap-4 flex-wrap ">
+                            <div className="d-flex align-items-center gap-2  flex-wrap" style={{
                                 border: "1px solid #ccc",
                                 padding: "10px",
                                 borderRadius: "5px",
@@ -144,7 +144,7 @@ export default function Dashboard() {
                                     {dashboardData ? formatCurrency(dashboardData.totalMonthRevenue) : "$0"}
                                 </div>
                             </div>
-                            <div className="d-flex align-items-center gap-2 flex-wrap" style={{
+                            <div className="d-flex align-items-center gap-2  flex-wrap" style={{
                                 border: "1px solid #ccc",
                                 padding: "10px",
                                 borderRadius: "5px",

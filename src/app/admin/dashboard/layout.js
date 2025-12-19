@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import DashboardLayout from "@/components/DashboardLayout"; // adjust path if your AuthLayout is not in components
+import DashboardLayout from "@/components/DashboardLayoutAdmin"; // adjust path if your AuthLayout is not in components
 import BallsLoading from "@/components/Spinner/BallsLoading";
 
 export default function DashboardLayoutWrapper({ children }) {

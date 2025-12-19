@@ -1,164 +1,232 @@
+// "use client";
+
+// import { useForm } from "react-hook-form";
+// import { yupResolver } from "@hookform/resolvers/yup";
+// import * as Yup from "yup";
+// import { AuthBtn } from "@/components/AuthBtn/AuthBtn";
+// import Image from "next/image";
+// import { useRouter } from "next/navigation";
+// import { useState } from "react";
+// import { showErrorToast, showSuccessToast } from "src/lib/toast";
+// import Cookies from "js-cookie";
+// import api from "@/lib/axios";
+// import Link from "next/link";
+// import BallsLoading from "@/components/Spinner/BallsLoading";
+// import { FiEye, FiEyeOff } from "react-icons/fi";
+
+// // ✅ Yup schema
+// const schema = Yup.object().shape({
+//   email: Yup.string().email("Invalid email").required("Email is required"),
+//   password: Yup.string().min(6, "Min 6 characters").required("Password is required"),
+// });
+
+// export default function SignUp() {
+//   const [show, setShow] = useState(false);
+//   const [loading, setLoading] = useState(false);
+//   const [success, setSuccess] = useState(false);
+//   const router = useRouter();
+
+//   const {
+//     register,
+//     handleSubmit,
+//     formState: { errors },
+//   } = useForm({
+//     resolver: yupResolver(schema),
+//   });
+
+//   const onSubmit = async (data) => {
+//     setLoading(true);
+//     try {
+//       const res = await api.post("/superAdmin/signUp", data);
+//       const result = res.data;
+
+//       if (!result?.success) throw new Error(result?.message || "Signup failed");
+
+//       Cookies.set("token", result?.token, {
+//         expires: 7,
+//         secure: process.env.NODE_ENV === "production",
+//         sameSite: "Strict",
+//       });
+
+//       Cookies.set("user", JSON.stringify(result?.data), {
+//         expires: 7,
+//         secure: process.env.NODE_ENV === "production",
+//         sameSite: "Strict",
+//       });
+
+//       setSuccess(true);
+//       showSuccessToast(result?.message || "Signup Successful");
+//       router.push("/admin/dashboard");
+//     } catch (err) {
+//       showErrorToast(err.message || "Signup error");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     <>
+//       {success ? (
+//         <BallsLoading borderWidth="mx-auto" />
+//       ) : (
+//         <form className="admin-signup-form" onSubmit={handleSubmit(onSubmit)}>
+//           <div className="d-flex align-items-center justify-content-center mb-3">
+//             <Image src="/images/logo.png" width={120} height={150} alt="Logo" />
+//           </div>
+
+//           {/* EMAIL */}
+//           <label htmlFor="email">Enter your email</label>
+//           <input
+//             id="email"
+//             type="email"
+//             placeholder="you@example.com"
+//             className="form-control mb-2"
+//             {...register("email")}
+//           />
+//           {errors.email && <p className="text-danger">{errors.email.message}</p>}
+
+//           {/* PASSWORD */}
+//           <label htmlFor="password">Enter your password</label>
+//           <div className="position-relative mb-2">
+//             <input
+//               id="password"
+//               type={show ? "text" : "password"}
+//               placeholder="Enter password"
+//               className="form-control"
+//               {...register("password")}
+//             />
+//             <span
+//               onClick={() => setShow(!show)}
+//               className="position-absolute top-50 end-0 translate-middle-y me-3"
+//               style={{ cursor: "pointer" }}
+//             >
+//               {show ? <FiEyeOff /> : <FiEye />}
+//             </span>
+//           </div>
+//           {errors.password && (
+//             <p className="text-danger">{errors.password.message}</p>
+//           )}
+
+//           <AuthBtn title="Signup" type="submit" disabled={loading} />
+
+//           {/* Google Button */}
+//           <div id="googleSignInDiv" className="mt-3 text-center"></div>
+
+//           <div className="register_link mt-3">
+//             <h5>
+//               Already have an account? <Link href="login">Login</Link>
+//             </h5>
+//           </div>
+//         </form>
+//       )}
+//     </>
+//   );
+// }
+
+
 "use client";
 
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import InputField from "@/components/Form/InputField";
-import { AuthBtn } from "@/components/AuthBtn/AuthBtn";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { showErrorToast, showSuccessToast } from "src/lib/toast";
 import Cookies from "js-cookie";
-import api from "@/lib/axios";
 import Link from "next/link";
-import AuthRedirectHandler from "@/utils/AuthHandler";
-import BallsLoading from "@/components/Spinner/BallsLoading";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
-// ✅ Yup schema
-const schema = Yup.object().shape({
-  email: Yup.string().email("Invalid email").required("Email is required"),
-  password: Yup.string().min(6, "Min 6 characters").required("Password is required"),
+import { AuthBtn } from "@/components/AuthBtn/AuthBtn";
+import BallsLoading from "@/components/Spinner/BallsLoading";
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
+import api from "@/lib/axios";
+
+// Schema
+const schema = Yup.object({
+  email: Yup.string().email().required(),
+  password: Yup.string().min(6).required(),
 });
 
-export default function LoginPage() {
+export default function SignUp() {
+  const [mounted, setMounted] = useState(false);
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
   const router = useRouter();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
-    resolver: yupResolver(schema),
-  });
+  } = useForm({ resolver: yupResolver(schema) });
 
-  // ✅ Handle normal signup
+  if (!mounted) return null; // ✅ prevents hydration mismatch
+
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const res = await api.post("/signUpAdmin", data);
+      const res = await api.post("/superAdmin/signUp", data);
       const result = res.data;
 
-      if (!result?.success) throw new Error(result?.message || "Signup failed");
+      if (!result?.success) throw new Error(result?.message);
 
-      sessionStorage.setItem("token", result?.token);
+      Cookies.set("token", result.token);
+      Cookies.set("user", JSON.stringify(result.data));
+
       setSuccess(true);
-      showSuccessToast(result?.message || "Signup Successful");
-      router.push("/auth/otp");
+      showSuccessToast("Signup Successful");
+      router.push("/admin/dashboard");
     } catch (err) {
-      const message = err?.response?.data?.message || err.message || "Signup error";
-      showErrorToast(message);
+      showErrorToast(err.message || "Signup failed");
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ GOOGLE Signup/Login
-  useEffect(() => {
-    // load Google Identity SDK
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    script.onload = initializeGoogleSignIn;
-    document.body.appendChild(script);
-  }, []);
+  return success ? (
+    <BallsLoading />
+  ) : (
+    <form className="admin-signup-form" onSubmit={handleSubmit(onSubmit)}>
+      <div className="text-center mb-3">
+        <Image src="/images/logo.png" width={120} height={150} alt="Logo" />
+      </div>
 
-  const initializeGoogleSignIn = () => {
-    if (!window.google) return;
+      <label>Email</label>
+      <input {...register("email")} className="form-control mb-2" />
+      {errors.email && <p className="text-danger">{errors.email.message}</p>}
 
-    window.google.accounts.id.initialize({
-      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID, // ✅ Set in .env.local
-      callback: handleGoogleResponse,
-    });
+      <label>Password</label>
+      <div className="position-relative mb-2">
+        <input
+          type={show ? "text" : "password"}
+          {...register("password")}
+          className="form-control"
+        />
+        <span
+          onClick={() => setShow(!show)}
+          className="position-absolute top-50 end-0 translate-middle-y me-3"
+          style={{ cursor: "pointer" }}
+        >
+          {show ? <FiEyeOff /> : <FiEye />}
+        </span>
+      </div>
+      {errors.password && <p className="text-danger">{errors.password.message}</p>}
 
-    window.google.accounts.id.renderButton(
-      document.getElementById("googleSignInDiv"),
-      { theme: "outline", size: "large", width: 330 }
-    );
-  };
+      <AuthBtn type="submit" title="Signup" disabled={loading} />
 
-  const handleGoogleResponse = async (response) => {
-    try {
-      // Decode Google JWT credential to get email
-      const payload = JSON.parse(atob(response.credential.split(".")[1]));
-      const email = payload.email;
+      {/* Google sign-in placeholder */}
+      {/* <div id="googleSignInDiv" className="mt-3 text-center" /> */}
 
-      if (!email) throw new Error("Unable to get email from Google");
-
-      const res = await api.post("/salonSignUpOrLoginWithGoogle", { email });
-      const result = res.data;
-
-      if (!result?.success) throw new Error(result?.message || "Google signup failed");
-
-      sessionStorage.setItem("token", result?.token);
-      Cookies.set("token", result?.token, {
-        expires: 7,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Strict",
-      });
-      Cookies.set("user", JSON.stringify(result?.data), {
-        expires: 7,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Strict",
-      });
-      showSuccessToast("Signed in with Google successfully!");
-      // ✅ Redirect based on isUpdated
-      if (result?.data?.isUpdated === true) {
-        router.push("/dashboard");
-      } else {
-        router.push("/auth/bussinessprofile");
-      }
-    } catch (error) {
-      showErrorToast(error.message || "Google Sign-in error");
-    }
-  };
-
-  return (
-    <>
-      <AuthRedirectHandler />
-      {success ? (
-        <BallsLoading borderWidth="mx-auto" />
-      ) : (
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="d-flex align-items-center justify-content-center mb-3">
-            <Image src="/images/logo.png" width={120} height={150} alt="Logo" />
-          </div>
-
-          <label htmlFor="email">Enter your email</label>
-          <InputField
-            id="email"
-            type="email"
-            placeholder="you@example.com"
-            {...register("email")}
-          />
-          {errors.email && <p style={{ color: "red" }}>{errors.email.message}</p>}
-
-          <label htmlFor="password">Enter your password</label>
-          <InputField
-            id="password"
-            type={show ? "text" : "password"}
-            placeholder="Enter password"
-            show={show}
-            handleClick={() => setShow(!show)}
-            {...register("password")}
-          />
-          {errors.password && <p style={{ color: "red" }}>{errors.password.message}</p>}
-
-          <AuthBtn title={"Signup"} type="submit" disabled={loading} />
-
-          {/* ✅ Google Signup/Login Button */}
-          <div id="googleSignInDiv" className="mt-3 text-center"></div>
-
-          <div className="register_link">
-            <h5>
-              Already have an account? <Link href="login">Login</Link>
-            </h5>
-          </div>
-        </form>
-      )}
-    </>
+      <div className="register_link text-center">
+        <h5 style={{ fontSize: "15px" }}>
+          Already have an account? <Link href="login">Login</Link>
+        </h5>
+      </div>
+    </form>
   );
 }

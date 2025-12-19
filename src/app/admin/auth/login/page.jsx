@@ -36,7 +36,7 @@ export default function LoginPage() {
     setSuccess(false)
     setLoading(true);
     try {
-      const res = await api.post("/loginAdmin", data);
+      const res = await api.post("/loginSuperAdmin", data);
 
       const result = res.data;
 
@@ -58,14 +58,8 @@ export default function LoginPage() {
 
       showSuccessToast(result?.message || "Login Successful")
       // Success
-      if (result?.data?.isUpdated === true) {
-        router.push("/admin/dashboard");
-        setSuccess(true)
-
-      }
-      else {
-        router.push("/admin/auth/bussinessprofile");
-      }
+      router.push("/admin/dashboard");
+     
     } catch (err) {
       const message = err?.response?.data?.message || err.message || "Login error";
       showErrorToast(message);
@@ -74,68 +68,64 @@ export default function LoginPage() {
     }
   };
   // ✅ GOOGLE Signup/Login
-  useEffect(() => {
-    // load Google Identity SDK
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    script.onload = initializeGoogleSignIn;
-    document.body.appendChild(script);
-  }, []);
+  // useEffect(() => {
+  //   const script = document.createElement("script");
+  //   script.src = "https://accounts.google.com/gsi/client";
+  //   script.async = true;
+  //   script.onload = initializeGoogleSignIn;
+  //   document.body.appendChild(script);
+  // }, []);
 
-  const initializeGoogleSignIn = () => {
-    if (!window.google) return;
+  // const initializeGoogleSignIn = () => {
+  //   if (!window.google) return;
 
-    window.google.accounts.id.initialize({
-      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID, // ✅ Set in .env.local
-      callback: handleGoogleResponse,
-    });
+  //   window.google.accounts.id.initialize({
+  //     client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID, // ✅ Set in .env.local
+  //     callback: handleGoogleResponse,
+  //   });
 
-    window.google.accounts.id.renderButton(
-      document.getElementById("googleSignInDiv"),
-      { theme: "outline", size: "large", width: 330 }
-    );
-  };
+  //   window.google.accounts.id.renderButton(
+  //     document.getElementById("googleSignInDiv"),
+  //     { theme: "outline", size: "large", width: 330 }
+  //   );
+  // };
 
-  const handleGoogleResponse = async (response) => {
-    try {
-      // Decode Google JWT credential to get email
-      const payload = JSON.parse(atob(response.credential.split(".")[1]));
-      const email = payload.email;
+  // const handleGoogleResponse = async (response) => {
+  //   try {
+  //     const payload = JSON.parse(atob(response.credential.split(".")[1]));
+  //     const email = payload.email;
 
-      if (!email) throw new Error("Unable to get email from Google");
+  //     if (!email) throw new Error("Unable to get email from Google");
 
-      // API call
-      const res = await api.post("/salonSignUpOrLoginWithGoogle", { email });
-      const result = res.data;
+  //     const res = await api.post("/salonSignUpOrLoginWithGoogle", { email });
+  //     const result = res.data;
 
-      if (!result?.success) throw new Error(result?.message || "Google signup failed");
+  //     if (!result?.success) throw new Error(result?.message || "Google signup failed");
 
-      // ✅ Save token and user data
-      sessionStorage.setItem("token", result?.token);
-      Cookies.set("token", result?.token, {
-        expires: 7,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Strict",
-      });
-      Cookies.set("user", JSON.stringify(result?.data), {
-        expires: 7,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "Strict",
-      });
+  //     sessionStorage.setItem("token", result?.token);
+  //     Cookies.set("token", result?.token, {
+  //       expires: 7,
+  //       secure: process.env.NODE_ENV === "production",
+  //       sameSite: "Strict",
+  //     });
+  //     Cookies.set("user", JSON.stringify(result?.data), {
+  //       expires: 7,
+  //       secure: process.env.NODE_ENV === "production",
+  //       sameSite: "Strict",
+  //     });
 
-      showSuccessToast("Signed in with Google successfully!");
+  //     showSuccessToast("Signed in with Google successfully!");
 
-      // ✅ Redirect based on isUpdated
-      if (result?.data?.isUpdated === true) {
-        router.push("/dashboard");
-      } else {
-        router.push("/auth/bussinessprofile");
-      }
-    } catch (error) {
-      showErrorToast(error.message || "Google Sign-in error");
-    }
-  };
+  //     // ✅ Redirect based on isUpdated
+  //     if (result?.data?.isUpdated === true) {
+  //       router.push("/dashboard");
+  //     } else {
+  //       router.push("/auth/bussinessprofile");
+  //     }
+  //   } catch (error) {
+  //     showErrorToast(error.message || "Google Sign-in error");
+  //   }
+  // };
 
   return (
     <>
@@ -179,12 +169,11 @@ export default function LoginPage() {
           />
           {/* ✅ Google Signup/Login Button */}
           <div id="googleSignInDiv" className="mt-3 text-center"></div>
-          <div className="register_link d-flex align-items-center justify-content-between">
+          <div className="register_link">
             <h5 style={{ fontSize: "15px" }}>
               {"Don't have an account? "}
               <Link href="signup" style={{ fontSize: "15px" }}>Sign Up</Link>
             </h5>
-            <h5 style={{ fontSize: "15px" }}><a href="forgot" style={{ fontSize: "15px" }}>Forgot password?</a></h5>
           </div>
         </form>
       )}

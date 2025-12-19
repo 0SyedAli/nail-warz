@@ -560,7 +560,7 @@ const EditProfile = () => {
                                 </div>
                             </div> */}
 
-                            <div className="col-8 wd_table">
+                            <div className="col-md-8 wd_table">
                                 <label className="mb-2" style={{ fontSize: "13px", fontWeight: 700, color: "#606060" }}>Working days & timing</label>
 
                                 <div className="table-responsive">

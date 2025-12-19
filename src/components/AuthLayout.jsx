@@ -46,11 +46,16 @@ export default function AuthLayout({ children }) {
       <div
         className={`${styles.auth_form_container} ${
           pathname === "/auth/login" ||
+          pathname === "/admin/auth/login" ||
           pathname === "/auth/signup" ||
+          pathname === "/admin/auth/signup" ||
           pathname === "/auth/uploadservice" ||
           pathname === "/auth/forgot" ||
+          pathname === "/admin/auth/forgot" ||
           pathname === "/auth/otp" ||
-          pathname === "/auth/reset"
+          pathname === "/admin/auth/otp" ||
+          pathname === "/auth/reset" ||
+          pathname === "/admin/auth/reset"
             ? "align-items-center"
             : "align-items-start"
         }`}

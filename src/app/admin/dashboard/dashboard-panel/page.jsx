@@ -1,242 +1,192 @@
-"use client"
+'use client'
 
-import MyChart2 from "@/components/dashChart/MyChart2";
-import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
-import SpinnerLoading from "@/components/Spinner/SpinnerLoading";
-import Link from "next/link";
-import AppointmentDetail from "@/components/Modal/AppointmentDetail";
-import { useDisclosure } from "@chakra-ui/react";
-const DashboardPanel = ({ activeTab }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [salonId, setSalonId] = useState("");
-  const [bookingDetail, setBookingDetail] = useState(null);
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+import Cookies from 'js-cookie'
+import AdminDashboardCard from '@/components/AdminDashboardCard'
+import AdminVendorRow from '@/components/AdminVendorRow'
+import MyChart2 from "@/components/dashChartAdmin/MyChart2";
+import { LuDollarSign, LuShoppingCart, LuUsers } from "react-icons/lu";
+import { LuWallet } from "react-icons/lu";
+import { RiSwordLine } from "react-icons/ri";
 
-  const [empty, setEmpty] = useState(false);   // <- NEW
-  const router = useRouter();
-  // Sample order data
-  // const pieData = [
-  //   { id: "Expenses", label: "Expenses", value: 40 },
-  //   { id: "Comes", label: "Comes", value: 25 },
-  // ];
-  // Filter orders based on the active tab
+export default function SuperAdminDashboard() {
+  const [stats, setStats] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
   useEffect(() => {
-    const cookie = Cookies.get("user");
+    const token = Cookies.get('token')
 
-    if (!cookie) return router.push("/auth/login");
-
-    try {
-      const u = JSON.parse(cookie);
-
-      if (u?._id) {
-        // setSalonId(u._id);
-        setSalonId(u._id);
-
-      } else {
-        console.warn("User has no _id:", u);
-        router.push("/auth/login");
-      }
-    } catch (err) {
-      console.error("Cookie parse error:", err);
-      router.push("/auth/login");
+    if (!token) {
+      setError('Authentication token missing')
+      setLoading(false)
+      return
     }
-  }, []);
-  useEffect(() => {
-    if (!salonId) return;
 
-    (async () => {
-      try {
-        setLoading(true);
-
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/getBookingsBySalonId?salonId=${salonId}`
-        );
-        const json = await res.json();      // always parse the body
-
-        if (!res.ok) throw new Error(json.message || "Network error");
-
-        if (json.success) {
-          // already sorted like in manage page
-          const parseDateTime = (dateStr, timeStr) => {
-            const [day, month, year] = dateStr.split("-");
-            return new Date(`${year}-${month}-${day} ${timeStr}`);
-          };
-
-          const sortedData = [...json.data].sort((a, b) => {
-            const dateA = parseDateTime(a.date, a.time);
-            const dateB = parseDateTime(b.date, b.time);
-            return dateB - dateA;
-          });
-
-          setOrders(sortedData);
-          setEmpty(sortedData.length === 0);
-          setError(null);
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/superAdmin/dashboard`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(res => {
+        if (res.data?.success && res.data?.stats) {
+          setStats(res.data.stats)
         } else {
-          /* success=false → treat as empty, not fatal */
-          setOrders([]);
-          setEmpty(true);
-          setError(null);
+          setStats(null)
         }
-      } catch (err) {
-        console.error(err);
-        setError(err.message);
-        setOrders([]);
-        setEmpty(false);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [salonId]);
+      })
+      .catch(err => {
+        console.error(err)
+        setError('Failed to load dashboard data')
+      })
+      .finally(() => setLoading(false))
+  }, [])
 
-  // Filter orders based on the active tab (e.g., Done, Pending, Accepted)
-  const filteredOrders = orders.filter((order) => {
-    const status = order.status.toLowerCase();
-    if (!activeTab) return true;
+  /* ---------------- Loading ---------------- */
+  if (loading) {
+    return (
+      <div className="page">
+        <div className="dashboard_panel_inner">
+          <div className="my-4 d-flex mb-0">
+            <div className="spinner-border text-primary" />
+          </div>
+        </div>
+      </div>
+    )
+  }
 
-    if (activeTab.toLowerCase() === "new") {
-      return status === "pending" || status === "accepted";
-    }
+  /* ---------------- Error ---------------- */
+  if (error) {
+    return (
+      <div className="page">
+        <div className="dashboard_panel_inner">
+          <div className="my-4 d-flex mb-0">
+            <p className="text-danger fw-semibold">{error}</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
-    return status.includes(activeTab.toLowerCase());
-  });
-  const formatDateTimeUS = (dateStr, timeStr) => {
-    try {
-      // Convert "10-10-2025" → "2025-10-10"
-      const [day, month, year] = dateStr.split("-");
-      const formatted = `${year}-${month}-${day} ${timeStr}`;
-      const date = new Date(formatted);
+  /* ---------------- Empty Data ---------------- */
+  if (!stats) {
+    return (
+      <div className="page">
+        <div className="dashboard_panel_inner">
+          <div className="my-4 d-flex mb-0">
+            <p className="text-muted">No dashboard data available</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
-      return date.toLocaleString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      });
-    } catch {
-      return `${dateStr} ${timeStr}`;
-    }
-  };
-
-  const getStatusBadge = (status) => {
-    switch (status.toLowerCase()) {
-      case "completed":
-        return <span className="badge py-2 bg-success">Completed</span>;
-      case "pending":
-      case "accepted":
-        return <span className="badge py-2 bg-primary">New</span>;
-      case "canceled":
-        return <span className="badge py-2 bg-danger">Canceled</span>;
-      default:
-        return <span className="badge py-2 bg-secondary">{status}</span>;
-    }
-  };
-  const fetchBookingDetail = async (id) => {
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/getBookingById?bookingId=${id}`
-      );
-      const json = await res.json();
-      if (!json.success) throw new Error("Failed to load booking");
-      setBookingDetail(json.data);
-      onOpen();
-    } catch (e) {
-      console.error("Booking Detail Error:", e.message);
-    }
-  };
   return (
     <div className="page">
       <div className="dashboard_panel_inner">
-        <div className="my-4 d-flex mb-0">
-          {/* <div className="dp_chart1" style={{ width: "60%" }}>
-            <CardLineChart />
-          </div>
-          <div className="dp_chart2" style={{ width: "40%" }}>
-            <MyPie data={pieData} />
-            <div className="dc2_bottom">
-              <div>
-                <h2>Total customers</h2>
-                <h5>5.000</h5>
-              </div>
-              <div>
-                <h2>This month</h2>
-                <h5>500</h5>
-              </div>
-            </div>
-          </div> */}
-          <MyChart2 />
-        </div>
+        <div className="my-4 mb-0">
+          <div className="row g-4">
 
-        {/* Booking List */}
+            {/* Total Revenue */}
+            <AdminDashboardCard
+              title="Total Revenue"
+              value={`$${(stats.totalRevenue ?? 0).toLocaleString()}`}
+              change={stats.revenueChange?.message ?? 'No data'}
+              icon={LuDollarSign}
+            />
 
-        <div className="card dash_list">
-          <div className="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2 py-3">
-            <h5 className="fw-bolder mb-0">Activity</h5>
-            <Link href="/dashboard/appointments" className="btn btn-outline-danger btn-sm">View All</Link>
+            {/* Wallet Balance */}
+            <AdminDashboardCard
+              title="Wallet Balance"
+              value={`$${stats.walletBalance ?? 0}`}
+              icon={LuWallet}
+            />
+
+            {/* Total Users */}
+            <AdminDashboardCard
+              title="Total Users"
+              value={stats.totalUsers ?? 0}
+              change={stats.userChange?.message ?? 'No data'}
+              icon={LuUsers}
+            />
+
+            {/* Active Battles */}
+            <AdminDashboardCard
+              title="Active Battles"
+              value={stats.activeBattles ?? 0}
+              icon={RiSwordLine}
+            />
           </div>
-          {loading ? (
-            <SpinnerLoading />
-          ) : error ? (
-            <p className="text-danger">Error: {error}</p>
-          ) : empty ? (
-            <div className="dash_list card-body">
-              <p>No bookings found for this salon.</p>
-            </div>
-          ) : (
-            <div className="dash_list card-body p-0">
-              <div className="table-responsive">
-                <table className="table caption-top table-hover mb-0">
-                  <thead className="table-light">
-                    <tr>
-                      <th>Customer</th>
-                      <th>Service</th>
-                      <th>Technician</th>
-                      <th>Date & Time</th>
-                      <th>Total</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredOrders.slice(0, 4).map((order, index) => (
-                      <tr key={index}>
-                        <td>{order.userId?.username || "Unknown"}</td>
-                        <td>{order.serviceId?.serviceName || "-"}</td>
-                        <td>{order.technicianId?.fullName || "-"}</td>
-                        <td>{formatDateTimeUS(order.date, order.time)}</td>
-                        <td>${order.totalAmount}</td>
-                        <td>{getStatusBadge(order.status)}</td>
-                        <td>
-                          <button
-                            className="btn btn-outline-primary btn-sm"
-                            onClick={() => fetchBookingDetail(order._id)}
-                          >
-                            View Details
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                    }
-                  </tbody>
-                </table>
+          <div className="my-4 d-flex mb-0 admin_chart">
+            <MyChart2 />
+          </div>
+          {/* Bottom Section */}
+          <div className="row g-4 mt-1">
+            <div className="col-lg-6">
+              <div className="card dashboard-card h-100">
+                <div className="card-body">
+                  <h6 className="fw-semibold mb-3">Recent Activity</h6>
+
+                  <ul className="list-unstyled small text-muted mb-0">
+                    <li className="mb-3 d-flex align-items-center gap-3">
+                      <div className="icon-box">
+                        <LuShoppingCart />
+                      </div>
+                      <div className='d-flex flex-column'>
+                        <span className='fs-6 fw-medium text-black'>New order placed</span>
+                        <span className=' fw-normal '>New order placed</span>
+                      </div>
+                    </li>
+                    <li className="mb-3 d-flex align-items-center gap-3">
+                      <div className="icon-box">
+                        < LuUsers/>
+                      </div>
+                      <div className='d-flex flex-column'>
+                        <span className='fs-6 fw-medium text-black'>New vendor registered</span>
+                        <span className=' fw-normal '>New vendor registered</span>
+                      </div>
+                    </li>
+                    <li className="d-flex align-items-center gap-3">
+                      <div className="icon-box">
+                        <RiSwordLine />
+                      </div>
+                      <div className='d-flex flex-column'>
+                        <span className='fs-6 fw-medium text-black'>Battle round completed</span>
+                        <span className=' fw-normal '>Battle round completed</span>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
-          )}
+
+            <div className="col-lg-6">
+              <div className="card dashboard-card h-100">
+                <div className="card-body">
+                  <h6 className="fw-semibold mb-3">Top Performing Vendors</h6>
+                  <AdminVendorRow
+                    name="Glamour Nails Salon"
+                    location="Los Angeles, CA"
+                    amount="$45,680"
+                  />
+                  <AdminVendorRow
+                    name="Elite Nail Studio"
+                    location="New York, NY"
+                    amount="$38,920"
+                  />
+                  <AdminVendorRow
+                    name="Sparkle & Shine"
+                    location="Miami, FL"
+                    amount="$22,340"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <AppointmentDetail
-        isOpen={isOpen}
-        onClose={onClose}
-        modalClass="appoint_detail_container"
-        booking={bookingDetail}
-      />
     </div>
-  );
-};
-
-export default DashboardPanel;
+  )
+}

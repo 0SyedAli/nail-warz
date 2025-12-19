@@ -403,23 +403,19 @@ input::placeholder {
 }
 
 /* sidebar css */
-.sidebar_container .sc2_sid {
-  padding: 0 0 0 50px;
-  margin: 40px 0;
-
-}
 
 .sidebar_container .sc2_sid .logout_btn {
   display: flex;
   align-items: center;
   gap: 15px;
   color: #FFF;
+  padding: 10px 0;
 }
 
 .sidebar_container ul {
   padding: 0 0 0 50px;
-  margin: 40px 0;
-  min-height: 55vh;
+  margin: 40px 0 0;
+  max-height: 60vh;
   overflow: auto;
 }
 
@@ -451,6 +447,10 @@ input::placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.sidebar_container ul li a span img {
+  filter: brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(0%) hue-rotate(5deg) brightness(102%) contrast(102%);
 }
 
 .sidebar_container ul li.active a {
@@ -2847,7 +2847,299 @@ button.fc-viewAppointments-button.fc-button {
   background: #9b0000;
 }
 
+.admin-signup-form input {
+  height: 44px;
+  width: 100%;
+  padding: 0 15px;
+  border-radius: 4.3px;
+  border: 1px solid #041e5e;
+  font-size: 14px;
+  color: #000;
+}
 
+
+.dashboard-card {
+  border-radius: 14px;
+  border: 1px solid #eef0f3;
+  background: #fff;
+}
+
+.icon-box {
+  min-width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #f3e8ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9333ea;
+  font-size: 20px;
+}
+
+.admin_chart .chart-card {
+  box-shadow: none;
+  border: 1px solid #eef0f3;
+  background: #fff;
+  margin-bottom: 0;
+}
+
+/* page spacing */
+.vendor-detail-page .dashboard_panel_inner {
+  padding: 10px 0 30px;
+}
+
+/* Back button */
+.vendor-detail-page .back-btn {
+  background: none;
+  border: none;
+  color: #111;
+  font-size: 14px;
+  margin: 8px 0 18px;
+  cursor: pointer;
+}
+
+/* ===== HEADER CARD ===== */
+.vendor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  background: #fff;
+  padding: 22px 24px;
+  border-radius: 12px;
+
+  border: 1px solid #eef0f3;
+  /* ✅ border */
+  /* box-shadow: 0 2px 10px rgba(0, 0, 0, .04); */
+  /* ✅ subtle shadow */
+  margin-bottom: 22px;
+}
+
+.vendor-header h4 {
+  font-size: 26px;
+  margin: 0 0 6px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.vendor-header p {
+  margin: 0 0 4px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.vendor-header p strong {
+  color: #111827;
+  font-weight: 600;
+}
+
+.status-badge {
+  margin-top: 10px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  display: inline-block;
+  text-transform: lowercase;
+}
+
+.status-badge.active,
+.status-badge.completed {
+  background: #0b0b0f;
+  color: #fff;
+}
+
+.delete-btn {
+  min-width: 140px;
+  background: #ef3a4d;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.delete-btn .trash {
+  font-size: 18px;
+}
+
+/* ===== STATS CARDS ===== */
+.vendor-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.stat-box {
+  background: #fff;
+  padding: 18px 18px;
+  border-radius: 12px;
+
+  border: 1px solid #eef0f3;
+  /* ✅ border */
+  /* box-shadow: 0 2px 10px rgba(0, 0, 0, .04); */
+  /* ✅ shadow */
+  min-height: 96px;
+}
+
+.stat-box p {
+  font-size: 13px;
+  color: #8b919a;
+  margin: 0 0 10px;
+}
+
+.stat-box h5 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.stat-box h5.green {
+  color: #0aa84f;
+}
+
+.stat-box h5.purple {
+  color: #7b2cbf;
+}
+
+/* ===== GRID: PAYOUT + SUMMARY ===== */
+.vendor-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-bottom: 22px;
+}
+
+.card-box {
+  background: #fff;
+  padding: 22px 22px;
+  border-radius: 12px;
+
+  border: 1px solid #eef0f3;
+  /* ✅ border */
+  /* box-shadow: 0 2px 10px rgba(0, 0, 0, .04); */
+  /* ✅ shadow */
+}
+
+.card-box h6 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 18px;
+  color: #111827;
+}
+
+.label {
+  font-size: 12px;
+  color: #8b919a;
+  margin-bottom: 4px;
+}
+
+.amount {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 18px;
+}
+
+.amount.purple {
+  color: #7b2cbf;
+}
+
+.input {
+  width: 100%;
+  height: 44px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #e6e8ee;
+  outline: none;
+  margin-top: 12px;
+}
+
+.payout-btn {
+  width: 100%;
+  margin-top: 16px;
+  height: 44px;
+  background: #0b0b0f;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+/* ✅ Summary rows with bottom border like screenshot */
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 10px 0;
+  border-bottom: 1px solid #eef0f3;
+  /* ✅ lines */
+  font-size: 14px;
+  color: #111827;
+}
+
+.summary-row:last-child {
+  border-bottom: none;
+}
+
+.summary-row.red {
+  color: #ef3a4d;
+}
+
+.summary-row.green {
+  color: #0aa84f;
+}
+
+.summary-row.purple {
+  color: #7b2cbf;
+}
+
+/* ===== PAYOUT HISTORY ===== */
+.mt-4 {
+  margin-top: 22px;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.history-table th {
+  text-align: left;
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 700;
+  padding: 12px 10px;
+  border-bottom: 1px solid #eef0f3;
+}
+
+.history-table td {
+  padding: 14px 10px;
+  border-bottom: 1px solid #eef0f3;
+  color: #111827;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .vendor-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .vendor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .delete-btn {
+    height: 70px;
+  }
+}
 
 /* chart css */
 @keyframes page-popup {
@@ -3124,7 +3416,7 @@ button.fc-viewAppointments-button.fc-button {
   }
 
   .sidebar_container ul {
-    margin: 10px 0;
+    margin: 10px 0 0;
   }
 
   .sidebar_menu {
@@ -3178,12 +3470,6 @@ button.fc-viewAppointments-button.fc-button {
   }
 }
 
-@media only screen and (max-height: 700px) {
-  .sidebar_container ul {
-    max-height: 55vh;
-  }
-}
-
 @media only screen and (max-height: 620px) {
   .textarea_field {
     height: 160px;
@@ -3196,7 +3482,21 @@ button.fc-viewAppointments-button.fc-button {
   .upload_img_cont {
     margin: 0 auto 10px;
   }
+
+  .sidebar_header img {
+    width: 100px;
+  }
+
+  .sidebar_container ul {
+    margin: 30px 0 0;
+  }
+
+  .sidebar_container ul li {
+    margin: 0;
+  }
 }
+
+@media only screen and (max-height: 620px) {}
 
 @media only screen and (max-width: 768px) {
   .upload_img_cont {

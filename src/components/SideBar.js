@@ -5,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import LogoutButton from "./Logout";
 import { RxCross2 } from "react-icons/rx";
-import { IoLayersOutline } from "react-icons/io5";
 
 const SideBar = () => {
   const pathname = usePathname();
@@ -38,6 +37,11 @@ const SideBar = () => {
       href: "/dashboard/categories",
       icon: "/images/layer-icon.png",
       text: "Categories",
+    },
+    {
+      href: "/dashboard/payouthistory",
+      icon: "/images/payout-icon.png",
+      text: "Payout History",
     },
     {
       href: "/dashboard/accountsettings",
@@ -115,22 +119,17 @@ const SideBar = () => {
                 {item.text}
               </Link>
             </li>
+
           ))}
-        </ul>
-        <div className="sc2_sid">
-          <div className="logout_btn" >
-            {/* <span>
-              <Image
-                src="/images/logout.png"
-                alt="icon"
-                width={24}
-                height={24}
-              />
-            </span> */}
+          <li className="sc2_sid">
             <LogoutButton />
-            {/* Logout */}
+          </li>
+        </ul>
+        {/* <div className="sc2_sid">
+          <div className="logout_btn" >
+            <LogoutButton />
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
