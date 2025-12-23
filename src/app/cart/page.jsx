@@ -5,6 +5,7 @@ import WebBanner from "@/components/Home/WebBanner";
 import RelatedProducts from "@/components/product/RelatedProducts";
 import CartItem from "@/components/cart/CartItem";
 import OrderSummary from "@/components/cart/OrderSummary";
+import Link from "next/link";
 
 export default function ProductPage() {
     return (
@@ -45,9 +46,9 @@ export default function ProductPage() {
 
                     {/* Checkout Button */}
                     <div className="mt-4">
-                        <button className="btn w-100 checkout-btn">
+                        <Link href="/checkout" className="btn w-100 checkout-btn">
                             Go To The Checkout
-                        </button>
+                        </Link>
                     </div>
                     <RelatedProducts />
                 </div>

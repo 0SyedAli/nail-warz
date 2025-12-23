@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Search, ShoppingCart } from "lucide-react";
+import { FaCartShopping } from "react-icons/fa6";
+import { IoSearchOutline } from "react-icons/io5";
 
 export default function Header() {
   return (
@@ -30,15 +31,29 @@ export default function Header() {
           </div>
 
           <div className="d-flex align-items-center gap-3">
-            <button className="btn btn-link text-dark p-2" aria-label="Search">
-              <Search size={20} />
+            <button className="btn btn-link btn-link-header  p-2" aria-label="Search">
+              <Image
+                src="/images/search-head.png"
+                alt="NAIL WARZ"
+                width={20}
+                height={20}
+                className="img-fluid"
+                priority
+              />
             </button>
-            <button className="btn btn-link text-dark p-2" aria-label="Shopping Cart">
-              <ShoppingCart size={20} />
-            </button>
-            <button className="btn  btn-header">
+            <Link href="/cart" className="btn btn-link btn-link-header  p-2" aria-label="Shopping Cart">
+              <Image
+                src="/images/cart-head.png"
+                alt="NAIL WARZ"
+                width={20}
+                height={20}
+                className="img-fluid"
+                priority
+              />
+            </Link>
+            <Link href="/contact" className="btn  btn-header">
               Join as professional
-            </button>
+            </Link>
           </div>
         </div>
       </div>

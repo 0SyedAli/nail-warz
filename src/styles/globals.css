@@ -3949,11 +3949,39 @@ button.fc-viewAppointments-button.fc-button {
   font-weight: 500;
   background-color: #C11111;
   color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-delete {
   color: #FF3333;
   font-size: 20px;
+}
+
+.banner-btn {
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 300;
+  background-color: #C11111;
+  border-color: #C11111;
+  font-family: var(--font-poppins);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px
+}
+
+.banner-btn span {
+  font-size: 17px;
+}
+
+.banner-btn:hover {
+  border-color: #C11111;
+  color: #FFF;
+
 }
 
 /* ---------- Checkout Boxes ---------- */
@@ -4069,9 +4097,11 @@ button.fc-viewAppointments-button.fc-button {
   border-bottom: 1px solid #ddd;
   font-size: 14px;
 }
+
 .score-row span {
   font-family: var(--font-poppins);
 }
+
 .score-row:last-child {
   border-bottom: none;
 
@@ -4092,6 +4122,7 @@ button.fc-viewAppointments-button.fc-button {
   font-weight: 800;
   font-size: 30px;
 }
+
 .fs-h4 {
   font-family: var(--font-poppins);
   font-weight: 800;

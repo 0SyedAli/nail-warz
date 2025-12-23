@@ -11,7 +11,7 @@ export default function BattlesPage() {
     return (
         <>
             <Header />
-            <WebBanner bannerTitle="Nail Warz" bannerPara="Premium nail care products and professional tools" />
+            <WebBanner bannerTitle="Nail Warz" bannerPara="Premium nail care products and professional tools" bannerBtn={true} />
             <div className="container my-5">
                 <BattleHero />
                 <ActiveBattles title="Active" />

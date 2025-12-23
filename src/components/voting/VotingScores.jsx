@@ -1,3 +1,4 @@
+import Link from "next/link";
 import ScoreRow from "./ScoreRow";
 
 const scores = [
@@ -15,16 +16,16 @@ export default function VotingScores() {
     <div className="voting-score-container">
       <h4 className=" mb-3">Live Voting Scores</h4>
 
-      <div className="voting-box">
+      <div className="voting-box position-relative">
         <div>
           {scores.map((item, index) => (
             <ScoreRow key={index} {...item} />
           ))}
         </div>
 
-        <button className="btn active-battle-btn ">
+        <Link href="/winners" className="btn active-battle-btn ">
           VIEW THE WINNERS
-        </button>
+        </Link>
       </div>
     </div>
   );

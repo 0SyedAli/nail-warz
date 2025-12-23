@@ -1,3 +1,4 @@
+import Link from "next/link";
 import BattleEntryCard from "./BattleEntryCard";
 
 export default function ActiveBattles({ title }) {
@@ -22,9 +23,9 @@ export default function ActiveBattles({ title }) {
           ))}
         </div>
 
-        <button className="btn active-battle-btn ">
+        <Link href="/votingscores" className="btn active-battle-btn ">
           VIEW THE SCORE BOARD
-        </button>
+        </Link>
 
       </div>
     </div>
