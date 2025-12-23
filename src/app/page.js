@@ -7,7 +7,6 @@ import FeaturesSection from "@/components/Home/FeaturesSection";
 import TestimonialsSection from "@/components/Home/TestimonialsSection";
 import AppCTASection from "@/components/Home/AppCTASection";
 import Footer from "@/components/Home/Footer";
-import "./home.css";
 
 export default function Home() {
   return (

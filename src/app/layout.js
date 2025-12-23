@@ -1,5 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '@/styles/globals.css';
+import "@/styles/home.css";
+
 import { Inter, Poppins } from "next/font/google"; 
 import ToastProvider from "../components/ToastProvider";
 import BootstrapClients from '@/components/BootstrapClients';

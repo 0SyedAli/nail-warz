@@ -22,10 +22,10 @@ export default function Header() {
 
             <nav className="d-none d-md-flex align-items-center gap-4">
               <Link href="/" className="text-dark text-decoration-none fw-medium">Home</Link>
-              <Link href="/" className="text-dark text-decoration-none fw-medium">Store</Link>
-              <Link href="/" className="text-dark text-decoration-none fw-medium">Nail Warz</Link>
-              <Link href="/" className="text-dark text-decoration-none fw-medium">About us</Link>
-              <Link href="/" className="text-dark text-decoration-none fw-medium">Contact us</Link>
+              <Link href="/store" className="text-dark text-decoration-none fw-medium">Store</Link>
+              <Link href="/nailwarz" className="text-dark text-decoration-none fw-medium">Nail Warz</Link>
+              <Link href="/about" className="text-dark text-decoration-none fw-medium">About us</Link>
+              <Link href="/contact" className="text-dark text-decoration-none fw-medium">Contact us</Link>
             </nav>
           </div>
 

@@ -451,23 +451,7 @@
   margin: 10px 0;
 }
 
-/* Features Section - Using Bootstrap with minimal custom CSS */
-.feature-icon-box {
-  width: 60px;
-  height: 60px;
-  background: -webkit-linear-gradient(#0A0A0A, #FE0000);
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  flex-shrink: 0;
-}
 
-.feature-icon-box img {
-  width: 36px;
-  height: 44px;
-}
 
 .feature-phone-wrapper {
   position: relative;
