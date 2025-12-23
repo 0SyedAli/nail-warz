@@ -521,7 +521,7 @@
   height: 420px;
   background: #F875AA;
   background: linear-gradient(175deg, rgba(248, 117, 170, 0.5) 0%, rgba(253, 242, 248, 0.5) 100%);
-  box-shadow: rgba(248, 117, 170, 0.2)  10px 30px 50px -10px, rgba(248, 117, 170, 0.2) 0px 20px 40px -30px;
+  box-shadow: rgba(248, 117, 170, 0.2) 10px 30px 50px -10px, rgba(248, 117, 170, 0.2) 0px 20px 40px -30px;
   border-radius: 40px;
   z-index: 1;
 }
@@ -534,18 +534,18 @@
   border-radius: 32px;
 }
 
-.feature-right .phone-wrapper {
+/* .feature-right .phone-wrapper {
   transform: rotate(16deg);
 }
 
 .feature-left .phone-wrapper {
   transform: rotate(-6deg);
-}
+} */
 
 /* Phone image */
 .phone-image {
-  border-radius: 32px;
-  width: fit-content;
+  max-width: unset;
+  height: auto;
 }
 
 /* Responsive */

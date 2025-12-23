@@ -39,7 +39,7 @@ export default function FeaturesSection() {
             <div className="right-section">
               <div className="phone-wrapper">
                 <Image
-                  src="/images/home-img2.png" // dummy image
+                  src="/images/feature-img1.png" // dummy image
                   alt="App Preview"
                   width={320}
                   height={640}
@@ -58,7 +58,7 @@ export default function FeaturesSection() {
             <div className="right-section">
               <div className="phone-wrapper">
                 <Image
-                  src="/images/home-img2.png" // dummy image
+                  src="/images/feature-img2.png" // dummy image
                   alt="App Preview"
                   width={320}
                   height={640}
@@ -110,7 +110,7 @@ export default function FeaturesSection() {
             <div className="right-section">
               <div className="phone-wrapper">
                 <Image
-                  src="/images/home-img2.png" // dummy image
+                  src="/images/feature-img3.png" // dummy image
                   alt="App Preview"
                   width={320}
                   height={640}
@@ -129,7 +129,7 @@ export default function FeaturesSection() {
             <div className="right-section">
               <div className="phone-wrapper">
                 <Image
-                  src="/images/home-img2.png" // dummy image
+                  src="/images/feature-img4.png" // dummy image
                   alt="App Preview"
                   width={320}
                   height={640}
@@ -181,10 +181,10 @@ export default function FeaturesSection() {
             <div className="right-section">
               <div className="phone-wrapper">
                 <Image
-                  src="/images/home-img2.png" // dummy image
+                  src="/images/feature-img5.png" // dummy image
                   alt="App Preview"
-                  width={320}
-                  height={640}
+                  width={490}
+                  height={291.5}
                   className="phone-image"
                   priority
                 />
@@ -200,10 +200,10 @@ export default function FeaturesSection() {
             <div className="right-section">
               <div className="phone-wrapper">
                 <Image
-                  src="/images/home-img2.png" // dummy image
+                  src="/images/feature-img6.png" // dummy image
                   alt="App Preview"
-                  width={320}
-                  height={640}
+                  width={490}
+                  height={291.5}
                   className="phone-image"
                   priority
                 />
