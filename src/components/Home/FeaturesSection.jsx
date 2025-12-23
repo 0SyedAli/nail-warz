@@ -159,7 +159,7 @@ export default function FeaturesSection() {
         </div>
 
         {/* Feature 3: Nail Compass/Marketplace */}
-        <div className="row align-items-center mb-5 pb-5 justify-content-between">
+        <div className="row align-items-center justify-content-between" style={{padding:"100px 0"}}>
           <div className="col-lg-7 mb-4 mb-lg-0">
             <div className="d-flex flex-column gap-4">
               <div className="d-flex align-items-center gap-3">
@@ -194,7 +194,7 @@ export default function FeaturesSection() {
         </div>
 
         {/* Feature 4: Booking a Service w/ a Salon */}
-        <div className="row align-items-center mb-5 pb-5 justify-content-between">
+        <div className="row align-items-center justify-content-between" style={{padding:"80px 0"}}>
 
           <div className="col-lg-5 feature-left">
             <div className="right-section">
