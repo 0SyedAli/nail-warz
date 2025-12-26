@@ -6,6 +6,7 @@ import { Inter, Poppins } from "next/font/google";
 import ToastProvider from "../components/ToastProvider";
 import BootstrapClients from '@/components/BootstrapClients';
 import { Providers } from './providers';
+import ReduxProvider from "@/utils/redux-provider"; // ✅ ADD THIS
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,7 +19,7 @@ const poppins = Poppins({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-poppins",
-    weight: ["300", "400", "500", "600", "700", "800", "900"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
 });
 
 export default function RootLayout({ children }) {
@@ -28,11 +29,13 @@ export default function RootLayout({ children }) {
       className={`${inter.variable} ${poppins.variable}`}
     >
       <body cz-shortcut-listen="true">
-        <ToastProvider />
-        <Providers>
-          {children}
-        </Providers>
-        <BootstrapClients />
+        <ReduxProvider> {/* ✅ REDUX WRAP */}
+          <ToastProvider />
+          <Providers>
+            {children}
+          </Providers>
+          <BootstrapClients />
+        </ReduxProvider>
       </body>
     </html>
   );

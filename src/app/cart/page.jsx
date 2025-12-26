@@ -1,3 +1,4 @@
+"use client"
 import AppCTASection from "@/components/Home/AppCTASection";
 import Footer from "@/components/Home/Footer";
 import Header from "@/components/Home/Header";
@@ -6,8 +7,19 @@ import RelatedProducts from "@/components/product/RelatedProducts";
 import CartItem from "@/components/cart/CartItem";
 import OrderSummary from "@/components/cart/OrderSummary";
 import Link from "next/link";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export default function ProductPage() {
+export default function AddToCart() {
+    const items = useSelector(state => state.cart.items);
+    console.log(items);
+    const router = useRouter()
+    useEffect(() => {
+        if (items.length === 0) {
+            router.push("/store")
+        }
+    }, [items])
     return (
         <>
             <Header />
@@ -19,22 +31,13 @@ export default function ProductPage() {
                         {/* Left: Cart Items */}
                         <div className="col-lg-8">
                             <div className="cart-box">
-                                <CartItem
-                                    price={145}
-                                    size="Large"
-                                    color="White"
-                                />
-                                <CartItem
-                                    price={180}
-                                    size="Medium"
-                                    color="Red"
-                                />
-                                <CartItem
-                                    price={240}
-                                    size="Large"
-                                    color="Blue"
-                                    className2="mb-0 pb-0"
-                                />
+                                {items.map(item => (
+                                    <CartItem
+                                        key={item._id}
+                                        item={item}
+                                    />
+                                ))}
+
                             </div>
                         </div>
 
@@ -45,7 +48,10 @@ export default function ProductPage() {
                     </div>
 
                     {/* Checkout Button */}
-                    <div className="mt-4">
+                    <div className="mt-4 d-flex align-items-center gap-3">
+                        <Link href="/store" className="btn w-100 checkout-btn-outline">
+                            Back To Store
+                        </Link>
                         <Link href="/checkout" className="btn w-100 checkout-btn">
                             Go To The Checkout
                         </Link>

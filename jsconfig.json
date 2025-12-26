@@ -7,6 +7,7 @@
       "@/styles/*": ["src/styles/*"],
       "@/utils/*": ["src/utils/*"],
       "@/lib/*": ["src/lib/*"],
+      "@/redux/*": ["src/redux/*"],
       "@/pages/*": ["src/pages/*"],
       "@/images/*": ["public/images/*"],
       "@/fonts/*": ["public/fonts/*"]

@@ -1,18 +1,21 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
 import { RiDeleteBin6Fill } from "react-icons/ri";
+import { useDispatch } from "react-redux";
+import { removeFromCart, updateQty } from "@/redux/slice/cartSlice";
 
-export default function CartItem({ price, size, color, className2 }) {
-    const [qty, setQty] = useState(1);
+export default function CartItem({ item }) {
+    console.log(item);
+    
+    const dispatch = useDispatch();
 
     return (
-        <div className={`cart-item d-flex ${className2 || ""}`}>
+        <div className={`cart-item d-flex `}>
 
             {/* Image */}
             <Image
-                src="/images/cart-img.png"
+                src={item?.image ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${item?.image}` : "/images/prod_paint.png" }
                 width={124}
                 height={124}
                 alt="Product"
@@ -21,22 +24,24 @@ export default function CartItem({ price, size, color, className2 }) {
 
             {/* Info */}
             <div className="flex-grow-1 ms-3">
-                <h6 className="fw-bold mb-1">Lorem ipsum dollor</h6>
-                <small className="text-muted d-block">Size: {size}</small>
-                <small className="text-muted d-block">Color: {color}</small>
-                <div className="fw-bold ci-price mt-1">${price}</div>
+                <h6 className="fw-bold mb-1">{item.name}</h6>
+                {/* <small className="text-muted d-block">Size: {item?.size}</small> */}
+                {/* <small className="text-muted d-block">Color: {item?.color}</small> */}
+                <small className="text-muted d-block">SKU: {item?.sku}</small>
+
+                <div className="fw-bold ci-price mt-1">${item.price}</div>
             </div>
             <div className="d-flex  flex-column justify-content-between align-items-end">
                 {/* Remove */}
-                <button className="btn-delete">
+                <button className="btn-delete" onClick={() => dispatch(removeFromCart(item._id))}>
                     <RiDeleteBin6Fill />
                 </button>
 
                 {/* Qty */}
                 <div className="qty-box">
-                    <button onClick={() => setQty(Math.max(1, qty - 1))}>−</button>
-                    <span>{qty}</span>
-                    <button onClick={() => setQty(qty + 1)}>+</button>
+                    <button  onClick={() => dispatch(updateQty({ id: item._id, qty: item.qty - 1 }))}>−</button>
+                    <span>{item?.qty}</span>
+                    <button onClick={() => dispatch(updateQty({ id: item._id, qty: item.qty + 1 }))}>+</button>
                 </div>
             </div>
         </div>

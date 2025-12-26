@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FaCartShopping } from "react-icons/fa6";
-import { IoSearchOutline } from "react-icons/io5";
+import { useSelector } from "react-redux";
 
 export default function Header() {
+  const cartItems = useSelector(state => state.cart.items);
+  const totalQty = cartItems.reduce((sum, i) => sum + i.qty, 0);
   return (
     <header className="header-home bg-white shadow-sm sticky-top" style={{ zIndex: 1000 }}>
       <div className="container">
@@ -31,7 +32,7 @@ export default function Header() {
           </div>
 
           <div className="d-flex align-items-center gap-3">
-            <button className="btn btn-link btn-link-header  p-2" aria-label="Search">
+            <button className="btn btn-link btn-link-header px-0 py-2" aria-label="Search">
               <Image
                 src="/images/search-head.png"
                 alt="NAIL WARZ"
@@ -41,16 +42,18 @@ export default function Header() {
                 priority
               />
             </button>
-            <Link href="/cart" className="btn btn-link btn-link-header  p-2" aria-label="Shopping Cart">
-              <Image
-                src="/images/cart-head.png"
-                alt="NAIL WARZ"
-                width={20}
-                height={20}
-                className="img-fluid"
-                priority
-              />
-            </Link>
+            {totalQty > 0 &&
+              <Link href="/cart" className="btn btn-link btn-link-header px-0 py-2" aria-label="Shopping Cart">
+                <Image
+                  src="/images/cart-head.png"
+                  alt="NAIL WARZ"
+                  width={20}
+                  height={20}
+                  className="img-fluid"
+                  priority
+                />
+                {totalQty}
+              </Link>}
             <Link href="/contact" className="btn  btn-header">
               Join as professional
             </Link>
