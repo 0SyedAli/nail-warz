@@ -15,6 +15,7 @@ export default function Dashboard({ children }) {
     users: { title: "Users Management" },
     vendors: { title: "Vendors Management" },
     vendorsDetails: { title: "Vendor Details" }, // ✅ ADD THIS
+    inventory: { title: "Inventory Management" },
     accountsettings: { title: "Account Settings" },
     categories: { title: "Manage Vendor Categories" },
   };

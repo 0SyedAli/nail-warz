@@ -3368,6 +3368,7 @@ button.fc-viewAppointments-button.fc-button {
   border-radius: 15px;
   width: 100%;
   object-fit: cover;
+  height: 280px;
 }
 
 .prod_title {

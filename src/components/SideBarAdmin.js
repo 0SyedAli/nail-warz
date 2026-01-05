@@ -28,6 +28,11 @@ const SideBar = () => {
       icon: "/images/users.svg",
       text: "Vendors Management",
     },
+    {
+      href: "/admin/dashboard/inventory",
+      icon: "/images/users.svg",
+      text: "Inventory Management",
+    },
     // {
     //   href: "/dashboard/categories",
     //   icon: "/images/layer-icon.png",

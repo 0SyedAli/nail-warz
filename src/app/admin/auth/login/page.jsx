@@ -36,7 +36,7 @@ export default function LoginPage() {
     setSuccess(false)
     setLoading(true);
     try {
-      const res = await api.post("/loginSuperAdmin", data);
+      const res = await api.post("/superAdmin/login", data);
 
       const result = res.data;
 
