@@ -44,7 +44,7 @@ export default function ProductCard({ product, actions }) {
   const image =
     product.images && product.images?.length > 0
       ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${product.images[0]}`
-      : "/images/prod_paint.png";
+      : "/images/prod_paint.png" ;
 
   return (
     <div className="prod_card">

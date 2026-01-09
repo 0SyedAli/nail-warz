@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { removeFromCart, updateQty } from "@/redux/slice/cartSlice";
 
 export default function CartItem({ item }) {
-    console.log(item);
+    console.log("item", item);
     
     const dispatch = useDispatch();
 
@@ -15,7 +15,7 @@ export default function CartItem({ item }) {
 
             {/* Image */}
             <Image
-                src={item?.image ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${item?.image}` : "/images/prod_paint.png" }
+                src={item?.images ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${item?.images[0]}` : "/images/prod_paint.png" }
                 width={124}
                 height={124}
                 alt="Product"
