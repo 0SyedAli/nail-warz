@@ -64,6 +64,7 @@ export default function Product() {
 
                 setError(message);
             } finally {
+                await new Promise(r => setTimeout(r, 600)); // dev UX
                 setLoading(false);
             }
         }
@@ -108,12 +109,22 @@ export default function Product() {
                 </ul>
 
                 {/* UI States */}
-                {loading && <ProductsSkeleton />}
+                {/* {loading && <ProductsSkeleton />}
                 {error && <ErrorState message={error} />}
 
                 {!loading && !error && filteredProducts.length === 0 && (
                     <EmptyState />
                 )}
+
+                {!loading && !error && filteredProducts.length > 0 && (
+                    <ProductsGrid products={filteredProducts} />
+                )} */}
+
+                {loading && <ProductsSkeleton />}
+
+                {!loading && error && <ErrorState message={error} />}
+
+                {filteredProducts.length === 0 && <EmptyState />}
 
                 {!loading && !error && filteredProducts.length > 0 && (
                     <ProductsGrid products={filteredProducts} />

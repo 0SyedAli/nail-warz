@@ -2,11 +2,13 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '@/styles/globals.css';
 import "@/styles/home.css";
 
-import { Inter, Poppins } from "next/font/google"; 
+import { Inter, Poppins } from "next/font/google";
 import ToastProvider from "../components/ToastProvider";
 import BootstrapClients from '@/components/BootstrapClients';
 import { Providers } from './providers';
 import ReduxProvider from "@/utils/redux-provider"; // ✅ ADD THIS
+import NextTopLoader from 'nextjs-toploader';
+import SmoothScrollProvider from '@/components/animations/SmoothScrollProvider';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,13 +31,14 @@ export default function RootLayout({ children }) {
       className={`${inter.variable} ${poppins.variable}`}
     >
       <body cz-shortcut-listen="true">
-        <ReduxProvider> {/* ✅ REDUX WRAP */}
-          <ToastProvider />
-          <Providers>
-            {children}
-          </Providers>
-          <BootstrapClients />
-        </ReduxProvider>
+        <NextTopLoader showSpinner={false} color="#C11111" speed={500} height={2} />
+          <ReduxProvider> {/* ✅ REDUX WRAP */}
+            <ToastProvider />
+            <Providers>
+              {children}
+            </Providers>
+            <BootstrapClients />
+          </ReduxProvider>
       </body>
     </html>
   );

@@ -123,7 +123,7 @@ export default function SuperAdminDashboard() {
             <MyChart2 />
           </div>
           {/* Bottom Section */}
-          <div className="row g-4 mt-1">
+          {/* <div className="row g-4 mt-1">
             <div className="col-lg-6">
               <div className="card dashboard-card h-100">
                 <div className="card-body">
@@ -184,7 +184,7 @@ export default function SuperAdminDashboard() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

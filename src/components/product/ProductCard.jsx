@@ -48,7 +48,7 @@ export default function ProductCard({ product, actions }) {
 
   return (
     <div className="prod_card">
-      <Link href={actions}>
+      <Link href={`/store/${actions}`}>
         <Image src={image} width={200} height={200} alt={product.name} className="prod_image" />
         <h4 className="prod_title">{product.name}</h4>
         <span className="prod_price d-block">${product.price}</span>

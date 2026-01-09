@@ -5,8 +5,8 @@ export default function Battles({ title, battles }) {
     if (!battles || battles.length === 0) return null;
 
     return (
-        <div className="py-5">
-            <h3 className="fw-bold mb-3 battle-title2">
+        <div className="py-4">
+            <h3 className="fw-bold mb-3 battle-title3">
                 {title} Battles
             </h3>
 

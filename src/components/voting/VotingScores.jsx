@@ -26,7 +26,7 @@ export default function VotingScores() {
         if (result.success) {
           // Sort by votes DESC
           setWinner(result.data.winner || null)
-          setPartId(result.data._id  || null)
+          setPartId(result.data._id || null)
           const sorted = result.data.participants
             .map(p => ({
               name: p.participant.name,
@@ -71,6 +71,11 @@ export default function VotingScores() {
             VIEW THE WINNERS
           </Link>
         }
+      </div>
+      <div className="text-center mt-5">
+        <Link href={`/nailwarz`} className="btn active-battle-btn2">
+          Go Back
+        </Link>
       </div>
     </div>
   );

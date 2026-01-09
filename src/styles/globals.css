@@ -16,6 +16,8 @@ body {
   max-width: 100vw;
   overflow-x: hidden;
   font-family: "Inter";
+    scroll-behavior: smooth;
+
 }
 
 h2 {
@@ -2286,7 +2288,11 @@ button.hamburger {
   background-color: transparent;
   border-color: #C11111;
 }
-
+.technician_detail .btn_tech2 {
+  border-radius: 30px;
+  padding: 10px 20px;
+  width: 100%;
+}
 .tech_status h3 {
   font-family: var(--font-poppins) !important;
 }
@@ -3592,6 +3598,9 @@ button.fc-viewAppointments-button.fc-button {
 .battle-entry img {
   border-radius: 12px;
   border: 2px solid #c40000;
+  height: 160px;
+  width: 160px;
+  object-fit: cover;
 }
 
 .entry-footer {
@@ -3743,6 +3752,12 @@ button.fc-viewAppointments-button.fc-button {
 }
 
 .battle-title2 {
+  font-size: 20px;
+  font-family: var(--font-poppins);
+  font-weight: 600;
+}
+
+.battle-title3 {
   font-size: 24px;
   font-family: var(--font-poppins);
   font-weight: 600;
@@ -3766,6 +3781,20 @@ button.fc-viewAppointments-button.fc-button {
   background-color: #FFF;
   border-color: #C11111;
 
+}
+
+.active-battle-btn2 {
+  background-color: #000;
+  border-color: #000;
+  border-radius: 8px;
+  color: #FFF;
+  font-size: 14px;
+  font-family: var(--font-poppins);
+  padding: 10px 40px;
+}
+
+.active-battle-btn2:hover {
+  border-color: #000;
 }
 
 /* Features Section - Using Bootstrap with minimal custom CSS */
@@ -4142,6 +4171,8 @@ button.fc-viewAppointments-button.fc-button {
 
 /* Avatar */
 .score-avatar {
+  height: 40px;
+  width: 40px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -4174,7 +4205,251 @@ button.fc-viewAppointments-button.fc-button {
   width: 60%;
 }
 
+/* admin product modal css */
 
+.product_modal_body {
+  padding: 0 10px;
+}
+
+.product_modal_body .modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.product_modal_body .modal-header button {
+  font-size: 30px;
+}
+
+.product_modal_body h5 {
+  font-family: var(--font-poppins);
+  font-weight: 700;
+  font-size: 25px;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.product_modal_body p {
+  font-family: var(--font-poppins);
+  font-weight: 500;
+  font-size: 16px;
+  color: #000;
+}
+
+.product_modal_body label {
+  color: #4A5565;
+  font-size: 15px;
+  margin-bottom: 5px;
+}
+
+.product_modal_body input,
+.product_modal_body textarea {
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 15px;
+  border: 1px solid #F3F3F5;
+  outline: 1px solid #F3F3F5;
+  background-color: #F3F3F5;
+}
+
+.product_modal_body input:focus-visible {
+  background-color: transparent;
+  border: 1px solid #D1D5DC;
+  outline: 1px solid #D1D5DC;
+}
+
+.product_modal_body input::placeholder {
+  color: #717182;
+  font-size: 15px;
+}
+
+.product_modal_body .grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.product_modal_body .btn-dark {
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.multi-image-upload {
+  margin-bottom: 16px;
+}
+
+.upload-box {
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+  cursor: pointer;
+  color: #555;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+}
+
+.upload-box:hover {
+  background: #f8f9fa;
+}
+
+.image-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.image-thumb {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.image-thumb img {
+  object-fit: cover;
+  border-radius: 6px;
+  width: 100%;
+}
+
+.image-thumb button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #C00606;
+  border: none;
+  color: #fff;
+  border-radius: 50%;
+  font-weight: 500;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+.text-primary2 {
+  color: #9810FA;
+}
+
+.bg-secondary2 {
+  background-color: #ECEEF2;
+}
+
+.text-secondary2 {
+  background-color: #ECEEF2;
+}
+
+/* ===== CONTENT SIDEBAR ===== */
+
+.participant-sidebar {
+  position: sticky;
+  top: 90px;
+}
+
+.participant-sidebar .sidebar-card {
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #eaeaea;
+  background: #fff;
+}
+
+.participant-sidebar .info-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.participant-sidebar .info-row:last-child {
+  margin-bottom: 0;
+}
+
+.participant-sidebar .info-row .label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 2px;
+}
+
+.participant-sidebar .info-row .value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.participant-sidebar .social-link {
+  color: #7c3aed;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.participant-sidebar .social-link:hover {
+  text-decoration: underline;
+}
+
+/* ===== STATUS BADGE ===== */
+
+.participant-sidebar .status-badge {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  text-transform: capitalize;
+}
+
+.participant-sidebar .status-badge.pending {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.participant-sidebar .status-badge.selected {
+  background: #111827;
+  color: #fff;
+}
+
+.participant-sidebar .status-badge.rejected {
+  background: #dc2626;
+  color: #fff;
+}
+
+/* ===== ACTION BUTTONS ===== */
+
+.participant-sidebar .action-btn {
+  height: 44px;
+  font-size: 14px;
+  border-radius: 10px;
+}
+
+.battle-select-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.battle-select-card {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fff;
+}
+
+.battle-select-card:hover {
+  border-color: #111827;
+}
+
+.battle-select-card.active {
+  border-color: #111827;
+  background: #f9fafb;
+}
+
+
+/* admin product modal css */
 @media (max-width: 900px) {
   .rs_grid {
     grid-template-columns: repeat(2, 1fr);
@@ -4229,6 +4504,9 @@ button.fc-viewAppointments-button.fc-button {
 }
 
 @media only screen and (max-width: 1280px) {
+  .prod_image {
+    height: 220px;
+  }
   .textarea_field {
     height: 200px;
   }

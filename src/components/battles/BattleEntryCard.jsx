@@ -7,7 +7,7 @@ export default function BattleEntryCard({ participant, votes, totalVotes }) {
         totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0;
     const [imgSrc, setImgSrc] = useState(
         participant?.images?.length
-            ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${participant.images[0]}`
+            ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${participant.images[0]}`
             : "/images/warz-dummy.png"
     );
     return (

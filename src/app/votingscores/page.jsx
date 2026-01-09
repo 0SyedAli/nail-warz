@@ -12,7 +12,6 @@ export default function ProductPage() {
             <section style={{padding:"80px 0"}}>
                 <div className="container">
                     <VotingScores />
-
                 </div>
             </section>
             <AppCTASection />

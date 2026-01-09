@@ -33,7 +33,7 @@ export default function Dashboard() {
         try {
             setLoading(true)
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/getSalonMonthlyRevenue?salonId=${"6865688e65aa0e302ed91d27"}&monthYear=${"08"}-${"2025"}`
+                `${process.env.NEXT_PUBLIC_API_URL}/getSalonMonthlyRevenue?salonId=${"6865688e65aa0e302ed91d27"}&monthYear=${month}-${year}`
             )
             const data = await response.json()
 

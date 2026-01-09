@@ -32,7 +32,7 @@ export default function Header() {
           </div>
 
           <div className="d-flex align-items-center gap-3">
-            <button className="btn btn-link btn-link-header px-0 py-2" aria-label="Search">
+            {/* <button className="btn btn-link btn-link-header px-0 py-2" aria-label="Search">
               <Image
                 src="/images/search-head.png"
                 alt="NAIL WARZ"
@@ -41,7 +41,7 @@ export default function Header() {
                 className="img-fluid"
                 priority
               />
-            </button>
+            </button> */}
             {totalQty > 0 &&
               <Link href="/cart" className="btn btn-link btn-link-header px-0 py-2" aria-label="Shopping Cart">
                 <Image

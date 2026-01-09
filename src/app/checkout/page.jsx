@@ -91,7 +91,7 @@ export default function CheckoutPage() {
                 <div className="container checkout-page py-5">
                     <div className="row g-5">
                         <div className="col-lg-7">
-                            <CheckoutForm />
+                            <CheckoutForm clientSecret={clientSecret}/>
                         </div>
                         <div className="col-lg-5">
                             <CheckoutSummary />

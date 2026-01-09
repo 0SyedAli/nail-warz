@@ -1,15 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { useStripe, useElements, CardElement, PaymentElement } from "@stripe/react-stripe-js";
+import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { clearCart } from "@/redux/slice/cartSlice";
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
+import { useRouter } from "next/navigation";
 
-export default function CheckoutForm() {
+export default function CheckoutForm({ clientSecret }) {
   const stripe = useStripe();
   const elements = useElements();
   const dispatch = useDispatch();
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
   const cart = useSelector((state) => state.cart.items);
 
   const [customer, setCustomer] = useState({
@@ -27,49 +31,82 @@ export default function CheckoutForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!stripe || !elements) return;
+    if (!stripe || !elements || loading) return;
 
+    setLoading(true);
     // 1️⃣ Create Stripe payment
     // const { paymentMethod, error } = await stripe.createPaymentMethod({
     //   type: "card",
     //   card: elements.getElement(CardElement),
     // });
-    const { error, paymentIntent } = await stripe.confirmPayment({
-      elements,
-      redirect: "if_required",
-    });
+    // const { error, paymentIntent } = await stripe.confirmPayment({
+    //   elements,
+    //   redirect: "if_required",
+    // });
+    try {
+      const cardElement = elements.getElement(CardElement);
 
-    if (error) {
-      alert(error.message);
-    } else if (paymentIntent.status === "succeeded") {
-      alert("Payment successful :tada:");
-    }
+      const { paymentMethod, error } = await stripe.createPaymentMethod({
+        type: "card",
+        card: cardElement,
+      });
 
-    // 2️⃣ Create Order API body
-    const body = {
-      customer: {
-        name: customer.name,
-        email: customer.email,
-        phone: customer.phone,
-        address: {
-          street: customer.street,
-          city: customer.city,
-          country: customer.country,
+      if (error) {
+        showErrorToast(error.message);
+        return;
+      }
+
+      const { error: confirmError, paymentIntent } =
+        await stripe.confirmCardPayment(clientSecret, {
+          payment_method: paymentMethod.id,
+        });
+
+      if (confirmError) {
+        showErrorToast(confirmError.message);
+        return;
+      }
+
+      if (paymentIntent.status === "succeeded") {
+        showSuccessToast("Payment successful 🎉");
+      }
+
+      // if (error) {
+      //   alert(error.message);
+      // } else if (paymentIntent.status === "succeeded") {
+      //   alert("Payment successful :tada:");
+      // }
+
+      // 2️⃣ Create Order API body
+      const body = {
+        customer: {
+          name: customer.name,
+          email: customer.email,
+          phone: customer.phone,
+          address: {
+            street: customer.street,
+            city: customer.city,
+            country: customer.country,
+          },
         },
-      },
-      products: cart,
-      payment: {
-        stripePaymentIntentId: paymentIntent.id,
-        paymentMethod: "card",
-      },
-      notes: "Order placed from website",
-    };
+        products: cart,
+        payment: {
+          stripePaymentIntentId: paymentIntent.id,
+          paymentMethod: "card",
+        },
+        notes: "Order placed from website",
+      };
 
-    // 3️⃣ Send to backend
-    await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/order`, body);
+      // 3️⃣ Send to backend
+      await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/order`, body);
 
-    dispatch(clearCart());
-    alert("Order placed successfully 🎉");
+      dispatch(clearCart());
+      showSuccessToast("Order placed successfully 🎉");
+      router.push("/store")
+    } catch (err) {
+      showErrorToast(err?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -115,12 +152,26 @@ export default function CheckoutForm() {
 
       <h6 className="fw-bold mt-4">Payment</h6>
       <div className="payment-box mb-3">
-        <PaymentElement />
+        <CardElement
+          options={{
+            hidePostalCode: true,
+            style: {
+              base: {
+                fontSize: "16px",
+                color: "#32325d",
+                "::placeholder": {
+                  color: "#aab7c4",
+                },
+              },
+            },
+          }}
+        />
       </div>
 
       <button
         className="btn btn-danger px-5 rounded-pill"
         onClick={handleSubmit}
+        disabled={!stripe || loading}
       >
         CONTINUE TO PAYMENT
       </button>

@@ -8,6 +8,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { IoIosStar } from "react-icons/io";
+import ScrollReveal from "../animations/ScrollReveal";
 
 const testimonials = [
   {
@@ -62,23 +63,25 @@ export default function TestimonialsSection() {
       >
         {testimonials.map((item, index) => (
           <SwiperSlide key={index}>
-            <div className="testimonial-card">
-              <div className="avatar">
-                <Image src={item.image} alt={item.name} width={56} height={56} />
+            <ScrollReveal direction="down" duration={1}>
+              <div className="testimonial-card">
+                <div className="avatar">
+                  <Image src={item.image} alt={item.name} width={56} height={56} />
+                </div>
+
+                <div className="stars">
+                  <Stars rating={5} />
+                </div>
+
+                <h4>{item.name}</h4>
+
+                <div className="quote">
+                  <Image src="/images/quotes.png" alt={item.name} width={83.62} height={58.36} />
+                </div>
+
+                <p className="mb-0">{item.text}</p>
               </div>
-
-              <div className="stars">
-                <Stars rating={5} />
-              </div>
-
-              <h4>{item.name}</h4>
-
-              <div className="quote">
-                <Image src="/images/quotes.png" alt={item.name} width={83.62} height={58.36} />
-              </div>
-
-              <p className="mb-0">{item.text}</p>
-            </div>
+            </ScrollReveal>
           </SwiperSlide>
         ))}
       </Swiper>

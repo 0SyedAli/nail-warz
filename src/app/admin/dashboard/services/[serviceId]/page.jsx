@@ -92,7 +92,7 @@ export default function EditService() {
             category: serviceData.categoryId,
             images: serviceData.images.map(img => ({
               name: img,
-              preview: `${process.env.NEXT_PUBLIC_IMAGE_URL}/${img}`
+              preview: `${process.env.NEXT_PUBLIC_IMAGE_URL}${img}`
             }))
           };
 

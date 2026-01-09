@@ -122,14 +122,10 @@ const SideBar = () => {
 
           ))}
           <li className="sc2_sid">
-            <LogoutButton />
+            <LogoutButton path="/auth/login" />
           </li>
         </ul>
-        {/* <div className="sc2_sid">
-          <div className="logout_btn" >
-            <LogoutButton />
-          </div>
-        </div> */}
+
       </div>
     </div>
   );

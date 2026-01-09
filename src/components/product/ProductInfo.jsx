@@ -61,18 +61,33 @@
 
 "use client";
 
-import RatingStars from "./RatingStars";
 import QuantitySelector from "./QuantitySelector";
+import { useDispatch } from "react-redux";
+import { useState } from "react";
 
 export default function ProductInfo({ product }) {
+  const dispatch = useDispatch();
+  const [qty, setQty] = useState(1);
+  const handleAddToCart = () => {
+    dispatch(
+      addToCart({
+        _id: product._id,
+        name: product.name,
+        sku: product.sku,
+        price: product.price,
+        images: product.images,
+        qty,
+      })
+    );
+  };
   return (
     <div className="product-info">
       <h1 className="product-title">{product.name}</h1>
 
-      <div className="d-flex align-items-center gap-2 mb-2">
+      {/* <div className="d-flex align-items-center gap-2 mb-2">
         <RatingStars rating={4.5} />
         <span className="rating-text">4.5/5</span>
-      </div>
+      </div> */}
 
       <div className="d-flex align-items-center gap-3 mb-2">
         <span className="price-current">${product.price}</span>
@@ -97,11 +112,27 @@ export default function ProductInfo({ product }) {
       <hr />
 
       <div className="d-flex align-items-center gap-3 mt-4">
-        <QuantitySelector max={product.stock} />
+        <QuantitySelector
+          qty={qty}
+          setQty={setQty}
+          max={product.stock} 
+          />
 
         <button
           className="btn btn-danger add-to-cart-btn"
           disabled={product.status === "outOfStock"}
+          onClick={() =>
+            dispatch(
+              addToCart({
+                _id: product._id,
+                name: product.name,
+                sku: product.sku,
+                price: product.price,
+                images: product.images,
+                qty,
+              })
+            )
+          }
         >
           Add To Cart
         </button>

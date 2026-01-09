@@ -28,13 +28,30 @@
   border-radius: 30px;
   padding: 8px 20px;
   transition: all .3s ease;
+  /* box-shadow: 0 0 10px #c1111181; */
+  animation: pulse-animation 2s infinite;
+
 }
 
 .header-home .btn-header:hover {
   background-color: transparent;
   border: 1px solid #C11111;
   color: #000;
+  transform: scale(1.05);
 }
+
+.pulse {}
+
+@keyframes pulse-animation {
+  0% {
+    box-shadow: 0 0 0 0px rgba(0, 0, 0, 0.2);
+  }
+
+  100% {
+    box-shadow: 0 0 0 15px rgba(0, 0, 0, 0);
+  }
+}
+
 
 /* Minimal custom CSS - Using Bootstrap for most styling */
 .home-page * {
@@ -546,6 +563,24 @@
 .phone-image {
   max-width: unset;
   height: auto;
+  animation: float 2s ease-in-out infinite;
+
+}
+
+/* Keyframes for smooth top-bottom movement */
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  /* move up 30px */
+  100% {
+    transform: translateY(0);
+  }
 }
 
 /* Responsive */
@@ -617,11 +652,18 @@
   transition: all 0.3s ease;
   position: relative;
   margin-top: 30px;
+    border: 2px solid #FFF;
+}
+
+.swiper-slide.swiper-slide-active+div .testimonial-card {
+  border: 2px solid #7a0000;
 }
 
 /* .swiper-slide-active .testimonial-card {
   transform: translateY(-10px);
 } */
+
+
 
 /* Avatar */
 .avatar {

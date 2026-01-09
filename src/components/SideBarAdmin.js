@@ -33,16 +33,22 @@ const SideBar = () => {
       icon: "/images/users.svg",
       text: "Inventory Management",
     },
-    // {
-    //   href: "/dashboard/categories",
-    //   icon: "/images/layer-icon.png",
-    //   text: "Categories",
-    // },
-    // {
-    //   href: "/dashboard/accountsettings",
-    //   icon: "/images/act.png",
-    //   text: "Account Settings",
-    // }
+    {
+      href: "/admin/dashboard/order",
+      icon: "/images/users.svg",
+      text: "Order Management",
+    },
+    {
+      href: "/admin/dashboard/battles",
+      icon: "/images/users.svg",
+      text: "Battles Management",
+    },
+    {
+      href: "/admin/dashboard/content",
+      icon: "/images/users.svg",
+      text: "Content Management",
+    },
+   
   ];
   useEffect(() => {
     setActiveTab(pathname);
@@ -109,14 +115,9 @@ const SideBar = () => {
             </li>
           ))}
           <li className="sc2_sid">
-            <LogoutButton />
+            <LogoutButton path="/admin/auth/login"/>
           </li>
         </ul>
-        {/* <div className="sc2_sid">
-          <div className="logout_btn" >
-            <LogoutButton />
-          </div>
-        </div> */}
       </div>
     </div>
   );

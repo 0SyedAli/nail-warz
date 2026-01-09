@@ -89,7 +89,7 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
         });
 
         if (technician.image) {
-          setPreview(`${process.env.NEXT_PUBLIC_IMAGE_URL}/${technician.image}`);
+          setPreview(`${process.env.NEXT_PUBLIC_IMAGE_URL}${technician.image}`);
         }
 
         setLoading(false);
@@ -260,17 +260,17 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
         />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Full Name</label>
+            <label className=" text-sm font-medium mb-0">Full Name</label>
             <InputField {...register("fullName")} placeholder="Full name" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label className=" text-sm font-medium mb-0">Email</label>
             <InputField {...register("email")} placeholder="abc@gmail.com" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Phone Number</label>
+            <label className=" text-sm font-medium mb-0">Phone Number</label>
             <InputField
               {...register("phoneNumber")}
               placeholder="+1 555 123-4567"
@@ -278,11 +278,11 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Designation</label>
+            <label className=" text-sm font-medium mb-0">Designation</label>
             <InputField {...register("designation")} placeholder="Designation" />
           </div>
           <div className="edit_textarea">
-            <label className="block text-sm font-medium mb-1">Description</label>
+            <label className=" text-sm font-medium mb-0">Description</label>
             <textarea
               {...register("description")}
               placeholder="Description"
@@ -294,7 +294,7 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
 
         {/* Working Days */}
         {/* <div>
-          <label className="block text-sm font-medium mb-1">Working Days</label>
+          <label className=" text-sm font-medium mb-0">Working Days</label>
           <div className="d-flex mt-1 mb-2 workDays">
             {ALL_DAYS.map((d) => (
               <div key={d} className="calender_item">
@@ -309,7 +309,7 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
         {/* Working Hours */}
         {/* <div className="row gy-4 py-3 time_fields"> */}
         {/* <div className="col-md-6">
-            <label className="block text-sm font-medium mb-1">Start Time</label>
+            <label className=" text-sm font-medium mb-0">Start Time</label>
             <input
               type="time"
               {...register("startTime")}
@@ -318,7 +318,7 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
           </div>
 
           <div className="col-md-6">
-            <label className="block text-sm font-medium mb-1">End Time</label>
+            <label className=" text-sm font-medium mb-0">End Time</label>
             <input
               type="time"
               {...register("endTime")}
@@ -327,7 +327,7 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
           </div> */}
 
         {/* <div className="col-md-6">
-            <label className="block text-sm font-medium mb-1">
+            <label className=" text-sm font-medium mb-0">
               Break Start
             </label>
             <input
@@ -338,7 +338,7 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
           </div>
 
           <div className="col-md-6">
-            <label className="block text-sm font-medium mb-1">
+            <label className=" text-sm font-medium mb-0">
               Break End
             </label>
             <input

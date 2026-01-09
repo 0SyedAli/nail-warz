@@ -4,12 +4,19 @@ import { useEffect, useState, useMemo } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { BsSearch, BsPencil, BsTrash } from "react-icons/bs";
+import ProductModal from "@/components/Modal/ProductModal";
+import DeleteProductModal from "@/components/Modal/DeleteProductModal";
+import { useDisclosure } from "@chakra-ui/react";
 
 const PAGE_SIZE = 10;
 
 export default function SuperAdminInventory() {
     const router = useRouter();
+    const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure();
+    const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
 
+    const [editProduct, setEditProduct] = useState(null);
+    const [deleteId, setDeleteId] = useState(null);
     const [products, setProducts] = useState([]);
     const [filtered, setFiltered] = useState([]);
     const [counts, setCounts] = useState(null);
@@ -108,7 +115,10 @@ export default function SuperAdminInventory() {
 
                         <button
                             className="btn btn-dark"
-                            onClick={() => router.push("/admin/dashboard/products/create")}
+                            onClick={() => {
+                                setEditProduct(null);   // ADD MODE
+                                onEditOpen();
+                            }}
                         >
                             Add Product
                         </button>
@@ -143,13 +153,20 @@ export default function SuperAdminInventory() {
                                             <td className="text-nowrap">
                                                 <button
                                                     className="btn btn-outline-secondary btn-sm me-2"
-                                                    onClick={() =>
-                                                        router.push(`/admin/dashboard/products/${p._id}`)
-                                                    }
+                                                    onClick={() => {
+                                                        setEditProduct(p);      // EDIT MODE
+                                                        onEditOpen();
+                                                    }}
                                                 >
                                                     <BsPencil />
                                                 </button>
-                                                <button className="btn btn-outline-danger btn-sm">
+                                                <button
+                                                    className="btn btn-outline-danger btn-sm"
+                                                    onClick={() => {
+                                                        setDeleteId(p._id);     // DELETE TARGET
+                                                        onDeleteOpen();
+                                                    }}
+                                                >
                                                     <BsTrash />
                                                 </button>
                                             </td>
@@ -162,6 +179,25 @@ export default function SuperAdminInventory() {
                 </div>
 
             </div>
+            <ProductModal
+                isOpen={isEditOpen}
+                onClose={() => {
+                    setEditProduct(null);
+                    onEditClose();
+                }}
+                product={editProduct}
+                onSuccess={fetchProducts}
+            />
+
+            <DeleteProductModal
+                isOpen={isDeleteOpen}
+                onClose={() => {
+                    setDeleteId(null);
+                    onDeleteClose();
+                }}
+                productId={deleteId}
+                onSuccess={fetchProducts}
+            />
         </div>
     );
 }

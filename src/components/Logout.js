@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import Image from "next/image";
 
-export default function LogoutButton() {
+export default function LogoutButton({path}) {
   const router = useRouter();
 
   const handleLogout = () => {
@@ -17,7 +17,7 @@ export default function LogoutButton() {
     sessionStorage.clear();
 
     // Redirect to login
-    router.push("/auth/login");
+    router.push(`${path}`);
   };
 
   return (

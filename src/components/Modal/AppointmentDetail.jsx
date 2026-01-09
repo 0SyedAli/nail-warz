@@ -124,7 +124,7 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
               {userId?.image &&
                 <Image
                   className="rounded"
-                  src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${userId?.image || "/images/avatar.png"}`}
+                  src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${userId?.image || "/images/avatar.png"}`}
                   width={60}
                   height={60}
                   style={{ width: "60px", height: "60px", objectFit:"cover" }}

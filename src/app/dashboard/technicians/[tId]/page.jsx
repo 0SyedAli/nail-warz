@@ -111,7 +111,7 @@ export default function TechnicianPage({ params }) {
                             <div className="tech_profile d-flex align-items-center">
                                 <div className="tech_image">
                                     <Image
-                                        src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${technicianData.image}` || "/images/profile-avatar.jpg"}
+                                        src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${technicianData.image}` || "/images/profile-avatar.jpg"}
                                         alt={technicianData.fullName || "Unknown"}
                                         className="rounded-circle"
                                         style={{ height: "120px", width: "120px" }}
@@ -196,6 +196,9 @@ export default function TechnicianPage({ params }) {
                                     </button>
                                     <button className="btn btn_tech" onClick={onDeleteOpen}>
                                         Delete Technician
+                                    </button>
+                                    <button className="btn btn_tech2 btn-outline-dark" onClick={()=> router.back()}>
+                                        Go Back
                                     </button>
                                 </div>
                             </div>

@@ -6,7 +6,7 @@ import { useState } from "react";
 export default function ScoreRow({ position, name, score, images }) {
     const [img, setImg] = useState(
         images?.length
-            ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${images[0]}`
+            ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${images[0]}`
             : "/images/warz-dummy.png"
     );
 
