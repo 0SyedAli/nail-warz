@@ -142,7 +142,7 @@ function ProductsGrid({ products }) {
             {products.map((item) => {
                 // const image =
                 //     item.images && item.images?.length > 0
-                //         ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${item.images[0]}`
+                //         ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${item.images[0]}`
                 //         : "/images/prod_paint.png";
 
                 return (

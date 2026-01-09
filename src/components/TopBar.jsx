@@ -75,7 +75,7 @@ const TopBar = ({ header }) => {
           <h5>{location}</h5>
         </div>
         <Image
-          src={image ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${image}` : "/images/avatar.png"}
+          src={image ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}` : "/images/avatar.png"}
           width={50}
           height={50}
           style={{ borderRadius: "100%", minWidth: "50px", minHeight: "50px" }}

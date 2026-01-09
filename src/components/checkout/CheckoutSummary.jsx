@@ -65,7 +65,7 @@ export default function CheckoutSummary() {
                 {cart.map((item) => {
                     const image =
                         item.images?.length > 0
-                            ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${item.images[0]}`
+                            ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${item.images[0]}`
                             : "/images/prod_paint.png";
                     return (
                         <div key={item._id} className="summary-item">

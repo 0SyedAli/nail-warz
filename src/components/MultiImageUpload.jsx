@@ -43,7 +43,7 @@ export default function MultiImageUpload({ images = [], setImages }) {
             <Image
               src={
                 typeof img === "string"
-                  ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${img}`
+                  ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${img}`
                   : URL.createObjectURL(img)
               }
               alt="product"

@@ -89,7 +89,7 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
         });
 
         if (technician.image) {
-          setPreview(`${process.env.NEXT_PUBLIC_IMAGE_URL}${technician.image}`);
+          setPreview(`${process.env.NEXT_PUBLIC_IMAGE_URL}/${technician.image}`);
         }
 
         setLoading(false);

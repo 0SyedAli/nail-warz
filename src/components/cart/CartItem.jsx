@@ -15,7 +15,7 @@ export default function CartItem({ item }) {
 
             {/* Image */}
             <Image
-                src={item?.images ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${item?.images[0]}` : "/images/prod_paint.png" }
+                src={item?.images ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${item?.images[0]}` : "/images/prod_paint.png" }
                 width={124}
                 height={124}
                 alt="Product"

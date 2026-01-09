@@ -6,7 +6,7 @@ export default function CustomerImage({ order }) {
 
   useEffect(() => {
     if (order.userId?.profileImage) {
-      const testUrl = `${process.env.NEXT_PUBLIC_IMAGE_URL}${order.userId?.profileImage}`;
+      const testUrl = `${process.env.NEXT_PUBLIC_IMAGE_URL}/${order.userId?.profileImage}`;
       fetch(testUrl, { method: "HEAD" })
         .then((res) => {
           if (res.ok) {

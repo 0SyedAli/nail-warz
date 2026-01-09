@@ -97,7 +97,7 @@ export default function ContentDetail() {
               <Avatar
                 src={
                   item.images && item.images?.[0]
-                    ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${item.images[0]}`
+                    ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${item.images[0]}`
                     : "/images/profile-avatar.jpg"
                 }
                 alt={item.name}

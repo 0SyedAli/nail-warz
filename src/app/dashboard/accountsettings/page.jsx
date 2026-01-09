@@ -134,7 +134,7 @@ const EditProfile = () => {
 
                     // Set existing image if available
                     if (profileData.image?.[0]) {
-                        setPreviews([`${process.env.NEXT_PUBLIC_IMAGE_URL}${profileData.image[0]}`]);
+                        setPreviews([`${process.env.NEXT_PUBLIC_IMAGE_URL}/${profileData.image[0]}`]);
                         // console.log(`${process.env.NEXT_PUBLIC_IMAGE_URL}/${profileData.image[0]}`);
                     }
                 }
@@ -362,7 +362,7 @@ const EditProfile = () => {
                                 {!previews.length && existingData?.image?.map((img, index) => (
                                     <div key={`existing-${index}`} style={{ position: "relative" }}>
                                         <Image
-                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}${img}`}
+                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${img}`}
                                             width={80}
                                             height={80}
                                             style={{ height: "80px", width: "80px" }}

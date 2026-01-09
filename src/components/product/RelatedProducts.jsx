@@ -61,7 +61,7 @@ export default function RelatedProducts({ relatedProducts = [] }) {
         {relatedProducts.map((item) => {
           const image =
             item.images && item.images?.length > 0
-              ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${item.images[0]}`
+              ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${item.images[0]}`
               : "/images/placeholder.png";
 
           return (

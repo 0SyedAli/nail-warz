@@ -126,7 +126,7 @@ export default function ViewResultModal({
                                         <Avatar
                                             src={
                                                 p.participant.images?.length
-                                                    ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${p.participant.images[0]}`
+                                                    ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${p.participant.images[0]}`
                                                     : "/images/profile-avatar.jpg"
                                             }
                                             alt="avatar"

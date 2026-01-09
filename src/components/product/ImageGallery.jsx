@@ -39,7 +39,7 @@ import { useState } from "react";
 export default function ImageGallery({ images = [] }) {
     const gallery =
         images.length && images.length > 0
-            ? images.map((img) => `${process.env.NEXT_PUBLIC_IMAGE_URL}${img}`)
+            ? images.map((img) => `${process.env.NEXT_PUBLIC_IMAGE_URL}/${img}`)
             : ["/images/prod_paint.png"];
 
     const [active, setActive] = useState(gallery[0]);

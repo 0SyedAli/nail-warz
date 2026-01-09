@@ -119,7 +119,7 @@ export default function OrderDetailsPage() {
                                             <Image
                                                 src={
                                                     p.images && p.images?.length
-                                                        ? `${process.env.NEXT_PUBLIC_IMAGE_URL}${p.images[0]}`
+                                                        ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${p.images[0]}`
                                                         : "/images/warz-dummy.png"
                                                 }
                                                 width={60}
