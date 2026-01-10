@@ -70,6 +70,7 @@ export default function SuperAdminInventory() {
         setFiltered(f);
         setPage(1);
     }, [search, products]);
+    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
 
     // 📄 Pagination
     const currentProducts = useMemo(() => {
@@ -177,7 +178,31 @@ export default function SuperAdminInventory() {
                         </div>
                     </div>
                 </div>
-
+                {totalPages > 1 && (
+                    <div className="pagination justify-content-end mt-4">
+                        <button
+                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                            disabled={page === 1}
+                        >
+                            &lt;
+                        </button>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                            <button
+                                key={n}
+                                className={n === page ? "active" : ""}
+                                onClick={() => setPage(n)}
+                            >
+                                {n}
+                            </button>
+                        ))}
+                        <button
+                            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                            disabled={page === totalPages}
+                        >
+                            &gt;
+                        </button>
+                    </div>
+                )}
             </div>
             <ProductModal
                 isOpen={isEditOpen}

@@ -48,6 +48,11 @@ const SideBar = () => {
       icon: "/images/users.svg",
       text: "Content Management",
     },
+    {
+      href: "/admin/dashboard/pushnotification",
+      icon: "/images/users.svg",
+      text: "Push Notifications",
+    },
    
   ];
   useEffect(() => {

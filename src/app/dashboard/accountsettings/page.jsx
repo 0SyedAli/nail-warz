@@ -494,13 +494,13 @@ const EditProfile = () => {
                             {/* Category */}
                             <div className="col-md-4">
                                 <div className="am_field">
-                                    <label>Category</label>
+                                    <label>Filter</label>
                                     {isClient && (
                                         <MultiSelect
                                             options={categoryList.map(c => ({ value: c._id, label: c.categoryName }))}
                                             value={watch("category")}
                                             onChange={(val) => setValue("category", val, { shouldValidate: true })}
-                                            placeholder="Select Category"
+                                            placeholder="Select Filter"
                                         />
                                     )}
                                     {errors.category && (

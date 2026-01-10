@@ -22,8 +22,7 @@ export default function Dashboard({ children }) {
     battlesDetails: { title: "Battles Details" }, // ✅ ADD THIS
     content: { title: "Content Management" },
     contentDetails: { title: "Content Details" }, // ✅ ADD THIS
-    accountsettings: { title: "Account Settings" },
-    categories: { title: "Manage Vendor Categories" },
+    pushnotification: { title: "Content Management" },
   };
   useEffect(() => {
     const parts = pathname.split("/").filter(Boolean);

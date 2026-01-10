@@ -238,6 +238,15 @@ export default function ManageAppointments() {
     return (
         <div className="page pt-4">
             {/* Stats Cards */}
+
+            <div className="text-end mb-3">
+                <button
+                    className="btn btn-outline-danger btn-sm px-4 py-2 fs-6 rounded-3"
+                    onClick={()=> router.push("/dashboard/appointments")}
+                >
+                    Calender View
+                </button>
+            </div>
             <div className="row g-2 g-sm-3 mb-4">
                 {["All", "Accepted", "Completed", "Canceled"].map((label, i) => (
                     <div className="col" key={i}>
@@ -345,7 +354,7 @@ export default function ManageAppointments() {
                                             <td>{getStatusBadge(appt.status)}</td>
                                             <td>
                                                 <button
-                                                    className="btn btn-outline-primary btn-sm"
+                                                    className="btn btn-outline-dark btn-sm"
                                                     onClick={() => fetchBookingDetail(appt._id)}
                                                 >
                                                     View Details

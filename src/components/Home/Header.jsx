@@ -43,7 +43,7 @@ export default function Header() {
               />
             </button> */}
             {totalQty > 0 &&
-              <Link href="/cart" className="btn btn-link btn-link-header px-0 py-2" aria-label="Shopping Cart">
+              <Link href="/cart" className="btn btn-link btn-link-header text-dark px-0 py-2" aria-label="Shopping Cart">
                 <Image
                   src="/images/cart-head.png"
                   alt="NAIL WARZ"

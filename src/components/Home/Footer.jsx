@@ -8,7 +8,7 @@ export default function Footer() {
     <footer className="bg-white py-4" style={{ background: '#8B0000' }}>
       <div className="container">
         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
-          <p className="text-dark mb-0 small">Copyright 2025 Nails Warz. All Rights Reserved</p>
+          <p className="text-dark mb-0 small">Copyright 2025 <Link href="/" style={{color:"#C11111"}}>Nails Warz.</Link> All Rights Reserved</p>
           <div className="d-flex gap-4">
             <Link href="/privacy-policy" className="text-dark text-decoration-none small">Privacy Policy</Link>
             <Link href="/terms-and-conditions" className="text-dark text-decoration-none small">Terms And Conditions</Link>

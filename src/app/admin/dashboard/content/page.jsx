@@ -54,6 +54,8 @@ export default function ContentManagement() {
     );
   }, [items, search]);
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+
   const current = useMemo(() => {
     const start = (page - 1) * PAGE_SIZE;
     return filtered.slice(start, start + PAGE_SIZE);
@@ -130,6 +132,31 @@ export default function ContentManagement() {
               </table>
             </div>
           </div>
+          {totalPages > 1 && (
+            <div className="pagination justify-content-end mt-4">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+              >
+                &lt;
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                <button
+                  key={n}
+                  className={n === page ? "active" : ""}
+                  onClick={() => setPage(n)}
+                >
+                  {n}
+                </button>
+              ))}
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+              >
+                &gt;
+              </button>
+            </div>
+          )}
         </div>
 
       </div>

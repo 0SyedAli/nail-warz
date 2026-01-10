@@ -70,6 +70,8 @@ export default function SuperAdminOrders() {
     return filtered.slice(start, start + PAGE_SIZE);
   }, [filtered, page]);
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+
   if (loading) return <p className="m-4">Loading orders…</p>;
   if (error) return <p className="m-4 text-danger">{error}</p>;
 
@@ -147,9 +149,35 @@ export default function SuperAdminOrders() {
                 </tbody>
 
               </table>
+
             </div>
           </div>
         </div>
+        {totalPages > 1 && (
+          <div className="pagination justify-content-end mt-4">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              &lt;
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+              <button
+                key={n}
+                className={n === page ? "active" : ""}
+                onClick={() => setPage(n)}
+              >
+                {n}
+              </button>
+            ))}
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+            >
+              &gt;
+            </button>
+          </div>
+        )}
 
       </div>
     </div>

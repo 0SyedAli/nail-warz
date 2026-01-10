@@ -7,7 +7,6 @@ import AreYouSure2 from "@/components/Modal/AreYouSure2";
 import { useDisclosure } from "@chakra-ui/react";
 import AddCategory from "@/components/Modal/AddCategory";
 
-const productImagePlaceholder = "/images/nail-cat.jpg";
 const ManageCategory = () => {
   const [categories, setCategories] = useState([]);
   const [adminId, setAdminId] = useState("");
@@ -17,14 +16,14 @@ const ManageCategory = () => {
   const { isOpen: isNotfOpen, onOpen: onNotfOpen, onClose: onNotfClose } = useDisclosure();
   useEffect(() => {
     const cookie = Cookies.get("user");
-    if (!cookie) return router.push("/auth/login");
+    if (!cookie) return router.push("/admin/auth/login");
 
     try {
       const u = JSON.parse(cookie);
       if (u?._id) setAdminId(u._id);
-      else router.push("/auth/login");
+      else router.push("/admin/auth/login");
     } catch {
-      router.push("/auth/login");
+      router.push("/admin/auth/login");
     }
   }, []);
 
