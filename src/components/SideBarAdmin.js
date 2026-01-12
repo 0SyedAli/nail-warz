@@ -51,7 +51,7 @@ const SideBar = () => {
     {
       href: "/admin/dashboard/pushnotification",
       icon: "/images/users.svg",
-      text: "Push Notifications",
+      text: "Push Notification",
     },
    
   ];
