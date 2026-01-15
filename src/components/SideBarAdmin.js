@@ -25,32 +25,32 @@ const SideBar = () => {
     },
     {
       href: "/admin/dashboard/vendors",
-      icon: "/images/users.svg",
+      icon: "/images/inventory-management.png",
       text: "Vendors Management",
     },
     {
       href: "/admin/dashboard/inventory",
-      icon: "/images/users.svg",
+      icon: "/images/invent-icon.png",
       text: "Inventory Management",
     },
     {
       href: "/admin/dashboard/order",
-      icon: "/images/users.svg",
+      icon: "/images/cart-2.png",
       text: "Order Management",
     },
     {
       href: "/admin/dashboard/battles",
-      icon: "/images/users.svg",
+      icon: "/images/warz-icon.png",
       text: "Battles Management",
     },
     {
       href: "/admin/dashboard/content",
-      icon: "/images/users.svg",
+      icon: "/images/report-data.png",
       text: "Content Management",
     },
     {
       href: "/admin/dashboard/pushnotification",
-      icon: "/images/users.svg",
+      icon: "/images/notification.png",
       text: "Push Notification",
     },
    
@@ -84,7 +84,7 @@ const SideBar = () => {
         <button className="hamburger" style={{ margin: "20px auto 0" }} onClick={toggleSidebar}>
           <RxCross2 />
         </button>
-        <ul>
+        <ul className="sma-ul">
           {navigationRouters.map((item, index) => (
             // <li
             //   key={index}
