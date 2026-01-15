@@ -24,37 +24,6 @@ const schema = Yup.object({
   email: Yup.string().email("Invalid email").required("Email is required"),
   description: Yup.string().required("Description is required"),
   designation: Yup.string().required("Designation is required"),
-
-  // workingDays: Yup.array()
-  //   .of(Yup.string().oneOf(DAYS))
-  //   .min(1, "Select at least one working day"),
-
-  // startTime: Yup.string().required("Start time is required"),
-  // endTime: Yup.string()
-  //   .required("End time is required")
-  //   .test("is-after-start", "End time must be after start time", function (value) {
-  //     const { startTime } = this.parent;
-  //     return !startTime || !value || value > startTime;
-  //   }),
-
-  // breakStart: Yup.string()
-  //   .nullable()
-  //   .test("break-after-start", "Break must be after work start", function (value) {
-  //     const { startTime } = this.parent;
-  //     return !value || !startTime || value > startTime;
-  //   }),
-
-  // breakEnd: Yup.string()
-  //   .nullable()
-  //   .test("break-after-breakstart", "Break end must be after break start", function (value) {
-  //     const { breakStart } = this.parent;
-  //     return !value || !breakStart || value > breakStart;
-  //   })
-  //   .test("break-before-end", "Break must end before work end", function (value) {
-  //     const { endTime } = this.parent;
-  //     return !value || !endTime || value < endTime;
-  //   }),
-
   image: Yup.mixed()
     .required("Image is required")
     .test("size", "Max 2 MB", (f) => f && f.size <= 2 * 1024 * 1024)
@@ -87,22 +56,47 @@ const AddTechnician = () => {
       router.replace("/auth/login");
     }
   }, [router]);
+  const ALL_DAYS = [
+    "Monday", "Tuesday", "Wednesday",
+    "Thursday", "Friday", "Saturday", "Sunday",
+  ];
+  // const {
+  //   register,
+  //   control,
+  //   handleSubmit,
+  //   setValue,
+  //   watch,
+  //   formState: { errors, isSubmitting },
+  // } = useForm({
+  //   resolver: yupResolver(schema),
+  //   defaultValues: {
+  //     workingDays: [],
+  //     startTime: "",
+  //     endTime: "",
+  //     breakStart: "",
+  //     breakEnd: "",
+  //     image: null,
+  //   },
+  // });
 
   const {
     register,
     control,
     handleSubmit,
-    setValue,
     watch,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      workingDays: [],
-      startTime: "",
-      endTime: "",
-      breakStart: "",
-      breakEnd: "",
+      workingDays: ALL_DAYS.reduce((acc, day) => {
+        acc[day] = {
+          isActive: false,
+          startTime: "",
+          endTime: "",
+        };
+        return acc;
+      }, {}),
       image: null,
     },
   });
@@ -139,21 +133,43 @@ const AddTechnician = () => {
         "Saturday",
         "Sunday",
       ];
-      const formatTo12Hour = (timeStr) => {
+      // const formatTo12Hour = (timeStr) => {
+      //   if (!timeStr) return "";
+      //   const [h, m] = timeStr.split(":").map(Number);
+      //   const period = h >= 12 ? "PM" : "AM";
+      //   const hour = h % 12 || 12; // convert 0 -> 12
+      //   return `${hour.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")} ${period}`;
+      // };
+      // const dayPayload = ALL_DAYS.map((day) => ({
+      //   day,
+      //   isActive: data.workingDays.includes(day),
+      //   startTime: formatTo12Hour(data.startTime),
+      //   endTime: formatTo12Hour(data.endTime),
+      //   breakStart: formatTo12Hour(data.breakStart),
+      //   breakEnd: formatTo12Hour(data.breakEnd),
+      // }));
+
+      // fd.append("workingDays", JSON.stringify(dayPayload));
+
+      const convertTo12Hour = (timeStr) => {
         if (!timeStr) return "";
         const [h, m] = timeStr.split(":").map(Number);
         const period = h >= 12 ? "PM" : "AM";
-        const hour = h % 12 || 12; // convert 0 -> 12
-        return `${hour.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")} ${period}`;
+        const hour = h % 12 || 12;
+        return `${hour.toString().padStart(2, "0")}:${m
+          .toString()
+          .padStart(2, "0")} ${period}`;
       };
-      const dayPayload = ALL_DAYS.map((day) => ({
-        day,
-        isActive: data.workingDays.includes(day),
-        startTime: formatTo12Hour(data.startTime),
-        endTime: formatTo12Hour(data.endTime),
-        breakStart: formatTo12Hour(data.breakStart),
-        breakEnd: formatTo12Hour(data.breakEnd),
-      }));
+
+      const dayPayload = ALL_DAYS.map(day => {
+        const d = data.workingDays[day];
+        return {
+          day,
+          isActive: !!d.isActive,
+          startTime: convertTo12Hour(d.startTime),
+          endTime: convertTo12Hour(d.endTime),
+        };
+      });
 
       fd.append("workingDays", JSON.stringify(dayPayload));
       fd.append("image", data.image);
@@ -297,7 +313,7 @@ const AddTechnician = () => {
             {errors.phoneNumber && <p className="text-danger">{errors.phoneNumber.message}</p>}
 
             {/* Days */}
-            <label className="form-label ">Select Working Days</label>
+            {/* <label className="form-label ">Select Working Days</label>
             <div className="d-flex mt-1 mb-2 col-12 col-lg-6 workDays">
               {DAYS.map((d) => (
                 <div key={d} className="calender_item">
@@ -335,30 +351,54 @@ const AddTechnician = () => {
                 </div>
               </div>
 
-              {/* <div className="col-md-6">
-                <label htmlFor="breakStart" className="form-label ">Break Start</label>
-                <input
-                  type="time"
-                  {...register("breakStart")}
-                  className="form-control"
-                />
-                <div className="text-danger small mt-1">
-                  {errors.breakStart && <p className="text-danger text-sm mt-1">{errors.breakStart.message}</p>}
-                </div>
-              </div>
+            </div> */}
 
-              <div className="col-md-6">
-                <label htmlFor="breakEnd" className="form-label ">Break End</label>
-                <input
-                  type="time"
-                  {...register("breakEnd")}
-                  className="form-control"
-                />
-                <div className="text-danger small mt-1">
-                  {errors.breakEnd && <p className="text-danger text-sm mt-1">{errors.breakEnd.message}</p>}
-                </div>
-              </div> */}
-            </div>
+            <table className="table table-bordered wd_table mt-3">
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>Active</th>
+                  <th style={{ width: 120 }}>Start</th>
+                  <th style={{ width: 120 }}>End</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ALL_DAYS.map(day => {
+                  const wd = watch(`workingDays.${day}`) || {};
+                  return (
+                    <tr key={day}>
+                      <td>{day}</td>
+
+                      <td>
+                        <input
+                          type="checkbox"
+                          {...register(`workingDays.${day}.isActive`)}
+                        />
+                      </td>
+
+                      <td>
+                        <input
+                          type="time"
+                          className="form-control"
+                          {...register(`workingDays.${day}.startTime`)}
+                          disabled={!wd.isActive}
+                        />
+                      </td>
+
+                      <td>
+                        <input
+                          type="time"
+                          className="form-control"
+                          {...register(`workingDays.${day}.endTime`)}
+                          disabled={!wd.isActive}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+
 
             {/* Image */}
             <div className="d-flex align-items-center gap-4 mt-4" >

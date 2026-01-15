@@ -4799,6 +4799,7 @@ button.fc-viewAppointments-button.fc-button {
 
   .sidebar_menu .sm_logo {
     margin: 0 auto;
+    width: 70px;
   }
 
   .sidebar_container ul li a span img {
@@ -4836,9 +4837,6 @@ button.fc-viewAppointments-button.fc-button {
     border-left: 0;
   }
 }
-
-
-
 
 @media only screen and (max-width: 768px) {
   .upload_img_cont {
@@ -5167,6 +5165,7 @@ button.fc-viewAppointments-button.fc-button {
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 4px;
+  height: 4px;
 }
 
 /* Scrollbar Thumb (Black → Red gradient) */
@@ -5178,4 +5177,11 @@ button.fc-viewAppointments-button.fc-button {
 /* Optional hover effect */
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(to bottom, #ff0000, #000000);
+}
+.btn  {
+  white-space: nowrap;
+}
+
+table tr th, table tr td {
+  white-space: nowrap;
 }

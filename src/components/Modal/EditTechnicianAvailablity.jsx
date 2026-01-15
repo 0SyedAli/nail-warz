@@ -1,12 +1,9 @@
 "use client";
 import { useEffect, useState, useCallback } from "react";
 import Modal from "./layout";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { FiPlusCircle } from "react-icons/fi";
-import Image from "next/image";
 
-import InputField from "@/components/Form/InputField";
 import { AuthBtn } from "@/components/AuthBtn/AuthBtn";
 import BallsLoading from "../Spinner/BallsLoading";
 
@@ -22,17 +19,12 @@ const ALL_DAYS = [
 ];
 
 export default function EditTechnicianAvailablity({ isOpen, onClose, techId, onSuccess  }) {
-  const router = useRouter();
-  const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [imageChanged, setImageChanged] = useState(false);
   const [originalData, setOriginalData] = useState(null);
 
   const {
     register,
-    control,
     handleSubmit,
-    setValue,
     watch,
     reset,
     formState: { isSubmitting, dirtyFields },
@@ -47,7 +39,6 @@ export default function EditTechnicianAvailablity({ isOpen, onClose, techId, onS
   });
 
   // Watch image to handle preview
-  const imageFile = watch("image");
 
   /* ---------- Helpers ---------- */
   const convertTo12Hour = useCallback((timeStr) => {
