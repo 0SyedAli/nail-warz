@@ -3541,10 +3541,12 @@ button.fc-viewAppointments-button.fc-button {
 .battle-hero-img img {
   border-radius: 16px;
 }
-.battle-hero-img2 img{
+
+.battle-hero-img2 img {
   height: 250px;
   object-fit: contain;
 }
+
 .battle-votes {
   display: flex;
   justify-content: space-between;
@@ -3787,9 +3789,11 @@ button.fc-viewAppointments-button.fc-button {
   border-color: #C11111;
 
 }
+
 :not(.btn-check)+.btn:active {
   background-color: #FFF;
 }
+
 .active-battle-btn2 {
   background-color: #000;
   border-color: #000;
@@ -4468,6 +4472,38 @@ button.fc-viewAppointments-button.fc-button {
 .payoutCommisionIcon {
   background: #ff00002b;
   color: red;
+}
+
+.filter-popover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  padding: 10px 12px;
+  background: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #333;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+.filter-popover2 {
+  font-size: 16px;
+  margin-top: 10px;
+  line-height: 1.5;
+  color: #333;
+  border: 1px solid #000;
+}
+/* small arrow */
+.filter-popover::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 18px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent #fff transparent;
 }
 
 /* admin product modal css */
@@ -5188,10 +5224,12 @@ button.fc-viewAppointments-button.fc-button {
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(to bottom, #ff0000, #000000);
 }
-.btn  {
+
+.btn {
   white-space: nowrap;
 }
 
-table tr th, table tr td {
+table tr th,
+table tr td {
   white-space: nowrap;
 }

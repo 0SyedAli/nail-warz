@@ -36,7 +36,7 @@ const SideBar = () => {
     {
       href: "/dashboard/categories",
       icon: "/images/layer-icon.png",
-      text: "Categories",
+      text: "Service Categories",
     },
     {
       href: "/dashboard/payouthistory",

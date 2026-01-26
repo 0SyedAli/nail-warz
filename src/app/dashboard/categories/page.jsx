@@ -1,14 +1,17 @@
 "use client";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 import AreYouSure2 from "@/components/Modal/AreYouSure2";
 import { useDisclosure } from "@chakra-ui/react";
 import AddCategory from "@/components/Modal/AddCategory";
+import { FaExclamationCircle } from "react-icons/fa";
 
 const productImagePlaceholder = "/images/nail-cat.jpg";
 const ManageCategory = () => {
+  const popoverRef = useRef(null);
+  const [open, setOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [adminId, setAdminId] = useState("");
   const [categoryToDelete, setCategoryToDelete] = useState(null);
@@ -50,8 +53,8 @@ const ManageCategory = () => {
       const message = err?.message || "Failed to load categories.";
       setError(message);
       toast.error(message, {
-          autoClose: 1500,
-        });
+        autoClose: 1500,
+      });
     } finally {
       setLoading(false);
     }
@@ -124,12 +127,38 @@ const ManageCategory = () => {
       </div>
     );
   };
-
+  // Close on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (popoverRef.current && !popoverRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   return (
     <>
       <div className="page">
         <div className="manage_order_head pb-3">
-          <h3 className="mb-0">All Categories</h3>
+          <div>
+            <div className="position-relative w-100 d-inline-flex align-items-center gap-1">
+              <h3 className="d-flex align-items-center gap-2 mb-0" style={{width:"500px"}}>
+                All Categories
+                <FaExclamationCircle
+                  color="#000"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setOpen(!open)}
+                />
+              </h3>
+
+              {open && (
+                <div ref={popoverRef} className="filter-popover filter-popover2">
+                  Select the filter you wish to populate your Salon when selected. These filters are accessible via App users and they can filter out Salons based on the filter they select.
+                </div>
+              )}
+            </div>
+          </div>
           <div onClick={onNotfOpen} className="btn btntheme3">
             Add Category
           </div>

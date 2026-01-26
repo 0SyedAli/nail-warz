@@ -14,6 +14,7 @@ export default function PayoutHistory() {
   const router = useRouter();
 
   const [vendorId, setVendorId] = useState("");
+  const [vendor, setVendor] = useState("");
   const [payouts, setPayouts] = useState([]);
   const [filteredPayouts, setFilteredPayouts] = useState([]);
   const [summary, setSummary] = useState(null);
@@ -74,7 +75,7 @@ export default function PayoutHistory() {
         setPayouts(history);
         setFilteredPayouts(history);
         setSummary(json.revenueSummary);
-
+        setVendor(json.vendor);
       } catch (err) {
         setError("Server error. Please try again later.");
       } finally {
@@ -145,7 +146,7 @@ export default function PayoutHistory() {
 
             {/* Active Battles */}
             <AdminDashboardCard
-              title="Total Paid Out"
+              title="Total Received"
               value={`$${summary.totalPaidAmount ?? 0}`}
               icon={LuDollarSign}
             />
@@ -168,8 +169,8 @@ export default function PayoutHistory() {
               <BsSearch className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
               <input
                 className="form-control ps-5"
-                placeholder="Search transaction / status"
-                style={{ width: 280 }}
+                placeholder="Search by payout ID"
+                style={{ width: 480 }}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -180,8 +181,8 @@ export default function PayoutHistory() {
               <table className="table table-hover mb-0">
                 <thead className="table-light">
                   <tr>
-                    {/* <th>#</th> */}
                     <th>Payout ID</th>
+                    <th>Title</th>
                     <th>Method</th>
                     <th>Received Amount</th>
                     <th>Status</th>
@@ -194,6 +195,7 @@ export default function PayoutHistory() {
                     <tr key={p.transactionId}>
                       {/* <td>{(page - 1) * PAGE_SIZE + i + 1}</td> */}
                       <td>{p.transactionId}</td>
+                      <td>{vendor?.salonName || "-"}</td>
                       <td>{p.payoutMethod}</td>
                       <td className="fw-bold">${p.amount}</td>
                       <td>

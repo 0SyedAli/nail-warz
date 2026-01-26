@@ -1,10 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { FaRegEdit, FaTimes } from "react-icons/fa";
+import { FaExclamationCircle, FaRegEdit, FaTimes } from "react-icons/fa";
 import { showErrorToast, showSuccessToast } from "src/lib/toast";
+
 import api from "@/lib/axios";
 import Cookies from "js-cookie";
 import Select from "react-select";
@@ -21,6 +22,8 @@ const DAYS_OF_WEEK = [
 
 const EditProfile = () => {
     const router = useRouter();
+    const popoverRef = useRef(null);
+    const [open, setOpen] = useState(false);
     const [adminId, setAdminId] = useState("");
     const [categoryList, setCategoryList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -331,6 +334,19 @@ const EditProfile = () => {
     const handleRemoveVendorCategory = (index) => {
         setVendorCategory(vendorCategory.filter((_, i) => i !== index));
     };
+
+
+
+    // Close on outside click
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (popoverRef.current && !popoverRef.current.contains(e.target)) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
     return (
         <div className="w-100">
             <div className="m_tabs_main mt-5">
@@ -494,7 +510,23 @@ const EditProfile = () => {
                             {/* Category */}
                             <div className="col-md-4">
                                 <div className="am_field">
-                                    <label>Filter</label>
+                                    {/* <label className="d-flex align-items-center gap-1">Filter <FaExclamationCircle  color="#000"/></label> */}
+                                    <div className="position-relative w-100 d-inline-flex align-items-center gap-1">
+                                        <label className="d-flex align-items-center gap-1 mb-0">
+                                            Filter
+                                            <FaExclamationCircle
+                                                color="#000"
+                                                style={{ cursor: "pointer" }}
+                                                onClick={() => setOpen(!open)}
+                                            />
+                                        </label>
+
+                                        {open && (
+                                            <div ref={popoverRef} className="filter-popover">
+                                                Select the filter you wish to populate your Salon when selected. These filters are accessible via App users and they can filter out Salons based on the filter they select.
+                                            </div>
+                                        )}
+                                    </div>
                                     {isClient && (
                                         <MultiSelect
                                             options={categoryList.map(c => ({ value: c._id, label: c.categoryName }))}
