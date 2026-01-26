@@ -4,9 +4,9 @@ export default function AboutHero() {
   return (
     <div className="row align-items-center py-5">
       <div className="col-5">
-        <div className="battle-hero-img">
+        <div className="battle-hero-img battle-hero-img2">
           <Image
-            src="/images/warz-img1.png"
+            src="/images/logo.png"
             alt="Galaxy Nails"
             width={380}
             height={380}
@@ -20,13 +20,17 @@ export default function AboutHero() {
         <div>
           <div className="d-flex align-items-center gap-2 mb-2">
             <div className="feature-icon-box">
-              <Image src="/images/logo.png" width={36} height={44} alt="" />
+              <Image src="/images/logo.png" width={400} height={400} alt="" />
             </div>
             <h4 className="mb-0 battle-title2">Lorem Ipsum passage</h4>
           </div>
-
-          <p className="battle-desc">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniamLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          <p className="battle-desc mb-0">
+            Founded in 2020, Nail Warz was created to bring innovation, trust, and creativity to the nail care
+            industry. Built with the nail care consumer, or “Nailee” at the center, our platform is designed to
+            simplify discovery, save time, elevate transparency, and create meaningful connections between
+            consumers and professionals. Nail Warz exists to provide customers with a trustworthy digital
+            environment, establish a new gold standard for the industry, and introduce fun, elevated
+            competition that celebrates creativity.
           </p>
         </div>
       </div>

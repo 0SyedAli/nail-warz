@@ -1691,7 +1691,7 @@ button.reset_btn svg {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 10px 0 15px 0;
+  margin: 5px 0 15px 0;
 }
 
 .inputField select {
@@ -3541,7 +3541,10 @@ button.fc-viewAppointments-button.fc-button {
 .battle-hero-img img {
   border-radius: 16px;
 }
-
+.battle-hero-img2 img{
+  height: 250px;
+  object-fit: contain;
+}
 .battle-votes {
   display: flex;
   justify-content: space-between;
@@ -3784,7 +3787,9 @@ button.fc-viewAppointments-button.fc-button {
   border-color: #C11111;
 
 }
-
+:not(.btn-check)+.btn:active {
+  background-color: #FFF;
+}
 .active-battle-btn2 {
   background-color: #000;
   border-color: #000;
@@ -4458,6 +4463,11 @@ button.fc-viewAppointments-button.fc-button {
   font-family: var(--font-poppins);
   color: #000000;
   line-height: 30px;
+}
+
+.payoutCommisionIcon {
+  background: #ff00002b;
+  color: red;
 }
 
 /* admin product modal css */

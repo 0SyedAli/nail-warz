@@ -4,6 +4,7 @@ const AdminDashboardCard = ({
   title,
   value,
   change,
+  icon_class,
   icon: Icon,
 }) => {
   return (
@@ -16,7 +17,7 @@ const AdminDashboardCard = ({
             <h5 className="fw-bold mb-1">{value}</h5>
             {change && <span className="text-success small">{change}</span>}
           </div>
-          <div className="icon-box">
+          <div className={`icon-box ${icon_class}`}>
             <Icon />
           </div>
         </div>

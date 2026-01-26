@@ -8,7 +8,7 @@ export default function ProductPage() {
     return (
         <>
             <Header />
-            <WebBanner bannerTitle="Live Voting Scores" bannerPara="Vote for your favorite nail art designs and watch the battles unfold!" />
+            <WebBanner bannerTitle="Live Voting Scores" bannerPara="Vote for your favorite Nail Warrior. MAY THE BEST SET WIN" />
             <section style={{padding:"80px 0"}}>
                 <div className="container">
                     <VotingScores />

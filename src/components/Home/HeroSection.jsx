@@ -12,18 +12,20 @@ export default function HeroSection() {
           <div className="col-lg-6 mb-4 mb-lg-0">
             <ScrollReveal direction="left" delay={0.5} duration={1.5}>
               <div className="d-flex flex-column gap-4 align-items-start">
-                <div className="callout-bubble d-inline-flex align-items-center gap-2">
+                {/* <div className="callout-bubble d-inline-flex align-items-center gap-2">
                   <Sparkles size={16} />
                   <span className="fw-semibold">Smart Beauty in 15 Minutes</span>
-                </div>
+                </div> */}
 
                 <h1 className="display-3 fw-bold mb-0">
-                  Smart Nail Box<br />
-                  <span className="text-danger">Perfect Nails</span> in 15 Minutes
+
+                  Nail Warz is Your<br />
+                  <span className="text-danger">One-Stop Shop</span> for the Nail Industry
                 </h1>
 
                 <p className="fs-5 text-muted" >
-                  Choose a design in the app. Insert your hand in the Nail Box. Get your perfect manicure — fast and flawless. No professional needed.
+                  Easily and reliably find a local nail salon and service on our app. Engage
+                  with other nail consumers, win a free manicure, and much more!
                 </p>
 
                 <div className="d-flex align-items-center gap-3">

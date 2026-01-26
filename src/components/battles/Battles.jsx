@@ -43,7 +43,7 @@ export default function Battles({ title, battles }) {
                         href={`/votingscores?battleId=${battle._id}`}
                         className="btn active-battle-btn"
                     >
-                        VIEW THE SCORE BOARD
+                        VIEW THE SCOREBOARD
                     </Link>
                 </div>
             ))}

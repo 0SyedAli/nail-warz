@@ -11,8 +11,6 @@ import { FiPlusCircle } from "react-icons/fi";
 import Image from "next/image";
 import Cookies from "js-cookie";
 import { showErrorToast, showSuccessToast } from "src/lib/toast";
-/* ---------- Days ---------- */
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 /* ---------- Yup schema ---------- */
 const schema = Yup.object({
@@ -56,6 +54,7 @@ const AddTechnician = () => {
       router.replace("/auth/login");
     }
   }, [router]);
+  /* ---------- Days ---------- */
   const ALL_DAYS = [
     "Monday", "Tuesday", "Wednesday",
     "Thursday", "Friday", "Saturday", "Sunday",
@@ -84,7 +83,6 @@ const AddTechnician = () => {
     control,
     handleSubmit,
     watch,
-    reset,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(schema),

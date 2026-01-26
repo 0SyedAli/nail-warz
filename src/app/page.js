@@ -15,7 +15,7 @@ export default function Home() {
       <div id="smooth-wrapper">
         <div id="smooth-content">
           <div className="home-page">
-            <TopBanner />
+            {/* <TopBanner /> */}
             <Header />
             <HeroSection />
             <FeaturesSection />

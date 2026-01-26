@@ -8,7 +8,7 @@ export default function ContactPage() {
     return (
         <>
             <Header />
-            <WebBanner bannerTitle="Contact Us" bannerPara="Premium nail care products and professional tools" />
+            <WebBanner bannerTitle="Contact Us" bannerPara="Please contact us with questions, inquiries, or to learn more about Nail Warz" />
 
             <div className="container" style={{ padding: "70px 0" }}>
                 <ContactForm />

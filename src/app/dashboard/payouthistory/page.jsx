@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { BsSearch } from "react-icons/bs";
 import AdminDashboardCard from "@/components/AdminDashboardCard";
 import { LuDollarSign, LuWallet } from "react-icons/lu";
+import { FiPercent } from "react-icons/fi";
 
 const PAGE_SIZE = 10;
 
@@ -128,22 +129,31 @@ export default function PayoutHistory() {
 
             {/* Total Revenue */}
             <AdminDashboardCard
-              title="Total Revenue"
+              title="Your Total Revenue"
               value={`$${(summary.totalRevenue ?? 0).toLocaleString()}`}
               icon={LuDollarSign}
             />
 
             {/* Wallet Balance */}
             <AdminDashboardCard
-              title="Vendor Share"
-              value={`$${summary.totalPayoutPending ?? 0}`}
-              icon={LuDollarSign}
+              title="Nail Warz Commission (15%)"
+              value={`$${summary.platformFee.amount ?? 0}`}
+              icon_class="payoutCommisionIcon"
+              // value={'$15'}
+              icon={FiPercent}
             />
 
             {/* Active Battles */}
             <AdminDashboardCard
-              title="Total Paid"
-              value={summary.totalPaidAmount ?? 0}
+              title="Total Paid Out"
+              value={`$${summary.totalPaidAmount ?? 0}`}
+              icon={LuDollarSign}
+            />
+
+            {/* Wallet Balance */}
+            <AdminDashboardCard
+              title="Your Pending Payouts"
+              value={`$${summary.totalPayoutPending ?? 0}`}
               icon={LuDollarSign}
             />
           </div>
@@ -152,7 +162,7 @@ export default function PayoutHistory() {
         {/* ===== TABLE ===== */}
         <div className="card mt-4">
           <div className="card-header bg-white d-flex justify-content-between align-items-center">
-            <h5 className="fw-bolder mb-0">Payout History</h5>
+            <h5 className="fw-bolder mb-0">Your Payout History</h5>
 
             <div className="position-relative">
               <BsSearch className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
@@ -170,10 +180,10 @@ export default function PayoutHistory() {
               <table className="table table-hover mb-0">
                 <thead className="table-light">
                   <tr>
-                    <th>#</th>
-                    <th>Transaction ID</th>
+                    {/* <th>#</th> */}
+                    <th>Payout ID</th>
                     <th>Method</th>
-                    <th>Amount</th>
+                    <th>Received Amount</th>
                     <th>Status</th>
                     <th>Date</th>
                     <th>Remarks</th>
@@ -182,12 +192,12 @@ export default function PayoutHistory() {
                 <tbody>
                   {currentPayouts.map((p, i) => (
                     <tr key={p.transactionId}>
-                      <td>{(page - 1) * PAGE_SIZE + i + 1}</td>
+                      {/* <td>{(page - 1) * PAGE_SIZE + i + 1}</td> */}
                       <td>{p.transactionId}</td>
                       <td>{p.payoutMethod}</td>
                       <td className="fw-bold">${p.amount}</td>
                       <td>
-                        <span className="badge bg-success">{p.status}</span>
+                        <span className="badge bg-success">Received</span>
                       </td>
                       <td>
                         {new Date(p.payoutDate).toLocaleString()}

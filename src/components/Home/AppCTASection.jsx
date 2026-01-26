@@ -21,7 +21,7 @@ export default function AppCTASection() {
         <h3 className="text-white mb-2 fw-bolder">Download Now</h3>
         
         <p className="text-white fs-6 mb-4" style={{ opacity: 0.9 }}>
-          Nails Warz Delivered Blazing Fast Performance, Striking Word Solution
+          Your One-Stop Shop for the Nail Care Industry
         </p>
         <div className="d-flex align-items-center justify-content-center gap-3">
           <Image src="/images/googleplay.png" width={173.96} height={50.32} alt="" />

@@ -8,7 +8,7 @@ export default function ContactForm() {
 
             {/* Contact Info */}
             <div className="d-flex justify-content-center gap-5 mb-4 contact-info">
-                <div className="contact-content">
+                {/* <div className="contact-content">
                     <div className="contact-icon">
                         <Image
                             src="/images/phone-bt.png"
@@ -23,7 +23,7 @@ export default function ContactForm() {
                         <div className="txt1">Call</div>
                         <small className="txt2">+123 456 789</small>
                     </div>
-                </div>
+                </div> */}
 
                 <div className="contact-content">
                     <div className="contact-icon">
@@ -38,7 +38,7 @@ export default function ContactForm() {
                     </div>
                     <div>
                         <div className="txt1">Email</div>
-                        <small className="txt2">info@nailswarz.com</small>
+                        <small className="txt2">info@nailwarz.com</small>
                     </div>
                 </div>
             </div>

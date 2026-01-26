@@ -62,7 +62,6 @@ export default function LoginPage() {
       if (result?.data?.isUpdated === true) {
         router.push("/dashboard");
         setSuccess(true)
-
       }
       else {
         router.push("/auth/bussinessprofile");

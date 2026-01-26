@@ -68,7 +68,7 @@ export default function VotingScores() {
         </div>
         {winner &&
           <Link href={`/winners?battleId=${partId}`} className="btn active-battle-btn">
-            VIEW THE WINNERS
+            VIEW THE NAIL CHAMPION
           </Link>
         }
       </div>

@@ -33,7 +33,7 @@ const schema = Yup.object({
   workingDays: Yup.array().of(Yup.string()).min(1, "Select at least one working day"),
   startTime: Yup.string().required("Start time is required"),
   endTime: Yup.string().required("End time is required"),
-  categories: Yup.array().of(Yup.string()).min(1, "Select at least one category"),
+  categories: Yup.array().of(Yup.string()).min(1, "Select at least one filter"),
   images: Yup.array()
     .of(
       Yup.mixed()
@@ -92,17 +92,38 @@ export default function BussinessProfile() {
   }, [images]);
 
   /* user auth check */
+  /* user auth check */
   useEffect(() => {
     const cookie = Cookies.get("user");
-    if (!cookie) return router.push("/auth/login");
+
+    if (!cookie) {
+      router.replace("/auth/login");
+      return;
+    }
+
     try {
       const u = JSON.parse(cookie);
-      if (u?._id) setAdminId(u._id);
-      else router.push("/auth/login");
-    } catch {
-      router.push("/auth/login");
+        console.log("isUpdated1");
+
+      // ✅ Redirect to dashboard if profile is updated
+      if (u?.isUpdated === true) {
+        router.replace("/dashboard");
+        console.log("isUpdated22");
+        
+        return;
+      }
+
+      // ✅ Otherwise just set admin id
+      if (u?._id) {
+        setAdminId(u._id);
+      } else {
+        router.replace("/auth/login");
+      }
+    } catch (err) {
+      router.replace("/auth/login");
     }
-  }, []);
+  }, [router]);
+
 
   /* fetch categories */
   useEffect(() => {
@@ -112,10 +133,10 @@ export default function BussinessProfile() {
         if (res?.data?.success) {
           setCategoryList(res?.data?.data || []);
         } else {
-          showErrorToast("Failed to fetch categories");
+          showErrorToast("Failed to fetch filter");
         }
       } catch {
-        showErrorToast("Failed to fetch categories");
+        showErrorToast("Failed to fetch filter");
       }
     })();
   }, []);
@@ -254,7 +275,7 @@ export default function BussinessProfile() {
           )}
 
           {/* categories */}
-          <label>Assign Categories</label>
+          <label>Assign Filter</label>
           <select
             defaultValue=""
             className="form-select input_field2 mt-1"

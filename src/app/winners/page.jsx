@@ -8,7 +8,7 @@ export default function BattlesPage() {
     return (
         <>
             <Header />
-            <WebBanner bannerTitle="The Winners" bannerPara="Vote for your favorite nail art designs and watch the battles unfold!" />
+            <WebBanner bannerTitle="The Winners" bannerPara="Congratulations to our NAIL CHAMPION" />
             <div className="container my-5">
                 <BattleFinalScoreboard />
             </div>
