@@ -517,7 +517,7 @@
   font-size: 20px;
   font-weight: 400;
   line-height: 1.8;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter);
 }
 
 
@@ -565,6 +565,14 @@
   height: auto;
   animation: float 2s ease-in-out infinite;
 
+}
+
+.fs-row-end {
+  padding: 80px 0;
+}
+
+.right-section-end {
+  margin: 80px 0 0 0;
 }
 
 /* Keyframes for smooth top-bottom movement */
@@ -652,7 +660,7 @@
   transition: all 0.3s ease;
   position: relative;
   margin-top: 30px;
-    border: 2px solid #FFF;
+  border: 2px solid #FFF;
 }
 
 .swiper-slide.swiper-slide-active+div .testimonial-card {
@@ -927,6 +935,15 @@
   .feature-item.feature-2 .feature-image {
     order: unset;
   }
+
+  .home-hero-section h1 {
+    font-size: 40px;
+  }
+
+  .home-our-feature h2 {
+    font-size: 40px;
+  }
+
 }
 
 @media (max-width: 992px) {
@@ -1029,5 +1046,27 @@
 
   .cta-title {
     font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .phone-image {
+    height: 400px;
+    object-fit: contain;
+  }
+
+  .right-section {
+    width: 100%;
+  }
+
+  .fs-row-end {
+    padding: 60px 0;
+  }
+
+  .fs-row-end .phone-image {
+    object-fit: unset;
+    height: auto;
+    width: 100%;
   }
 }

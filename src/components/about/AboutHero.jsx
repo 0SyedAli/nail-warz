@@ -2,8 +2,8 @@ import Image from "next/image";
 
 export default function AboutHero() {
   return (
-    <div className="row align-items-center py-5">
-      <div className="col-5">
+    <div className="row align-items-center py-5 gy-4">
+      <div className="col-md-5">
         <div className="battle-hero-img battle-hero-img2">
           <Image
             src="/images/logo.png"
@@ -15,14 +15,14 @@ export default function AboutHero() {
         </div>
       </div>
       {/* Image */}
-      <div className="col-7">
+      <div className="col-md-7">
         {/* Content */}
         <div>
           <div className="d-flex align-items-center gap-2 mb-2">
             <div className="feature-icon-box">
               <Image src="/images/logo.png" width={400} height={400} alt="" />
             </div>
-            <h4 className="mb-0 battle-title2">Lorem Ipsum passage</h4>
+            <h4 className="mb-0 battle-title2">About</h4>
           </div>
           <p className="battle-desc mb-0">
             Founded in 2020, Nail Warz was created to bring innovation, trust, and creativity to the nail care

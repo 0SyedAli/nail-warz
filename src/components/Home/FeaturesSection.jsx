@@ -20,7 +20,7 @@ export default function FeaturesSection() {
           </div>
         </ScrollReveal>
         {/* Feature 1: Nail Compass/Marketplace */}
-        <div className="row align-items-center mb-5 pb-5 justify-content-between">
+        <div className="row align-items-center mb-sm-5 pb-5 justify-content-between">
           <div className="col-lg-7 mb-4 mb-lg-0">
             <ScrollReveal direction="left" duration={1.5}>
               <div className="d-flex flex-column gap-4">
@@ -38,14 +38,14 @@ export default function FeaturesSection() {
                   needs — from acrylics to gel, artistry to maintenance — delivering
                   precision, convenience, and confidence in every booking decision.
                 </p>
-                <div className="d-flex align-items-center gap-3">
+                <div className="d-flex align-items-center gap-3 flex-wrap">
                   <Image src="/images/googleplay.png" width={173.96} height={50.32} alt="" />
                   <Image src="/images/app-store-icon.png" width={173.96} height={50.32} alt="" />
                 </div>
               </div>
             </ScrollReveal>
           </div>
-          <div className="col-lg-5 feature-right text-end">
+          <div className="col-lg-5 feature-right text-lg-end">
             <ScrollReveal direction="right" duration={1.5}>
               <div className="right-section">
                 <div className="phone-wrapper">
@@ -64,9 +64,9 @@ export default function FeaturesSection() {
         </div>
 
         {/* Feature 2: Booking a Service w/ a Salon */}
-        <div className="row align-items-center mb-5 pb-5 justify-content-between">
+        <div className="row align-items-center  flex-column-reverse flex-lg-row mb-sm-5 pb-5 justify-content-between">
 
-          <div className="col-lg-5 feature-left">
+          <div className="col-lg-6 col-xl-5 feature-left">
             <ScrollReveal direction="left" duration={1.5}>
               <div className="right-section">
                 <div className="phone-wrapper">
@@ -82,7 +82,7 @@ export default function FeaturesSection() {
               </div>
             </ScrollReveal>
           </div>
-          <div className="col-lg-7 mb-4 mb-lg-0">
+          <div className="col-lg-6  col-xl-7 mb-4 mb-lg-0">
             <ScrollReveal direction="right" duration={1.5}>
               <div className="d-flex flex-column gap-4">
                 <div className="d-flex align-items-center gap-3">
@@ -99,7 +99,7 @@ export default function FeaturesSection() {
                   payments, instant confirmations, and smart scheduling, Nail Warz
                   eliminates uncertainty and delivers effortless, reliable booking.
                 </p>
-                <div className="d-flex align-items-center gap-3">
+                <div className="d-flex align-items-center gap-3  flex-wrap">
                   <Image src="/images/googleplay.png" width={173.96} height={50.32} alt="" />
                   <Image src="/images/app-store-icon.png" width={173.96} height={50.32} alt="" />
                 </div>
@@ -109,7 +109,7 @@ export default function FeaturesSection() {
         </div>
 
         {/* Feature 3: Nail Compass/Marketplace */}
-        <div className="row align-items-center mb-5 pb-5 justify-content-between">
+        <div className="row align-items-center mb-sm-5 pb-5 justify-content-between">
           <div className="col-lg-7 mb-4 mb-lg-0">
             <ScrollReveal direction="left" duration={1.5}>
               <div className="d-flex flex-column gap-4">
@@ -127,14 +127,14 @@ export default function FeaturesSection() {
                   favorite nail tech, influence outcomes, and become part of the culture
                   shaping, nail care interactive experience. MAY THE BEST SET WIN!
                 </p>
-                <div className="d-flex align-items-center gap-3">
+                <div className="d-flex align-items-center gap-3  flex-wrap">
                   <Image src="/images/googleplay.png" width={173.96} height={50.32} alt="" />
                   <Image src="/images/app-store-icon.png" width={173.96} height={50.32} alt="" />
                 </div>
               </div>
             </ScrollReveal>
           </div>
-          <div className="col-lg-5 feature-right text-end">
+          <div className="col-lg-5 feature-right text-lg-end">
             <ScrollReveal direction="right" duration={1.5}>
               <div className="right-section">
                 <div className="phone-wrapper">
@@ -153,9 +153,9 @@ export default function FeaturesSection() {
         </div>
 
         {/* Feature 4: Booking a Service w/ a Salon */}
-        <div className="row align-items-center mb-5 pb-5 justify-content-between">
+        <div className="row align-items-center mb-sm-5 pb-5 flex-column-reverse flex-lg-row justify-content-between">
 
-          <div className="col-lg-5 feature-left">
+          <div className="col-lg-6  col-xl-5 feature-left">
             <ScrollReveal direction="left" duration={1.5}>
               <div className="right-section">
                 <div className="phone-wrapper">
@@ -171,7 +171,7 @@ export default function FeaturesSection() {
               </div>
             </ScrollReveal>
           </div>
-          <div className="col-lg-7 mb-4 mb-lg-0">
+          <div className="col-lg-6  col-xl-7 mb-4 mb-lg-0">
             <ScrollReveal direction="right" duration={1.5}>
               <div className="d-flex flex-column gap-4">
                 <div className="d-flex align-items-center gap-3">
@@ -190,7 +190,7 @@ export default function FeaturesSection() {
                   talent at the forefront of nail culture — with select battles offering
                   exclusive cash rewards.
                 </p>
-                <div className="d-flex align-items-center gap-3">
+                <div className="d-flex align-items-center gap-3  flex-wrap">
                   <Image src="/images/googleplay.png" width={173.96} height={50.32} alt="" />
                   <Image src="/images/app-store-icon.png" width={173.96} height={50.32} alt="" />
                 </div>
@@ -200,7 +200,7 @@ export default function FeaturesSection() {
         </div>
 
         {/* Feature 3: Nail Compass/Marketplace */}
-        <div className="row align-items-center justify-content-between" style={{ padding: "100px 0" }}>
+        <div className="row align-items-center justify-content-between fs-row-end " >
           <div className="col-lg-7 mb-4 mb-lg-0">
             <ScrollReveal direction="left" duration={1.5}>
               <div className="d-flex flex-column gap-4">
@@ -218,16 +218,16 @@ export default function FeaturesSection() {
                   trusted talent — creating meaningful opportunities to grow clientele,
                   expand reach, and stand out within a competitive industry.
                 </p>
-                <div className="d-flex align-items-center gap-3">
+                <div className="d-flex align-items-center gap-3  flex-wrap">
                   <Image src="/images/googleplay.png" width={173.96} height={50.32} alt="" />
                   <Image src="/images/app-store-icon.png" width={173.96} height={50.32} alt="" />
                 </div>
               </div>
             </ScrollReveal>
           </div>
-          <div className="col-lg-5 feature-right text-end">
+          <div className="col-lg-5 feature-right text-lg-end">
             <ScrollReveal direction="right" duration={1.5}>
-              <div className="right-section">
+              <div className="right-section right-section-end">
                 <div className="phone-wrapper">
                   <Image
                     src="/images/feature-img5.png" // dummy image
@@ -244,11 +244,11 @@ export default function FeaturesSection() {
         </div>
 
         {/* Feature 4: Booking a Service w/ a Salon */}
-        <div className="row align-items-center justify-content-between" style={{ padding: "80px 0" }}>
+        <div className="row align-items-center justify-content-between flex-column-reverse flex-lg-row fs-row-end" >
 
-          <div className="col-lg-5 feature-left">
+          <div className="col-lg-6  col-xl-5 feature-left">
             <ScrollReveal direction="left" duration={1.5}>
-              <div className="right-section">
+              <div className="right-section right-section-end">
                 <div className="phone-wrapper">
                   <Image
                     src="/images/feature-img6.png" // dummy image
@@ -262,7 +262,7 @@ export default function FeaturesSection() {
               </div>
             </ScrollReveal>
           </div>
-          <div className="col-lg-7 mb-4 mb-lg-0">
+          <div className="col-lg-6  col-xl-7 mb-4 mb-lg-0">
             <ScrollReveal direction="right" duration={1.5}>
               <div className="d-flex flex-column gap-4">
                 <div className="d-flex align-items-center gap-3">
@@ -279,7 +279,7 @@ export default function FeaturesSection() {
                   Nail Warz empowers salons and technicians to focus less on logistics —
                   and more on delivering exceptional service.
                 </p>
-                <div className="d-flex align-items-center gap-3">
+                <div className="d-flex align-items-center gap-3  flex-wrap">
                   <Image src="/images/googleplay.png" width={173.96} height={50.32} alt="" />
                   <Image src="/images/app-store-icon.png" width={173.96} height={50.32} alt="" />
                 </div>

@@ -7,10 +7,10 @@ export default function HeroSection() {
   return (
     <section className="home-hero-section" >
       <div className="container">
-        <div className="row align-items-center">
+        <div className="row align-items-center text-center text-lg-start">
           <div className="col-lg-6 mb-4 mb-lg-0">
             <ScrollReveal direction="left" delay={0.5} duration={1.5}>
-              <div className="d-flex flex-column gap-4 align-items-start">
+              <div className="d-flex flex-column gap-4 align-items-center align-items-lg-start">
                 {/* <div className="callout-bubble d-inline-flex align-items-center gap-2">
                   <Sparkles size={16} />
                   <span className="fw-semibold">Smart Beauty in 15 Minutes</span>

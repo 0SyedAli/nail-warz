@@ -3433,7 +3433,7 @@ button.fc-viewAppointments-button.fc-button {
 }
 
 .web_banner {
-  padding: 70px 0;
+  padding: 70px 30px;
   background-color: #0b0b0f;
   background-image: url(/images/web-banner.png);
   background-position: center;
@@ -4497,6 +4497,15 @@ button.fc-viewAppointments-button.fc-button {
   font-family: var(--font-poppins);
   color: #000000;
   line-height: 30px;
+}
+
+.privacy-body-mobile h1 {
+  display: none;
+}
+
+.privacy-body-mobile pre {
+  background-color: transparent;
+  padding: 20px 15px;
 }
 
 .payoutCommisionIcon {

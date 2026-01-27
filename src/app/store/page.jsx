@@ -93,7 +93,7 @@ export default function Product() {
                 bannerPara="Premium nail care products and professional tools"
             />
 
-            <div className="container" style={{ padding: "70px 0" }}>
+            <div className="container" style={{ paddingBottom: "70px", paddingTop: "70px" }}>
                 {/* Tabs */}
                 <ul className="nav nav-pills product-tabs mb-4">
                     {TABS.map((tab) => (
@@ -153,7 +153,7 @@ function ProductsGrid({ products }) {
                     //         />
                     //     </Link>
                     // </div>
-                    <div key={item._id} className="col-xl-3 col-md-4">
+                    <div key={item._id} className="col-xl-3 col-md-4  col-sm-6">
                         <ProductCard
                             product={item}
                             actions={item._id}
@@ -169,7 +169,7 @@ function ProductsSkeleton() {
     return (
         <div className="row g-4">
             {[...Array(8)].map((_, i) => (
-                <div key={i} className="col-xl-3 col-md-4">
+                <div key={i} className="col-xl-3 col-md-4 col-sm-6">
                     <div className="card p-3">
                         <div className="skeleton-img mb-3" />
                         <div className="skeleton-text mb-2" />

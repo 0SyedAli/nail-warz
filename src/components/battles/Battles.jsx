@@ -28,7 +28,7 @@ export default function Battles({ title, battles }) {
                         )}
                     </div>
 
-                    <div className="d-flex gap-3 overflow-auto pb-3">
+                    <div className="d-flex gap-3 overflow-auto pb-3 mb-2">
                         {battle.participants.map((p, index) => (
                             <BattleEntryCard
                                 key={p.participant._id}

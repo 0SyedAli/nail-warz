@@ -7,7 +7,7 @@ export default function Footer() {
   return (
     <footer className="bg-white py-4" style={{ background: '#8B0000' }}>
       <div className="container">
-        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-sm-between gap-3">
           <p className="text-dark mb-0 small">Copyright© 2026  <Link href="/" style={{color:"#C11111"}}>Nail Warz. </Link> All Rights Reserved</p>
           <div className="d-flex gap-4">
             <Link href="/cookies" className="text-dark text-decoration-none small">Cookies</Link>
