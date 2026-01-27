@@ -6,16 +6,16 @@ import Header from "@/components/Home/Header";
 import WebBanner from "@/components/Home/WebBanner";
 import SpinnerLoading from "@/components/Spinner/SpinnerLoading";
 
-const PrivacyPolicy = () => {
-    const [privacyPolicy, setPrivacyPolicy] = useState(null);
+const Cookies = () => {
+    const [cookiePolicy, setCookiePolicy] = useState(null);
 
     // Fetch cookie policy data from the API
     useEffect(() => {
-        fetch("https://apiforapp.link/NailWarz/api/privacyPolicy")
+        fetch("https://apiforapp.link/NailWarz/api/cookiePolicy")
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    setPrivacyPolicy(data.html); // Set the HTML content from the API
+                    setCookiePolicy(data.html); // Set the HTML content from the API
                 } else {
                     console.error("Failed to fetch cookie policy");
                 }
@@ -26,12 +26,12 @@ const PrivacyPolicy = () => {
     return (
         <>
             <Header />
-            <WebBanner bannerTitle="Privacy policy" />
+            <WebBanner bannerTitle="Cookie Policy" />
             <div className="container my-5">
                 <div className="privacy-body">
                     {/* Render the fetched HTML content */}
-                    {privacyPolicy ? (
-                        <div dangerouslySetInnerHTML={{ __html: privacyPolicy }} />
+                    {cookiePolicy ? (
+                        <div dangerouslySetInnerHTML={{ __html: cookiePolicy }} />
                     ) : (
                         <SpinnerLoading />
                     )}
@@ -43,4 +43,4 @@ const PrivacyPolicy = () => {
     );
 };
 
-export default PrivacyPolicy;
+export default Cookies;

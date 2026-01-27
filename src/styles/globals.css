@@ -17,7 +17,37 @@ body {
   overflow-x: hidden;
   font-family: "Inter";
   scroll-behavior: smooth;
+  padding: 0 !important;
+}
 
+.privacy-body pre {
+  white-space: pre-line;
+}
+
+.privacy-body h1 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #333;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 5px;
+}
+
+.privacy-body p {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 20px;
+  text-align: justify;
+  letter-spacing: 0.5px;
+}
+
+.privacy-body pre {
+  font-family: var(--font-open-sans);
+  background-color: #f4f4f4;
+  padding: 20px;
+  border-radius: 8px;
+  white-space: pre-line;
+  word-wrap: break-word;
 }
 
 h2 {
@@ -4488,6 +4518,7 @@ button.fc-viewAppointments-button.fc-button {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
   z-index: 1000;
 }
+
 .filter-popover2 {
   font-size: 16px;
   margin-top: 10px;
@@ -4495,6 +4526,7 @@ button.fc-viewAppointments-button.fc-button {
   color: #333;
   border: 1px solid #000;
 }
+
 /* small arrow */
 .filter-popover::before {
   content: "";
@@ -5174,6 +5206,9 @@ button.fc-viewAppointments-button.fc-button {
     margin: 0 10px;
   }
 
+  .web_banner h1 {
+    font-size: 40px;
+  }
 }
 
 @media only screen and (max-height: 620px) {
