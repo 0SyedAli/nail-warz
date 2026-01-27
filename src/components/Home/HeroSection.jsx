@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { Sparkles } from "lucide-react";
 import ScrollReveal from "@/components/animations/ScrollReveal";
 
 export default function HeroSection() {
