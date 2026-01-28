@@ -21,7 +21,7 @@ const TermsCondition = () => {
 
     return (
         <>
-            <div className="container  my-2">
+            <div className="container">
                 <div className="privacy-body privacy-body-mobile">
                     {/* Render the fetched HTML content */}
                     {termsCondition ? (

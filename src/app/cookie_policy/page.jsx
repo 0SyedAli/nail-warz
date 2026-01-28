@@ -23,7 +23,7 @@ const Cookies = () => {
         <>
             {/* <Header /> */}
             {/* <WebBanner bannerTitle="Cookie Policy" /> */}
-            <div className="container my-2">
+            <div className="container">
                 <div className="privacy-body privacy-body-mobile ">
                     {/* Render the fetched HTML content */}
                     {cookiePolicy ? (
