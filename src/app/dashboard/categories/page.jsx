@@ -154,7 +154,7 @@ const ManageCategory = () => {
 
               {open && (
                 <div ref={popoverRef} className="filter-popover filter-popover2">
-                  Select the filter you wish to populate your Salon when selected. These filters are accessible via App users and they can filter out Salons based on the filter they select.
+                  These are service categories which will categorize the services a Salon provide in the Salon Profile. You can choose any category you want the service to be highlighted under while adding a new Service and you can change them as well.
                 </div>
               )}
             </div>
