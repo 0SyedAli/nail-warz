@@ -29,7 +29,7 @@ const Cookies = () => {
                     {cookiePolicy ? (
                         <div dangerouslySetInnerHTML={{ __html: cookiePolicy }} />
                     ) : (
-                        <SpinnerLoading />
+                        <p>Loading....</p>
                     )}
                 </div>
             </div>

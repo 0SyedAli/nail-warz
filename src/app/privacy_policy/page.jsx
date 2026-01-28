@@ -27,7 +27,7 @@ const PrivacyPolicy = () => {
                     {privacyPolicy ? (
                         <div dangerouslySetInnerHTML={{ __html: privacyPolicy }} />
                     ) : (
-                        <SpinnerLoading />
+                        <p>Loading....</p>
                     )}
                 </div>
             </div>

@@ -27,7 +27,7 @@ const TermsCondition = () => {
                     {termsCondition ? (
                         <div dangerouslySetInnerHTML={{ __html: termsCondition }} />
                     ) : (
-                        <SpinnerLoading />
+                        <p>Loading....</p>
                     )}
                 </div>
             </div>
