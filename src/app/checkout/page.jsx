@@ -47,7 +47,10 @@ import { useSelector } from "react-redux";
 export default function CheckoutPage() {
     const [clientSecret, setClientSecret] = useState(null)
     const cart = useSelector((state) => state.cart.items);
+    const shipping = 15; // Shipping fee
     const amount = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    const totalAmount = amount + shipping; // Total amount including shipping
+
     const hasCreatedIntent = useRef(false);
 
     const onSubmit = async () => {
@@ -56,7 +59,7 @@ export default function CheckoutPage() {
             const res = await axios.post(
                 `${process.env.NEXT_PUBLIC_API_URL}/order/createPaymentIntent`,
                 {
-                    amount: amount,
+                    amount: totalAmount,
                 }
             );
 
@@ -76,12 +79,13 @@ export default function CheckoutPage() {
     useEffect(() => {
         if (!amount || amount <= 0) return;
         if (hasCreatedIntent.current) return; // 🔥 PREVENT DOUBLE CALL
-        
+
         hasCreatedIntent.current = true;
         onSubmit();
     }, [amount]);
 
     if (!clientSecret) return <>loading</>;
+    
     return (
         <>
             <Header />
@@ -91,7 +95,7 @@ export default function CheckoutPage() {
                 <div className="container checkout-page py-5">
                     <div className="row g-5">
                         <div className="col-lg-7">
-                            <CheckoutForm clientSecret={clientSecret}/>
+                            <CheckoutForm clientSecret={clientSecret} />
                         </div>
                         <div className="col-lg-5">
                             <CheckoutSummary />

@@ -4192,7 +4192,7 @@ span.prod_stock_status {
 }
 
 .checkout-summary .subtotal span {
-  text-decoration: underline;
+  /* text-decoration: underline; */
 }
 
 .subtotal {

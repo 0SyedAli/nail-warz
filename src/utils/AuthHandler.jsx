@@ -15,6 +15,7 @@ export default function AuthRedirectHandler() {
     const publicRoutes = ["/auth/login", "/auth/signup"];
     const isPublicRoute = publicRoutes.includes(pathname);
 
+    // If token or userData doesn't exist, redirect to login (except on public routes)
     if (!token || !userData) {
       if (!isPublicRoute) {
         router.replace("/auth/login");
@@ -25,6 +26,11 @@ export default function AuthRedirectHandler() {
     try {
       const parsedUser = JSON.parse(userData);
 
+      // If `isUpdated` is missing in userData, do nothing (no redirect)
+      if (!parsedUser?.hasOwnProperty('isUpdated')) {
+        return; // Prevent redirect if `isUpdated` is missing
+      }
+
       // Redirect to proper route only if already on login/signup
       if (isPublicRoute) {
         if (parsedUser?.isUpdated === true) {
@@ -33,12 +39,12 @@ export default function AuthRedirectHandler() {
           router.replace("/auth/bussinessprofile");
         }
       }
-
     } catch (error) {
       console.error("Failed to parse user cookie:", error);
       Cookies.remove("token");
       Cookies.remove("user");
 
+      // Redirect to login page if cookie parsing fails
       if (!isPublicRoute) {
         router.replace("/auth/login");
       }

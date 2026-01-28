@@ -52,12 +52,24 @@ import Image from "next/image";
 import { useSelector } from "react-redux";
 
 export default function CheckoutSummary() {
+    // const cart = useSelector((state) => state.cart.items);
+
+    // const subtotal = cart.reduce(
+    //     (sum, item) => sum + item.price * item.qty,
+    //     0
+    // );
+
     const cart = useSelector((state) => state.cart.items);
 
+    const shipping = 15; // Static shipping fee (you can modify this based on your logic)
+
+    // Calculate subtotal
     const subtotal = cart.reduce(
         (sum, item) => sum + item.price * item.qty,
         0
     );
+
+    const total = subtotal + shipping; // Total includes shipping fee
 
     return (
         <div className="checkout-summary">
@@ -90,9 +102,16 @@ export default function CheckoutSummary() {
                     <span>${subtotal.toFixed(2)}</span>
                 </div>
 
+                {/* Shipping */}
+                <div className="d-flex justify-content-between">
+                    <span>Shipping</span>
+                    <span>${shipping}</span> {/* You can dynamically calculate shipping if needed */}
+                </div>
+
+                {/* Total */}
                 <div className="d-flex justify-content-between fw-bold fs-5 mt-3">
                     <span>Total</span>
-                    <span>${subtotal.toFixed(2)} USD</span>
+                    <span>${total.toFixed(2)} USD</span>
                 </div>
             </div>
         </div>
