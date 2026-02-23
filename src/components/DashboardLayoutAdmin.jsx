@@ -20,8 +20,9 @@ export default function Dashboard({ children }) {
     orderDetails: { title: "Order Details" }, // ✅ ADD THIS
     battles: { title: "Battles Management" },
     battlesDetails: { title: "Battles Details" }, // ✅ ADD THIS
-    content: { title: "Content Management" },
-    contentDetails: { title: "Content Details" }, // ✅ ADD THIS
+    content: { title: "Participant Requests" },
+    contentDetails: { title: "Participant Details" }, // ✅ ADD THIS
+    categories: { title: "Filter Management" }, // ✅ ADD THIS
     pushnotification: { title: "Push Notification" },
   };
   useEffect(() => {

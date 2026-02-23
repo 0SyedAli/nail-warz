@@ -43,13 +43,17 @@ export default function BattleManagementPage() {
     const active = battles.filter(b => b.status === "active");
     const upcoming = battles.filter(b => b.status === "upcoming");
     const completed = battles.filter(b => b.status === "completed");
-
+    const activeParticipantsCount = useMemo(() => {
+        return active.reduce((total, battle) => {
+            return total + (battle.participants?.length || 0);
+        }, 0);
+    }, [active]);
     return (
         <div className="page">
             <div className="dashboard_panel_inner pt-4">
 
                 {/* ===== HEADER ===== */}
-                <div className="d-flex justify-content-between align-items-center mb-4">
+                <div className="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4">
                     <div>
                         <h4 className="fw-bold">Warz Management</h4>
                         <p className="text-muted">Create and manage nail art battles</p>
@@ -69,7 +73,7 @@ export default function BattleManagementPage() {
                 <BattleStats battles={battles} />
 
                 {/* ===== BATTLE SECTIONS ===== */}
-                <div className="row g-4 mt-2">
+                {/* <div className="row g-4 mt-2">
                     {active.length > 0 &&
                         <BattleCard
                             title="Active Battles"
@@ -98,7 +102,42 @@ export default function BattleManagementPage() {
                         />
                     }
 
+                </div> */}
+
+                {/* ===== BATTLE SECTIONS ===== */}
+                <div className="row g-4 mt-2">
+
+                    {/* ACTIVE */}
+                    <BattleCard
+                        title="Active Battles"
+                        battles={active}
+                        onEdit={(b) => {
+                            setEditBattle(b);
+                            onOpen();
+                        }}
+                        emptyMessage="No active battles available at the moment."
+                    />
+
+                    {/* UPCOMING */}
+                    <BattleCard
+                        title="Upcoming Battles"
+                        battles={upcoming}
+                        onEdit={(b) => {
+                            setEditBattle(b);
+                            onOpen();
+                        }}
+                        emptyMessage="No upcoming battles scheduled."
+                    />
+
+                    {/* COMPLETED */}
+                    <BattleCard
+                        title="Completed Battles"
+                        battles={completed}
+                        emptyMessage="No completed battles yet."
+                    />
+
                 </div>
+
             </div>
 
             {/* ===== CREATE / EDIT MODAL ===== */}

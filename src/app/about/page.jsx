@@ -9,7 +9,7 @@ const About = () => {
         <>
             <Header />
             <WebBanner bannerTitle="About Us" />
-            <div className="container my-5">
+            <div className="container about-container my-5">
                 <AboutHero />
                 <p className="battle-desc mw-100">Operated by business professionals, marketing experts, and nail enthusiasts, Nail Warz blends
                     beauty, technology, and culture to offer a dedicated digital community for all things nail care. From

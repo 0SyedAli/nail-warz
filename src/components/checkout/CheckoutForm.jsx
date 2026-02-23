@@ -7,6 +7,7 @@ import axios from "axios";
 import { clearCart } from "@/redux/slice/cartSlice";
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 import { useRouter } from "next/navigation";
+import { PatternFormat } from "react-number-format";
 
 export default function CheckoutForm({ clientSecret }) {
   const stripe = useStripe();
@@ -15,6 +16,7 @@ export default function CheckoutForm({ clientSecret }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const cart = useSelector((state) => state.cart.items);
+  console.log(cart);
 
   const [customer, setCustomer] = useState({
     name: "",
@@ -23,6 +25,8 @@ export default function CheckoutForm({ clientSecret }) {
     street: "",
     city: "",
     country: "",
+    state: "",
+    zipCode: "",
   });
 
   const handleChange = (e) => {
@@ -86,6 +90,8 @@ export default function CheckoutForm({ clientSecret }) {
             street: customer.street,
             city: customer.city,
             country: customer.country,
+            state: customer.state,
+            postalCode: customer.zipCode,
           },
         },
         products: cart,
@@ -125,12 +131,27 @@ export default function CheckoutForm({ clientSecret }) {
         name="email"
         onChange={handleChange}
       />
-      <input
+      {/* <input
         className="form-control mb-2"
-        placeholder="Phone"
+        placeholder="Phone Number"
         name="phone"
         onChange={handleChange}
+      /> */}
+      <PatternFormat
+        format="+1 (###) ###-####"
+        mask="_"
+        value={customer.phone}
+        onValueChange={(values) => {
+          setCustomer({
+            ...customer,
+            phone: values.formattedValue,
+          });
+        }}
+        customInput="input"
+        className="form-control mb-2"
+        placeholder="+1 (123) 456-7890"
       />
+
       <input
         className="form-control mb-2"
         placeholder="Street Address"
@@ -144,9 +165,15 @@ export default function CheckoutForm({ clientSecret }) {
         onChange={handleChange}
       />
       <input
+        className="form-control mb-2"
+        placeholder="State"
+        name="state"
+        onChange={handleChange}
+      />
+      <input
         className="form-control mb-3"
-        placeholder="Country"
-        name="country"
+        placeholder="Zip Code"
+        name="zipCode"
         onChange={handleChange}
       />
 

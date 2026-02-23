@@ -23,7 +23,7 @@ export default function AppCTASection() {
         <p className="text-white fs-6 mb-4" style={{ opacity: 0.9 }}>
           Your One-Stop Shop for the Nail Care Industry
         </p>
-        <div className="d-flex align-items-center justify-content-center gap-3">
+        <div className="d-flex align-items-center justify-content-center gap-3 app-icon">
           <Image src="/images/googleplay.png" width={173.96} height={50.32} alt="" />
           <Image src="/images/app-store-icon.png" style={{
             filter: "brightness(0) saturate(100%) invert(100%) sepia(0%) saturate(7472%) hue-rotate(114deg) brightness(109%) contrast(97%)"

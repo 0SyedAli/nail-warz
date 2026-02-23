@@ -120,7 +120,7 @@ export default function SuperAdminOrders() {
                     <th>Products</th>
                     <th>Total</th>
                     <th>Date</th>
-                    <th>Status</th>
+                    <th>Fulfillment Status</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -205,7 +205,7 @@ const OrderStatusBadge = ({ status }) => {
   };
 
   return (
-    <span className={`badge ${map[status] || "bg-secondary"} py-2`}>
+    <span className={`badge text-capitalize ${map[status] || "bg-secondary"} py-2`}>
       {status}
     </span>
   );

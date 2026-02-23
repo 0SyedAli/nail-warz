@@ -47,9 +47,13 @@ import { useSelector } from "react-redux";
 export default function CheckoutPage() {
     const [clientSecret, setClientSecret] = useState(null)
     const cart = useSelector((state) => state.cart.items);
-    const shipping = 15; // Shipping fee
+    // Shipping fee
+    // const shipping = 15;
+    const shipping = useSelector((state) => state.cart.shippingFee);
+
     const amount = cart.reduce((s, i) => s + i.price * i.qty, 0);
     const totalAmount = amount + shipping; // Total amount including shipping
+    console.log(amount, totalAmount);
 
     const hasCreatedIntent = useRef(false);
 
@@ -85,7 +89,7 @@ export default function CheckoutPage() {
     }, [amount]);
 
     if (!clientSecret) return <>loading</>;
-    
+
     return (
         <>
             <Header />

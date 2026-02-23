@@ -135,7 +135,6 @@ function AddTechnician({ isOpen, onClose, btntitle, onSuccess, service_id }) {
   const handleClose = () => {
     onClose();
     setSelectedTechs([]);
-    // setTechnicianList([]);
     setError(null);
     setHasLoadedService(false);
   };

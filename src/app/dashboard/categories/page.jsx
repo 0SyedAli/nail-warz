@@ -143,7 +143,7 @@ const ManageCategory = () => {
         <div className="manage_order_head pb-3">
           <div>
             <div className="position-relative w-100 d-inline-flex align-items-center gap-1">
-              <h3 className="d-flex align-items-center gap-2 mb-0" style={{width:"500px"}}>
+              <h3 className="d-flex align-items-center gap-2 mb-0 cat-top2" >
                 All Categories
                 <FaExclamationCircle
                   color="#000"

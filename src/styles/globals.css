@@ -271,6 +271,16 @@ textarea::placeholder {
 .classInput {
   padding: 0 20px !important;
 } */
+.form-control.classInput {
+  height: 44px;
+  width: 100%;
+  padding: 0 15px;
+  border-radius: 4.3px;
+  border: 1px solid #041e5e;
+  font-size: 14px;
+  color: #000;
+  margin: 3px 0 8px;
+}
 
 button.locationBtn {
   text-align: start;
@@ -494,6 +504,7 @@ input::placeholder {
   border-radius: 8px;
   padding: 12px 15px;
   margin-right: 20px;
+  box-shadow: 0 0 8px 2px #4f3f3f45;
   /* Change color for active link */
 }
 
@@ -556,6 +567,8 @@ input::placeholder {
   box-shadow: 0 0 10px 2px #cccccc7d;
   border-radius: 10px;
   padding: 15px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .topbar_container p {
@@ -897,6 +910,10 @@ table.table.caption-top th {
   width: 41px;
   height: 6px;
   border-radius: 6px;
+}
+
+.cat-top2 {
+  width: 500px;
 }
 
 .sidebar_container ul li.active::before {
@@ -1294,12 +1311,12 @@ table.table.caption-top th {
 }
 
 .appoint_btn {
-  background-color: #C11111;
+  background-color: #dc3545;
   border-radius: 30px;
   padding: 0 20px;
   height: 44px;
   color: #FFF;
-  border: 2px solid #C11111;
+  border: 2px solid #dc3545;
   transition: all .3s ease;
   display: flex;
   align-items: center;
@@ -1309,6 +1326,47 @@ table.table.caption-top th {
 .appoint_btn:hover {
   background-color: transparent;
   color: #000;
+}
+
+.appoint_btn.reschedule {
+  background-color: #f59e0b;
+  border: 2px solid #f59e0b;
+}
+
+.appoint_btn.reschedule:hover {
+  background-color: transparent;
+  color: #000;
+}
+
+.appoint_btn.completed {
+  background-color: #198754;
+  border: 2px solid #198754;
+}
+
+.appoint_btn.completed:hover {
+  background-color: transparent;
+  color: #000;
+}
+
+.appoint_btn.completed:disabled {
+  background-color: #e6f4ea;
+  border: 2px solid #198754;
+  color: #198754;
+  cursor: unset;
+}
+
+.appoint_btn.reschedule:disabled {
+  background-color: #e6f4ea;
+  border: 2px solid #198754;
+  color: #198754;
+  cursor: unset;
+}
+
+.appoint_btn.cancel:disabled {
+  background-color: #fdecea;
+  border: 2px solid #dc3545;
+  color: #dc3545;
+  cursor: unset;
 }
 
 .customer_card {
@@ -2165,6 +2223,14 @@ input[type="checkbox"]:checked {
   font-family: var(--font-poppins);
 }
 
+.addNewService.add_form tbody tr td:first-child {
+  margin: 5px 0 0;
+  font-size: 14.6px;
+  color: #484848;
+  font-weight: 400;
+  font-family: var(--font-poppins);
+}
+
 .back_btn {
   background-color: transparent !important;
   border: 1px solid #C11111 !important;
@@ -2829,6 +2895,10 @@ button.fc-viewAppointments-button.fc-button {
   border-color: rgba(0, 0, 0, 0.12);
 }
 
+.fc .fc-col-header-cell-cushion {
+  white-space: normal;
+}
+
 /* Today highlight */
 .fc .fc-day-today {
   background: rgba(255, 0, 0, 0.22);
@@ -2879,6 +2949,7 @@ button.fc-viewAppointments-button.fc-button {
   background: #FFF;
   border-radius: 12px;
   padding: 10px;
+  min-width: 600px;
 }
 
 .fc .fc-button {
@@ -3575,7 +3646,7 @@ span.prod_stock_status {
 /* ---------- Battle Hero ---------- */
 
 
-.battle-hero-img {
+/* .battle-hero-img {
   position: relative;
   border-radius: 16px;
   overflow: hidden;
@@ -3592,6 +3663,68 @@ span.prod_stock_status {
 .battle-hero-img2 img {
   height: 250px;
   object-fit: contain;
+} */
+
+.battle-hero-img {
+  position: relative;
+  width: fit-content;
+  background: transparent;
+  /* remove gradient */
+  padding: 0;
+  /* remove spacing */
+}
+
+.battle-hero-img img {
+  border-radius: 0;
+  animation: floatLogo 3s ease-in-out infinite;
+
+  /* no rounded box needed */
+}
+
+.battle-hero-img2 img {
+  height: 250px;
+  object-fit: contain;
+}
+
+.shipping-option {
+  border: 1px solid #e7e7e7;
+  border-radius: 5px;
+  padding: 10px 7px;
+  position: relative;
+  cursor: pointer;
+}
+
+.shipping-option input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.shipping-option:has(input:checked) {
+  border-color: #000;
+}
+
+.shipping-option span {
+  font-size: 15px !important;
+  font-weight: 500 !important;
+}
+
+@keyframes floatLogo {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 .battle-votes {
@@ -3620,6 +3753,10 @@ span.prod_stock_status {
   height: 36px;
   background: radial-gradient(circle, #ff005c, #000);
   border-radius: 10px;
+}
+
+.about-container p {
+  text-align: justify;
 }
 
 .battle-desc {
@@ -4022,7 +4159,7 @@ span.prod_stock_status {
 }
 
 .order-summary span {
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .promo-input {
@@ -4180,6 +4317,12 @@ span.prod_stock_status {
   border-bottom: 1px solid #eee;
   margin-bottom: 20px;
   padding-bottom: 20px;
+}
+
+.summary-item img {
+  width: 80px;
+  height: 80px;
+  border-radius: 6px;
 }
 
 .summary-img {
@@ -4481,7 +4624,16 @@ span.prod_stock_status {
   font-size: 14px;
   border-radius: 10px;
 }
-
+.add-user {
+  border: 2px solid #000;
+  border-radius: 100%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
 .battle-select-list {
   display: flex;
   flex-direction: column;
@@ -4564,13 +4716,30 @@ span.prod_stock_status {
   border-color: transparent transparent #fff transparent;
 }
 
-/* admin product modal css */
-@media (max-width: 900px) {
-  .rs_grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.battle-hero-img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+.appointment-calendere-container {
+  height: 85vh;
+  padding: 20px;
+  background: linear-gradient(to bottom, #000000, #300000, #ff0000);
+  border-radius: 12px;
+  overflow: auto;
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  margin-top: 20px;
+}
+
+.al-cb h5 {
+  font-size: 15px;
+}
+
+.al-cb h4 {
+  font-weight: 700;
+  font-family: var(--font-poppins);
+}
 
 /* Responsive */
 @media (max-width: 992px) {
@@ -4584,6 +4753,22 @@ span.prod_stock_status {
 
   .delete-btn {
     height: 70px;
+  }
+
+  .checkout-summary {
+    padding: 0;
+    border: none;
+  }
+
+  .al-topper {
+    width: 100%;
+  }
+}
+
+/* admin product modal css */
+@media (max-width: 900px) {
+  .rs_grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -5061,9 +5246,35 @@ span.prod_stock_status {
   .chakra-modal__content-container {
     z-index: 1111111;
   }
+
+  .appointment-calendere-container {
+    height: 70vh;
+  }
+
+  .topbar_container {
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .tc_profile {
+    flex-direction: row-reverse;
+    text-align: start;
+  }
+
+  .cat-top2 {
+    width: 100%;
+  }
+
+  .filter-popover2 {
+    font-size: 13px;
+    top: 29px;
+    width: 300px;
+  }
 }
 
 @media only screen and (max-width: 576px) {
+
+
   .topbar_container h1 {
     font-size: 20px;
   }
@@ -5113,6 +5324,56 @@ span.prod_stock_status {
     font-weight: 800;
     font-family: "Poppins";
   }
+
+  .reward-names.rn1 {
+    top: 57%;
+    left: 29px;
+  }
+
+  .reward-names.rn2 {
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .reward-names.rn3 {
+    top: 55%;
+    left: unset;
+    right: 29px;
+  }
+
+  .reward-names h3 {
+    font-size: 17px;
+  }
+
+  .cart-img {
+    border-radius: 12px;
+    width: 80px;
+    height: 80px;
+  }
+
+  .cart-item h6,
+  .ci-price,
+  .summary-item h6 {
+    font-size: 17px;
+  }
+
+  .cc-ot {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* .fc .fc-col-header-cell-cushion {
+    font-size: 11px;
+  }
+
+  .fc .fc-toolbar {
+    flex-direction: column-reverse;
+    gap: 9px;
+  }
+  .fc .fc-timegrid-axis-cushion, .fc .fc-timegrid-slot-label-cushion {
+    font-size: 12px;
+  } */
 }
 
 @media only screen and (max-width: 480px) {
@@ -5234,6 +5495,43 @@ span.prod_stock_status {
 
   .web_banner h1 {
     font-size: 40px;
+  }
+
+  .reward-names {
+    width: 90px;
+  }
+
+  .reward-names.rn1 {
+    top: 55%;
+    left: 7%;
+  }
+
+  .reward-names.rn2 {
+    top: 45%;
+  }
+
+  .qty-box {
+    /* flex-direction: column; */
+    gap: 7px;
+    padding: 4px 12px;
+  }
+
+  li.recharts-tooltip-item {
+    font-size: 13px;
+  }
+
+  p.recharts-tooltip-label {
+    font-size: 12px;
+  }
+
+  .chart-container {
+    height: 230px !important;
+  }
+
+  .filter-popover2 {
+    left: 50%;
+    transform: translateX(-50%);
+    width: 250px;
   }
 }
 

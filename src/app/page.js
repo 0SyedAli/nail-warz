@@ -19,7 +19,7 @@ export default function Home() {
             <Header />
             <HeroSection />
             <FeaturesSection />
-            <TestimonialsSection />
+            {/* <TestimonialsSection /> */}
             <AppCTASection />
             <Footer />
           </div>

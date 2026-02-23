@@ -53,7 +53,7 @@ export default function AddToCart() {
                             Back To Store
                         </Link>
                         <Link href="/checkout" className="btn w-100 checkout-btn">
-                            Go To The Checkout
+                            Continue to Checkout
                         </Link>
                     </div>
                     <RelatedProducts />

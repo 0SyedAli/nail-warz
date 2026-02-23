@@ -33,17 +33,25 @@ export default function Dashboard() {
         try {
             setLoading(true)
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/getSalonMonthlyRevenue?salonId=${"6865688e65aa0e302ed91d27"}&monthYear=${month}-${year}`
+                `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/getDailyRevenue?month=${month}&year=${year}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get("token")}`,
+                    },
+                }
             )
             const data = await response.json()
 
             if (data?.success) {
                 setDashboardData(data)
 
-                // Find today's revenue
-                const todayDate = today.toLocaleDateString("en-GB").split("/").reverse().join("-") // dd-mm-yyyy
-                const todayData = data.data.find((d) => d.date === todayDate)
-                setTodayRevenue(todayData ? todayData.revenue : 0)
+                const todayDay = today.getDate()
+
+                const todayData = data.dailyRevenue.find(
+                    (d) => d.day === todayDay
+                )
+
+                setTodayRevenue(todayData ? todayData.adminAmount : 0)
             }
         } catch (error) {
             console.error("Error fetching dashboard data:", error)
@@ -66,16 +74,16 @@ export default function Dashboard() {
         }).format(amount)
     }
 
-    const handleMonthChange = (e) => {
-        const [month, year] = e.target.value.split("-")
-        setSelectedMonth(month)
-        setSelectedYear(year)
-    }
+    // const handleMonthChange = (e) => {
+    //     const [month, year] = e.target.value.split("-")
+    //     setSelectedMonth(month)
+    //     setSelectedYear(year)
+    // }
 
     const chartData =
-        dashboardData?.data?.map((item) => ({
-            date: item.date,
-            revenue: item.revenue,
+        dashboardData?.dailyRevenue?.map((item) => ({
+            date: item.day,              // day number
+            revenue: item.adminAmount,   // super admin earning
         })) || []
 
     if (loading) {
@@ -83,8 +91,8 @@ export default function Dashboard() {
             <div className="row gy-4 gx-0 w-100">
                 <div className="col-12">
                     <div className="chart-card">
-                        <div className="overview-header d-flex align-items-center justify-content-between mb-4">
-                            <div className="d-flex align-items-center gap-4 flex-wrap">
+                        <div className="overview-header d-flex align-items-center justify-content-end mb-4">
+                            {/* <div className="d-flex align-items-center gap-4 flex-wrap">
                                 <div className="d-flex align-items-center gap-2 flex-wrap" style={{
                                     border: "1px solid #ccc",
                                     padding: "10px",
@@ -101,8 +109,8 @@ export default function Dashboard() {
                                     <h3 className="overview-title fw-bolder m-0">Today's Revenue:</h3>
                                     <div className="total-amount">$0</div>
                                 </div>
-                            </div>
-                            <select
+                            </div> */}
+                            {/* <select
                                 className="form-select date-selector-input"
                                 value={`${selectedMonth}-${selectedYear}`}
                                 onChange={handleMonthChange}
@@ -117,7 +125,47 @@ export default function Dashboard() {
                                         </option>
                                     )
                                 })}
-                            </select>
+                            </select> */}
+                            <div className="d-flex align-items-center gap-2">
+
+                                {/* Month Dropdown */}
+                                <select
+                                    className="form-select date-selector-input"
+                                    value={selectedMonth}
+                                    onChange={(e) => setSelectedMonth(e.target.value)}
+                                    style={{ width: "auto", fontSize: "14px" }}
+                                >
+                                    {Array.from({ length: 12 }, (_, i) => {
+                                        const month = String(i + 1).padStart(2, "0");
+                                        const date = new Date(Number(selectedYear), i);
+
+                                        return (
+                                            <option key={month} value={month}>
+                                                {date.toLocaleDateString("en-US", { month: "long" })}
+                                            </option>
+                                        );
+                                    })}
+                                </select>
+
+                                {/* Year Dropdown */}
+                                <select
+                                    className="form-select date-selector-input"
+                                    value={selectedYear}
+                                    onChange={(e) => setSelectedYear(e.target.value)}
+                                    style={{ width: "auto", fontSize: "14px" }}
+                                >
+                                    {Array.from({ length: 5 }, (_, i) => {
+                                        const year = new Date().getFullYear() - 2 + i;
+                                        return (
+                                            <option key={year} value={year}>
+                                                {year}
+                                            </option>
+                                        );
+                                    })}
+                                </select>
+
+                            </div>
+
                         </div>
                         <div className="chart-container" style={{ height: "350px" }}>
                             <SpinnerLoading spinner_class="h-100" />
@@ -132,8 +180,8 @@ export default function Dashboard() {
         <div className="row gy-4 gx-0 w-100">
             <div className="col-12">
                 <div className="chart-card">
-                    <div className="overview-header d-flex align-items-center justify-content-center justify-content-sm-between gap-2 mb-4 flex-wrap">
-                        <div className="d-flex align-items-center gap-4 flex-wrap">
+                    <div className="overview-header d-flex align-items-center justify-content-end gap-2 mb-4 flex-wrap">
+                        {/* <div className="d-flex align-items-center gap-4 flex-wrap">
                             <div className="d-flex align-items-center gap-2 flex-wrap" style={{
                                 border: "1px solid #ccc",
                                 padding: "10px",
@@ -152,9 +200,9 @@ export default function Dashboard() {
                                 <h3 className="overview-title fw-bolder m-0">Today's Revenue:</h3>
                                 <div className="total-amount">{formatCurrency(todayRevenue)}</div>
                             </div>
-                        </div>
+                        </div> */}
 
-                        <select
+                        {/* <select
                             className="form-select date-selector-input"
                             value={`${selectedMonth}-${selectedYear}`}
                             onChange={handleMonthChange}
@@ -169,7 +217,41 @@ export default function Dashboard() {
                                     </option>
                                 )
                             })}
-                        </select>
+                        </select> */}
+                        <div className="d-flex align-items-center gap-2">
+                            <select
+                                className="form-select date-selector-input"
+                                value={selectedMonth}
+                                onChange={(e) => setSelectedMonth(e.target.value)}
+                                style={{ width: "auto", fontSize: "14px" }}
+                            >
+                                {Array.from({ length: 12 }, (_, i) => {
+                                    const month = String(i + 1).padStart(2, "0");
+                                    const date = new Date(2026, i);
+
+                                    return (
+                                        <option key={month} value={month}>
+                                            {date.toLocaleDateString("en-US", { month: "long" })}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                            <select
+                                className="form-select date-selector-input"
+                                value={selectedYear}
+                                onChange={(e) => setSelectedYear(e.target.value)}
+                                style={{ width: "auto", fontSize: "14px" }}
+                            >
+                                {Array.from({ length: 5 }, (_, i) => {
+                                    const year = new Date().getFullYear() - 2 + i;
+                                    return (
+                                        <option key={year} value={year}>
+                                            {year}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        </div>
                     </div>
 
                     <div className="chart-container" style={{ height: "350px" }}>
@@ -186,11 +268,7 @@ export default function Dashboard() {
                                 <XAxis
                                     dataKey="date"
                                     tick={{ fontSize: 10, fill: "#000" }}
-                                    tickFormatter={(value) => {
-                                        // value looks like "01-08-2025"
-                                        const [day] = value.split("-") // ignore year
-                                        return `${day}` // show only dd-mm
-                                    }}
+                                    tickFormatter={(value) => `Day ${value}`}
                                 />
 
                                 {/* ✅ Y-Axis: Format as US dollars */}
@@ -209,7 +287,7 @@ export default function Dashboard() {
                                 />
 
                                 {/* ✅ Tooltip: Clean full date format */}
-                                <Tooltip
+                                {/* <Tooltip
                                     formatter={(value) => [formatCurrency(value), "Revenue"]}
                                     labelFormatter={(label) => {
                                         const [day, month, year] = label.split("-")
@@ -219,6 +297,24 @@ export default function Dashboard() {
                                             day: "numeric",
                                             year: "numeric",
                                         })
+                                    }}
+                                /> */}
+                                <Tooltip
+                                    formatter={(value) => [formatCurrency(value), "Revenue"]}
+                                    labelFormatter={(label) => {
+                                        const day = label; // label is day number
+
+                                        const date = new Date(
+                                            Number(selectedYear),
+                                            Number(selectedMonth) - 1,
+                                            Number(day)
+                                        );
+
+                                        return date.toLocaleDateString("en-US", {
+                                            month: "long",
+                                            day: "numeric",
+                                            year: "numeric",
+                                        });
                                     }}
                                 />
 

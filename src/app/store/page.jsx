@@ -82,7 +82,6 @@ export default function Product() {
             Array.isArray(p.category) && p.category.includes(activeTab)
         );
     }, [products, activeTab]);
-    console.log(filteredProducts);
 
     return (
         <>
@@ -136,6 +135,7 @@ export default function Product() {
         </>
     );
 }
+
 function ProductsGrid({ products }) {
     return (
         <div className="row g-4">

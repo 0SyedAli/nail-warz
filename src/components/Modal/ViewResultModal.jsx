@@ -5,6 +5,7 @@ import api from "@/lib/axios";
 import Cookies from "js-cookie";
 import Modal from "./layout";
 import Image from "next/image";
+import { MdDeleteForever } from "react-icons/md";
 
 export default function ViewResultModal({
     isOpen,
@@ -142,7 +143,7 @@ export default function ViewResultModal({
                                             className="btn btn-sm btn-outline-danger"
                                             onClick={() => handleDelete(p.participant.email)}
                                         >
-                                            🗑
+                                            <MdDeleteForever />
                                         </button>
                                     )}
                                 </div>

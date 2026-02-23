@@ -120,7 +120,21 @@ const Technicians = () => {
         </Link>
       </div>
     );
+  const formatUSPhone = (phone) => {
+    if (!phone) return "-";
 
+    // Convert to string and remove everything except digits
+    const cleaned = phone.toString().replace(/\D/g, "");
+
+    // Remove leading 1 (US country code)
+    const digits = cleaned.length === 11 && cleaned.startsWith("1")
+      ? cleaned.slice(1)
+      : cleaned;
+
+    if (digits.length !== 10) return "-";
+
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+  };
   return (
     <div className="page">
       <div className="dashboard_panel_inner pt-2">
@@ -132,7 +146,7 @@ const Technicians = () => {
         <div className="card mt-4">
           <div className="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
             <h5 className="fw-bolder mb-0">Technician List</h5>
-            <div className="d-flex align-items-center gap-2 position-relative">
+            <div className="d-flex align-items-center gap-2 position-relative al-topper flex-wrap flex-md-nowrap">
               <button
                 className="btn btn-outline-secondary btn-sm"
                 onClick={() => fetchTechnicians()}
@@ -140,11 +154,11 @@ const Technicians = () => {
               >
                 Refresh
               </button>
-              <div className="position-relative">
+              <div className="position-relative w-100">
                 <BsSearch className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
                 <input
                   type="text"
-                  className="form-control ps-5"
+                  className="form-control ps-5 w-100"
                   placeholder="Search by name or ID..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -176,7 +190,8 @@ const Technicians = () => {
                       <td>{t.fullName}</td>
                       <td>{t.email}</td>
                       <td>{new Date(t.createdAt).toLocaleDateString()}</td>
-                      <td>{t.phoneNumber || "-"}</td>
+                      {/* <td>{t.phoneNumber || "-"}</td> */}
+                      <td>{formatUSPhone(t.phoneNumber)}</td>
                       <td>{t.designation || "-"}</td>
                       <td>
                         <div className="d-flex gap-2">

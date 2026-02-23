@@ -156,7 +156,7 @@ export default function VendorDetail() {
                         <h4>{vendor.salonName}</h4>
                         <p><strong>Owner:</strong> {vendor.email}</p>
                         <p>{vendor.locationName}</p>
-                        <span className="status-badge active">active</span>
+                        <span className="status-badge text-capitalize active">Active</span>
                     </div>
 
                     <button className="delete-btn" onClick={deleteVendor}>
@@ -277,7 +277,7 @@ export default function VendorDetail() {
                                         <td>${p.amount}</td>
                                         <td>{p.remarks}</td>
                                         <td>
-                                            <span className={`status-badge ${p.status === "Paid" ? "completed" : ""}`}>
+                                            <span className={`status-badge text-capitalize bg-success ${p.status === "Paid" ? "completed" : ""}`}>
                                                 {p.status}
                                             </span>
                                         </td>

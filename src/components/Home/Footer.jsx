@@ -9,7 +9,7 @@ export default function Footer() {
       <div className="container">
         <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-sm-between gap-3">
           <p className="text-dark mb-0 small">Copyright© 2026  <Link href="/" style={{color:"#C11111"}}>Nail Warz. </Link> All Rights Reserved</p>
-          <div className="d-flex gap-4">
+          <div className="d-flex gap-4 flex-wrap justify-content-center">
             <Link href="/cookies" className="text-dark text-decoration-none small">Cookies</Link>
             <Link href="/privacy-policy" className="text-dark text-decoration-none small">Privacy policy</Link>
             <Link href="/terms-and-conditions" className="text-dark text-decoration-none small">Terms And Conditions</Link>

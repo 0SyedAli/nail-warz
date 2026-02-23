@@ -38,7 +38,7 @@ export default function FeaturesSection() {
                   needs — from acrylics to gel, artistry to maintenance — delivering
                   precision, convenience, and confidence in every booking decision.
                 </p>
-                <div className="d-flex align-items-center gap-3 flex-wrap">
+                <div className="d-flex align-items-center gap-3 flex-wrap app-icon">
                   <Image src="/images/googleplay.png" width={173.96} height={50.32} alt="" />
                   <Image src="/images/app-store-icon.png" width={173.96} height={50.32} alt="" />
                 </div>
@@ -99,7 +99,7 @@ export default function FeaturesSection() {
                   payments, instant confirmations, and smart scheduling, Nail Warz
                   eliminates uncertainty and delivers effortless, reliable booking.
                 </p>
-                <div className="d-flex align-items-center gap-3  flex-wrap">
+                <div className="d-flex align-items-center gap-3  flex-wrap app-icon">
                   <Image src="/images/googleplay.png" width={173.96} height={50.32} alt="" />
                   <Image src="/images/app-store-icon.png" width={173.96} height={50.32} alt="" />
                 </div>
@@ -127,7 +127,7 @@ export default function FeaturesSection() {
                   favorite nail tech, influence outcomes, and become part of the culture
                   shaping, nail care interactive experience. MAY THE BEST SET WIN!
                 </p>
-                <div className="d-flex align-items-center gap-3  flex-wrap">
+                <div className="d-flex align-items-center gap-3  flex-wrap app-icon">
                   <Image src="/images/googleplay.png" width={173.96} height={50.32} alt="" />
                   <Image src="/images/app-store-icon.png" width={173.96} height={50.32} alt="" />
                 </div>
@@ -190,7 +190,7 @@ export default function FeaturesSection() {
                   talent at the forefront of nail culture — with select battles offering
                   exclusive cash rewards.
                 </p>
-                <div className="d-flex align-items-center gap-3  flex-wrap">
+                <div className="d-flex align-items-center gap-3  flex-wrap app-icon">
                   <Image src="/images/googleplay.png" width={173.96} height={50.32} alt="" />
                   <Image src="/images/app-store-icon.png" width={173.96} height={50.32} alt="" />
                 </div>
@@ -218,7 +218,7 @@ export default function FeaturesSection() {
                   trusted talent — creating meaningful opportunities to grow clientele,
                   expand reach, and stand out within a competitive industry.
                 </p>
-                <div className="d-flex align-items-center gap-3  flex-wrap">
+                <div className="d-flex align-items-center gap-3  flex-wrap app-icon">
                   <Image src="/images/googleplay.png" width={173.96} height={50.32} alt="" />
                   <Image src="/images/app-store-icon.png" width={173.96} height={50.32} alt="" />
                 </div>
@@ -279,7 +279,7 @@ export default function FeaturesSection() {
                   Nail Warz empowers salons and technicians to focus less on logistics —
                   and more on delivering exceptional service.
                 </p>
-                <div className="d-flex align-items-center gap-3  flex-wrap">
+                <div className="d-flex align-items-center gap-3  flex-wrap app-icon">
                   <Image src="/images/googleplay.png" width={173.96} height={50.32} alt="" />
                   <Image src="/images/app-store-icon.png" width={173.96} height={50.32} alt="" />
                 </div>

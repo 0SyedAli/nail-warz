@@ -46,7 +46,12 @@ const SideBar = () => {
     {
       href: "/admin/dashboard/content",
       icon: "/images/report-data.png",
-      text: "Content Management",
+      text: "Participation Requests",
+    },
+    {
+      href: "/admin/dashboard/categories",
+      icon: "/images/layer-icon.png",
+      text: "Filter Management",
     },
     {
       href: "/admin/dashboard/pushnotification",

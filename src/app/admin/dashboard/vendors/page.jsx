@@ -113,8 +113,8 @@ export default function SuperAdminVendors() {
                                 <thead className="table-light">
                                     <tr>
                                         <th>Business Name</th>
-                                        <th>Owner</th>
-                                        <th>Location</th>
+                                        {/* <th>Owner</th> */}
+                                        <th>City</th>
                                         <th>Join Date</th>
                                         <th>Status</th>
                                         <th>Total Revenue</th>
@@ -126,8 +126,8 @@ export default function SuperAdminVendors() {
                                     {currentVendors.map(v => (
                                         <tr key={v._id}>
                                             <td>{v.salonName || "-"}</td>
-                                            <td>{v.email}</td>
-                                            <td>{v.locationName || "-"}</td>
+                                            {/* <td>{v.email}</td> */}
+                                            <td>{v?.city || "-"}</td>
                                             <td>{new Date(v.createdAt).toLocaleDateString()}</td>
                                             <td>
                                                 <span className={`badge ${v.isDeleted ? "bg-secondary" : "bg-success"}`}>
@@ -151,7 +151,31 @@ export default function SuperAdminVendors() {
                         </div>
                     </div>
                 </div>
-
+                {totalPages > 1 && (
+                    <div className="pagination justify-content-end mt-4">
+                        <button
+                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                            disabled={page === 1}
+                        >
+                            &lt;
+                        </button>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                            <button
+                                key={n}
+                                className={n === page ? "active" : ""}
+                                onClick={() => setPage(n)}
+                            >
+                                {n}
+                            </button>
+                        ))}
+                        <button
+                            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                            disabled={page === totalPages}
+                        >
+                            &gt;
+                        </button>
+                    </div>
+                )}
             </div>
         </div >
     );

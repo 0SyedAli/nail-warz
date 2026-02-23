@@ -2,7 +2,7 @@ import Link from "next/link";
 import BattleEntryCard from "./BattleEntryCard";
 
 export default function Battles({ title, battles }) {
-    if (!battles || battles.length === 0) return null;
+    const isEmpty = !battles || battles.length === 0;
 
     return (
         <div className="py-4">
@@ -10,43 +10,55 @@ export default function Battles({ title, battles }) {
                 {title} Battles
             </h3>
 
-            {battles.map((battle) => (
-                <div key={battle._id} className="active-battle-card mb-5">
+            {/* {battles.map((battle) => ( */}
+            {isEmpty ? (
+                <div className="text-center active-battle-card py-5 empty-battle-box">
+                    <h5 className="fw-semibold mb-2">
+                        No {title?.toLowerCase()} battles available
+                    </h5>
+                    <p className="text-muted mb-0">
+                        Please check back later for new battles.
+                    </p>
+                </div>
+            ) : (
+                battles.map((battle) => (
+                    <div key={battle._id} className="active-battle-card mb-5">
 
-                    <div className="d-flex justify-content-between align-items-center mb-3">
-                        <div>
-                            <h5 className="battle-title2 mb-1">
-                                {battle.name}
-                            </h5>
-                            <small className="text-muted">
-                                Ends on {new Date(battle.endDate).toDateString()}
-                            </small>
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h5 className="battle-title2 mb-1">
+                                    {battle.name}
+                                </h5>
+                                <small className="text-muted">
+                                    Ends on {new Date(battle.endDate).toDateString()}
+                                </small>
+                            </div>
+
+                            {battle.status === "active" && (
+                                <span className="live-badge">● Live</span>
+                            )}
                         </div>
 
-                        {battle.status === "active" && (
-                            <span className="live-badge">● Live</span>
-                        )}
-                    </div>
+                        <div className="d-flex gap-3 overflow-auto pb-3 mb-2">
+                            {battle.participants.map((p, index) => (
+                                <BattleEntryCard
+                                    key={p.participant._id}
+                                    participant={p.participant}
+                                    votes={p.vote.length}
+                                    totalVotes={battle.totalVotes}
+                                />
+                            ))}
+                        </div>
 
-                    <div className="d-flex gap-3 overflow-auto pb-3 mb-2">
-                        {battle.participants.map((p, index) => (
-                            <BattleEntryCard
-                                key={p.participant._id}
-                                participant={p.participant}
-                                votes={p.vote.length}
-                                totalVotes={battle.totalVotes}
-                            />
-                        ))}
+                        <Link
+                            href={`/votingscores?battleId=${battle._id}`}
+                            className="btn active-battle-btn"
+                        >
+                            VIEW THE SCOREBOARD
+                        </Link>
                     </div>
-
-                    <Link
-                        href={`/votingscores?battleId=${battle._id}`}
-                        className="btn active-battle-btn"
-                    >
-                        VIEW THE SCOREBOARD
-                    </Link>
-                </div>
-            ))}
+                ))
+            )}
         </div>
     );
 }

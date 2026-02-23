@@ -55,7 +55,7 @@ export default function VotingScores() {
     <div className="voting-score-container">
       <h4 className="mb-3">Live Voting Scores</h4>
 
-      <div className="voting-box position-relative">
+      <div className="voting-box py-3 position-relative">
         <div>
           {participants.map((item, index) => (
             <ScoreRow

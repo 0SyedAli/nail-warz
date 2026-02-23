@@ -21,7 +21,7 @@ const schema = Yup.object({
     .required("Phone number is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
   description: Yup.string().required("Description is required"),
-  designation: Yup.string().required("Designation is required"),
+  // designation: Yup.string().required("Designation is required"),
   image: Yup.mixed()
     .required("Image is required")
     .test("size", "Max 2 MB", (f) => f && f.size <= 2 * 1024 * 1024)
@@ -119,7 +119,7 @@ const AddTechnician = () => {
       const cleanedPhoneNumber = data.phoneNumber.replace(/\D/g, '');
       fd.append("phoneNumber", cleanedPhoneNumber);
       fd.append("description", data.description);
-      fd.append("designation", data.designation);
+      // fd.append("designation", data.designation);
 
       // Ensure all 7 days included
       const ALL_DAYS = [
@@ -272,7 +272,7 @@ const AddTechnician = () => {
               { label: "Full Name", name: "fullName", ph: "Full name" },
               { label: "Email", name: "email", ph: "abc@gmail.com" },
               { label: "Description/Bio", name: "description", ph: "Description..." },
-              { label: "Designation", name: "designation", ph: "Designation" },
+              // { label: "Designation", name: "designation", ph: "Designation" },
             ].map(({ label, name, ph }) => (
               <div key={name}>
                 <label className="form-label ">{label}</label>
@@ -285,7 +285,7 @@ const AddTechnician = () => {
             <label className="form-label ">Phone Number</label>
             <InputField
               {...register("phoneNumber")}
-              placeholder="+1 (175) 959-5268"
+              placeholder="+1 (xxx) xxx-xxxx"
               onChange={(e) => {
                 // Format as user types
                 const value = e.target.value;

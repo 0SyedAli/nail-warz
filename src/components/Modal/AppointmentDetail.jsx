@@ -127,7 +127,7 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
                   src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${userId?.image || "/images/avatar.png"}`}
                   width={60}
                   height={60}
-                  style={{ width: "60px", height: "60px", objectFit:"cover" }}
+                  style={{ width: "60px", height: "60px", objectFit: "cover" }}
                   alt="User"
                   unoptimized
 
@@ -142,29 +142,55 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
           </div>
 
           {/* ───── Action Buttons ───── */}
-          {booking?.status?.toLowerCase() === "accepted" && (
+          {booking?.status && (
             <div className="mt-4 d-flex align-items-center gap-2 flex-wrap">
-              {booking?.rescheduleStatus === "Pending" ? (
-                // 🔹 Show message if reschedule is pending
-                <p className="text-warning fw-bold mb-0">
-                  Reschedule request is pending approval…
-                </p>
-              ) : (
-                // 🔹 Otherwise, show action buttons
-                <>
-                  <button className="appoint_btn" onClick={cancelDisc.onOpen}>
-                    Cancel Booking
-                  </button>
-                  <button className="appoint_btn" onClick={rescheduleDisc.onOpen}>
-                    Reschedule
-                  </button>
-                  <button className="appoint_btn" onClick={completedDisc.onOpen}>
-                    Completed
-                  </button>
-                </>
+
+              {/* ✅ If Booking is Accepted */}
+              {booking.status.toLowerCase() === "accepted" && (
+                booking?.rescheduleStatus === "Pending" ? (
+                  <p className="text-warning fw-bold mb-0">
+                    Reschedule request is pending approval…
+                  </p>
+                ) : (
+                  <>
+                    <button className="appoint_btn" onClick={cancelDisc.onOpen}>
+                      Cancel Booking
+                    </button>
+
+                    <button
+                      className="appoint_btn reschedule"
+                      onClick={rescheduleDisc.onOpen}
+                    >
+                      Reschedule
+                    </button>
+
+                    <button
+                      className="appoint_btn completed"
+                      onClick={completedDisc.onOpen}
+                    >
+                      Completed
+                    </button>
+                  </>
+                )
               )}
+
+              {/* ✅ If Booking is Completed */}
+              {booking.status.toLowerCase() === "completed" && (
+                <button className="appoint_btn completed" disabled>
+                  Booking Completed
+                </button>
+              )}
+
+              {/* ✅ If Booking is Canceled */}
+              {booking.status.toLowerCase() === "canceled" && (
+                <button className="appoint_btn cancel" disabled>
+                  Booking Canceled
+                </button>
+              )}
+
             </div>
           )}
+
         </div>
       </Modal>
 

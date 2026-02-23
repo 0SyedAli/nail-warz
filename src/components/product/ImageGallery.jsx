@@ -45,7 +45,7 @@ export default function ImageGallery({ images = [] }) {
     const [active, setActive] = useState(gallery[0]);
 
     return (
-        <div className="row product_wrapper">
+        <div className="row product_wrapper  py-4">
             <div className="col-3">
                 <div className="thumbs">
                     {gallery.map((img, i) => (

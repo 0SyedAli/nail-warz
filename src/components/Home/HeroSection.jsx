@@ -27,7 +27,7 @@ export default function HeroSection() {
                   with other nail consumers, win a free manicure, and much more!
                 </p>
 
-                <div className="d-flex align-items-center gap-3">
+                <div className="d-flex align-items-center gap-3 app-icon">
                   <Image src="/images/googleplay.png" width={173.96} height={50.32} alt="" />
                   <Image src="/images/app-store-icon.png" width={173.96} height={50.32} alt="" />
                 </div>

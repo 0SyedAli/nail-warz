@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { FaExclamationCircle, FaRegEdit, FaTimes } from "react-icons/fa";
 import { showErrorToast, showSuccessToast } from "src/lib/toast";
-
+import { PatternFormat } from "react-number-format";
+import { useLoadScript, Autocomplete } from "@react-google-maps/api";
 import api from "@/lib/axios";
 import Cookies from "js-cookie";
 import Select from "react-select";
@@ -31,6 +32,11 @@ const EditProfile = () => {
     const [hasCommonTimes, setHasCommonTimes] = useState(true);
     const [vendorCategory, setVendorCategory] = useState([]);
     const [vendorInput, setVendorInput] = useState("");
+    const [cityAutocomplete, setCityAutocomplete] = useState(null);
+    const { isLoaded } = useLoadScript({
+        googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+        libraries: ["places"],
+    });
 
     const {
         register,
@@ -49,8 +55,11 @@ const EditProfile = () => {
             category: [],
             salonName: "",
             phoneNumber: "",
-            bussinessAddress: "",
-            locationName: "",
+            // bussinessAddress: "",
+            // locationName: "",
+            city: "",
+            state: "",
+            zipCode: "",
             description: ""
         },
     });
@@ -58,7 +67,64 @@ const EditProfile = () => {
     const images = watch("images");
     const [previews, setPreviews] = useState([]);
 
+
+    // const handleCitySelect = () => {
+    //     if (!cityAutocomplete) return;
+
+    //     const place = cityAutocomplete.getPlace();
+
+    //     let city = "";
+    //     let state = "";
+    //     let zip = "";
+
+    //     place.address_components.forEach((component) => {
+    //         if (component.types.includes("locality")) {
+    //             city = component.long_name;
+    //         }
+
+    //         if (component.types.includes("administrative_area_level_1")) {
+    //             state = component.long_name;
+    //         }
+
+    //         if (component.types.includes("postal_code")) {
+    //             zip = component.long_name;
+    //         }
+    //     });
+
+    //     setValue("city", city);
+    //     setValue("state", state);
+    //     setValue("zipCode", zip);
+    // };
+
     // Handle image previews
+
+    const handleCitySelect = () => {
+        if (!cityAutocomplete) return;
+
+        const place = cityAutocomplete.getPlace();
+        if (!place || !place.address_components) return;
+
+        let city = "";
+        let state = "";
+        let zip = "";
+
+        place.address_components.forEach((component) => {
+            if (component.types.includes("locality")) {
+                city = component.long_name;
+            }
+            if (component.types.includes("administrative_area_level_1")) {
+                state = component.long_name;
+            }
+            if (component.types.includes("postal_code")) {
+                zip = component.long_name;
+            }
+        });
+
+        setValue("city", city, { shouldValidate: true });
+        setValue("state", state, { shouldValidate: true });
+        setValue("zipCode", zip, { shouldValidate: true });
+    };
+
     useEffect(() => {
         const currentImages = images || [];
         const newPreviews = currentImages
@@ -121,8 +187,11 @@ const EditProfile = () => {
                     reset({
                         salonName: profileData.salonName || "",
                         phoneNumber: profileData.phoneNumber?.toString() || "",
-                        bussinessAddress: profileData.bussinessAddress || "",
-                        locationName: profileData.locationName || "",
+                        // bussinessAddress: profileData.bussinessAddress || "",
+                        // locationName: profileData.locationName || "",
+                        city: profileData.city || "",
+                        state: profileData.state || "",
+                        zipCode: profileData.zipCode || "",
                         description: profileData.description || "",
                         // workingDays: profileData.workingDays?.map(d => d.day) || [],
                         workingDays: workingDaysObj,   // <-- set here
@@ -227,24 +296,43 @@ const EditProfile = () => {
                 formData.append("salonName", data.salonName);
             }
 
-            if (data.phoneNumber !== existingData.phoneNumber?.toString()) {
-                formData.append("phoneNumber", data.phoneNumber);
-            }
+            // if (data.phoneNumber !== existingData.phoneNumber?.toString()) {
+            //     formData.append("phoneNumber", data.phoneNumber);
+            // }
+            const cleanPhone = data.phoneNumber?.replace(/\D/g, "") || "";
 
-            if (data.bussinessAddress !== existingData.bussinessAddress) {
-                formData.append("bussinessAddress", data.bussinessAddress);
+            if (cleanPhone !== existingData.phoneNumber?.toString()) {
+                formData.append("phoneNumber", cleanPhone);
             }
 
             if (data.description !== existingData.description) {
                 formData.append("description", data.description);
             }
 
-            if (data.locationName !== existingData.locationName) {
-                formData.append("locationName", data.locationName);
+            // if (data.bussinessAddress !== existingData.bussinessAddress) {
+            //     formData.append("bussinessAddress", data.bussinessAddress);
+            // }
+
+            // if (data.locationName !== existingData.locationName) {
+            //     formData.append("locationName", data.locationName);
+            // }
+
+            if (data.city !== existingData.city) {
+                formData.append("city", data.city);
+            }
+
+            if (data.state !== existingData.state) {
+                formData.append("state", data.state);
+            }
+
+            if (data.zipCode !== existingData.zipCode) {
+                formData.append("zipCode", data.zipCode);
             }
 
             // category changed?
-            const oldCats = existingData.categoryId.map(c => c._id);
+            // const oldCats = existingData.categoryId.map(c => c._id);
+            const oldCats = existingData.categoryId?.map(c => c._id) || [];
+
             const newCats = data.category.map(c => c.value);
 
             if (JSON.stringify(oldCats) !== JSON.stringify(newCats)) {
@@ -455,11 +543,26 @@ const EditProfile = () => {
                             <div className="col-md-4">
                                 <div className="am_field">
                                     <label>Phone Number</label>
-                                    <input
+                                    {/* <input
                                         type="text"
                                         {...register("phoneNumber")}
                                         className={`form-control ${errors.phoneNumber ? "is-invalid" : ""}`}
+                                    /> */}
+
+                                    <PatternFormat
+                                        format="+1 (###) ###-####"
+                                        mask="_"
+                                        value={watch("phoneNumber") || ""}
+                                        onValueChange={(values) => {
+                                            setValue("phoneNumber", values.formattedValue, {
+                                                shouldValidate: true,
+                                            });
+                                        }}
+                                        customInput="input"
+                                        className={`form-control ${errors.phoneNumber ? "is-invalid" : ""}`}
+                                        placeholder="+1 (123) 456-7890"
                                     />
+
                                     {errors.phoneNumber && (
                                         <div className="invalid-feedback">{errors.phoneNumber.message}</div>
                                     )}
@@ -467,7 +570,7 @@ const EditProfile = () => {
                             </div>
 
                             {/* Business Address */}
-                            <div className="col-md-4">
+                            {/* <div className="col-md-4">
                                 <div className="am_field">
                                     <label>Business Address</label>
                                     <input
@@ -479,10 +582,10 @@ const EditProfile = () => {
                                         <div className="invalid-feedback">{errors.bussinessAddress.message}</div>
                                     )}
                                 </div>
-                            </div>
+                            </div> */}
 
                             {/* Location  */}
-                            <div className="col-md-4">
+                            {/* <div className="col-md-4">
                                 <div className="am_field">
                                     <label>Location</label>
                                     <input
@@ -492,6 +595,76 @@ const EditProfile = () => {
                                     />
                                     {errors.locationName && (
                                         <div className="invalid-feedback">{errors.locationName.message}</div>
+                                    )}
+                                </div>
+                            </div> */}
+
+                            {/* City */}
+                            <div className="col-md-4">
+                                <div className="am_field">
+                                    <label>City</label>
+
+                                    {isLoaded ? (
+                                        <Autocomplete
+                                            onLoad={(auto) => setCityAutocomplete(auto)}
+                                            onPlaceChanged={handleCitySelect}
+                                            options={{ types: ["(cities)"] }}
+                                        >
+                                            <input
+                                                type="text"
+                                                className={`form-control ${errors.city ? "is-invalid" : ""}`}
+                                                value={watch("city") || ""}
+                                                onChange={(e) =>
+                                                    setValue("city", e.target.value, {
+                                                        shouldValidate: true,
+                                                    })
+                                                }
+                                                placeholder="Start typing city..."
+                                            />
+                                        </Autocomplete>
+                                    ) : (
+                                        <input
+                                            type="text"
+                                            {...register("city")}
+                                            className={`form-control ${errors.city ? "is-invalid" : ""}`}
+                                        />
+                                    )}
+
+                                    {errors.city && (
+                                        <div className="invalid-feedback">
+                                            {errors.city.message}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+
+                            {/* State */}
+                            <div className="col-md-4">
+                                <div className="am_field">
+                                    <label>State</label>
+                                    <input
+                                        type="text"
+                                        {...register("state")}
+                                        className={`form-control ${errors.state ? "is-invalid" : ""}`}
+                                    />
+                                    {errors.state && (
+                                        <div className="invalid-feedback">{errors.state.message}</div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Zip Code */}
+                            <div className="col-md-4">
+                                <div className="am_field">
+                                    <label>Zip Code</label>
+                                    <input
+                                        type="text"
+                                        {...register("zipCode")}
+                                        className={`form-control ${errors.zipCode ? "is-invalid" : ""}`}
+                                    />
+                                    {errors.zipCode && (
+                                        <div className="invalid-feedback">{errors.zipCode.message}</div>
                                     )}
                                 </div>
                             </div>
@@ -513,7 +686,7 @@ const EditProfile = () => {
                                     {/* <label className="d-flex align-items-center gap-1">Filter <FaExclamationCircle  color="#000"/></label> */}
                                     <div className="position-relative w-100 d-inline-flex align-items-center gap-1">
                                         <label className="d-flex align-items-center gap-1 mb-0">
-                                            Filter
+                                            Service Filters
                                             <FaExclamationCircle
                                                 color="#000"
                                                 style={{ cursor: "pointer" }}
@@ -522,8 +695,16 @@ const EditProfile = () => {
                                         </label>
 
                                         {open && (
-                                            <div ref={popoverRef} className="filter-popover">
-                                                Select the filter you wish to populate your Salon when selected. These filters are accessible via App users and they can filter out Salons based on the filter they select.
+                                            <div ref={popoverRef} className="filter-popover fw-bold">
+                                                Select all services offered by your
+                                                salon. These service filters help
+                                                customers within the Nail Warz app
+                                                search by specific service needs and
+                                                display your salon profile to users
+                                                looking for those services in your area. <br /><br />
+                                                Tip: Accurately selecting all applicable
+                                                services improves your visibility and
+                                                helps customers find you more easily.
                                             </div>
                                         )}
                                     </div>

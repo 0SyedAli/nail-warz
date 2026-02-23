@@ -7,7 +7,7 @@ export default function BattleCTA() {
         Download the Nail Warz app to Vote and Join the battles to showcase your art!
       </p>
 
-      <button className="btn btn-light fw-semibold px-5 py-3 fs-5 rounded-3 w-50" style={{ color: "#6D0000" }}>
+      <button className="btn btn-light fw-semibold px-5 py-3 fs-5 rounded-3 w-sm-50" style={{ color: "#6D0000" }}>
         Enter the Warz
       </button>
     </div>

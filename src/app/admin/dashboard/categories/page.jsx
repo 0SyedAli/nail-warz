@@ -1,15 +1,16 @@
 "use client";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 import AreYouSure2 from "@/components/Modal/AreYouSure2";
 import { useDisclosure } from "@chakra-ui/react";
-import AddCategory from "@/components/Modal/AddCategory";
-
+import AddCategory from "@/components/Modal/AddFilterCategory";
+import { FaExclamationCircle } from "react-icons/fa";
 const ManageCategory = () => {
+  const popoverRef = useRef(null);
+  const [open, setOpen] = useState(false);
   const [categories, setCategories] = useState([]);
-  const [adminId, setAdminId] = useState("");
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,25 +18,15 @@ const ManageCategory = () => {
   useEffect(() => {
     const cookie = Cookies.get("user");
     if (!cookie) return router.push("/admin/auth/login");
+    getCategories();
 
-    try {
-      const u = JSON.parse(cookie);
-      if (u?._id) setAdminId(u._id);
-      else router.push("/admin/auth/login");
-    } catch {
-      router.push("/admin/auth/login");
-    }
   }, []);
-
-  useEffect(() => {
-    if (adminId) getCategories();
-  }, [adminId]);
 
   const getCategories = async () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/getSalonCategory?salonId=${adminId}`
+        `${process.env.NEXT_PUBLIC_API_URL}/getAllCategories`
       );
       if (!response.ok) throw new Error(`Error: ${response.status}`);
 
@@ -43,14 +34,14 @@ const ManageCategory = () => {
       if (data.success) {
         setCategories(data.data);
       } else {
-        throw new Error(data.msg || "Failed to fetch categories.");
+        throw new Error(data.msg || "Failed to fetch filters.");
       }
     } catch (err) {
-      const message = err?.message || "Failed to load categories.";
+      const message = err?.message || "Failed to load filters.";
       setError(message);
       toast.error(message, {
-          autoClose: 1500,
-        });
+        autoClose: 1500,
+      });
     } finally {
       setLoading(false);
     }
@@ -59,22 +50,22 @@ const ManageCategory = () => {
   const deleteCategory = async (catId) => {
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/deleteSalonCategory`,
+        `${process.env.NEXT_PUBLIC_API_URL}/deleteCategory`,
         {
           categoryId: catId,
         }
       );
       if (response?.data?.success) {
-        toast.success("Category deleted successfully", {
+        toast.success("Filter deleted successfully", {
           autoClose: 1500,
         });
-        console.log("Category deleted successfully");
+        console.log("Filter deleted successfully");
         getCategories();
       } else {
-        throw new Error(response?.data?.msg || "Failed to delete category");
+        throw new Error(response?.data?.msg || "Failed to delete filter");
       }
     } catch (err) {
-      const message = err?.message || "Error deleting category.";
+      const message = err?.message || "Error deleting filter.";
       toast.error(message, {
         autoClose: 1500,
       });
@@ -91,7 +82,7 @@ const ManageCategory = () => {
   const renderCategories = () => {
     if (loading) return <p>Loading...</p>;
     if (error) return <p>{error}</p>;
-    if (categories.length === 0) return <p>No categories found.</p>;
+    if (categories.length === 0) return <p>No filter found.</p>;
 
     return (
       <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xxl-5 g-3">
@@ -123,14 +114,48 @@ const ManageCategory = () => {
       </div>
     );
   };
-
+  // Close on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (popoverRef.current && !popoverRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   return (
     <>
       <div className="page">
         <div className="manage_order_head pb-3">
-          <h3 className="mb-0">All Categories</h3>
+          <div>
+            <div className="position-relative w-100 d-inline-flex align-items-center gap-1">
+              <h3 className="d-flex align-items-center gap-2 mb-0 cat-top2" >
+                All Filters
+                {/* <FaExclamationCircle
+                  color="#000"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => setOpen(!open)}
+                /> */}
+              </h3>
+
+              {/* {open && (
+                <div ref={popoverRef} className="filter-popover filter-popover2">
+                  Select all services offered by your
+                  salon. These service filters help
+                  customers within the Nail Warz app
+                  search by specific service needs and
+                  display your salon profile to users
+                  looking for those services in your area. <br />
+                  <strong>Tip:</strong> Accurately selecting all applicable
+                  services improves your visibility and
+                  helps customers find you more easily.
+                </div>
+              )} */}
+            </div>
+          </div>
           <div onClick={onNotfOpen} className="btn btntheme3">
-            Add Category
+            Add Filter
           </div>
         </div>
         <div className="manage_order_body">{renderCategories()}</div>

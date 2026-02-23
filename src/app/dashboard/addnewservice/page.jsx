@@ -287,7 +287,7 @@ export default function AddNewService() {
                 </span>
               ))}
             </div>
-            <label className="mt-0">Assign Category</label>
+            <label className="mt-0">Assign Service Category</label>
             <select
               className="form-select input_field2 mt-1"
               {...register("category")}

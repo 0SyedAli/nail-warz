@@ -61,7 +61,11 @@ export default function CheckoutSummary() {
 
     const cart = useSelector((state) => state.cart.items);
 
-    const shipping = 15; // Static shipping fee (you can modify this based on your logic)
+    // Static shipping fee (you can modify this based on your logic)
+    // const shipping = 15; 
+
+    const shipping = useSelector((state) => state.cart.shippingFee);
+
 
     // Calculate subtotal
     const subtotal = cart.reduce(
@@ -74,30 +78,32 @@ export default function CheckoutSummary() {
     return (
         <div className="checkout-summary">
             <div className="summary-item-container">
-                {cart.map((item) => {
-                    const image =
-                        item.images?.length > 0
-                            ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${item.images[0]}`
-                            : "/images/prod_paint.png";
-                    return (
-                        <div key={item._id} className="summary-item">
-                            <Image src={image} width={80} height={80} alt={item.name} />
+                {cart
+                    .filter((item) => item.qty > 0)
+                    .map((item) => {
+                        const image =
+                            item.images?.length > 0
+                                ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${item.images[0]}`
+                                : "/images/prod_paint.png";
+                        return (
+                            <div key={item._id} className="summary-item">
+                                <Image src={image} width={80} height={80} alt={item.name} />
 
-                            <div className="flex-grow-1 ms-3">
-                                <h6 className="fw-bold mb-1">{item.name}</h6>
-                                <small className="text-muted">
-                                    Qty: {item.qty}
-                                </small>
+                                <div className="flex-grow-1 ms-3">
+                                    <h6 className="fw-bold mb-1">{item.name}</h6>
+                                    <small className="text-muted">
+                                        Qty: {item.qty}
+                                    </small>
+                                </div>
+
+                                <strong>${(item.price * item.qty).toFixed(2)}</strong>
                             </div>
-
-                            <strong>${(item.price * item.qty).toFixed(2)}</strong>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
             </div>
 
             <div className="subtotal mt-3">
-                <div className="d-flex justify-content-between">
+                <div className="d-flex justify-content-between mb-2">
                     <span>Subtotal</span>
                     <span>${subtotal.toFixed(2)}</span>
                 </div>

@@ -83,9 +83,9 @@ export default function Dashboard() {
             <div className="row gy-4 gx-0 w-100">
                 <div className="col-12">
                     <div className="chart-card">
-                        <div className="overview-header d-flex align-items-center justify-content-between mb-4">
-                            <div className="d-flex align-items-center gap-4 flex-wrap">
-                                <div className="d-flex align-items-center gap-2 flex-wrap" style={{
+                        <div className="overview-header d-flex align-items-center justify-content-center justify-content-sm-between gap-2 mb-4 flex-wrap">
+                            <div className="d-flex align-items-center gap-2 gap-sm-4 flex-wrap ">
+                                <div className="d-flex align-items-center gap-2 flex-wrap cc-ot" style={{
                                     border: "1px solid #ccc",
                                     padding: "10px",
                                     borderRadius: "5px",
@@ -93,7 +93,7 @@ export default function Dashboard() {
                                     <h3 className="overview-title fw-bolder m-0">Overview (Total):</h3>
                                     <div className="total-amount">$0</div>
                                 </div>
-                                <div className="d-flex align-items-center gap-2 flex-wrap" style={{
+                                <div className="d-flex align-items-center gap-2 flex-wrap cc-ot" style={{
                                     border: "1px solid #ccc",
                                     padding: "10px",
                                     borderRadius: "5px",
@@ -102,7 +102,7 @@ export default function Dashboard() {
                                     <div className="total-amount">$0</div>
                                 </div>
                             </div>
-                            <select
+                            {/* <select
                                 className="form-select date-selector-input"
                                 value={`${selectedMonth}-${selectedYear}`}
                                 onChange={handleMonthChange}
@@ -117,7 +117,41 @@ export default function Dashboard() {
                                         </option>
                                     )
                                 })}
-                            </select>
+                            </select> */}
+                            <div className="d-flex align-items-center gap-2">
+                                <select
+                                    className="form-select date-selector-input"
+                                    value={selectedMonth}
+                                    onChange={(e) => setSelectedMonth(e.target.value)}
+                                    style={{ width: "auto", fontSize: "14px" }}
+                                >
+                                    {Array.from({ length: 12 }, (_, i) => {
+                                        const month = String(i + 1).padStart(2, "0");
+                                        const date = new Date(2026, i);
+
+                                        return (
+                                            <option key={month} value={month}>
+                                                {date.toLocaleDateString("en-US", { month: "long" })}
+                                            </option>
+                                        );
+                                    })}
+                                </select>
+                                <select
+                                    className="form-select date-selector-input"
+                                    value={selectedYear}
+                                    onChange={(e) => setSelectedYear(e.target.value)}
+                                    style={{ width: "auto", fontSize: "14px" }}
+                                >
+                                    {Array.from({ length: 5 }, (_, i) => {
+                                        const year = new Date().getFullYear() - 2 + i;
+                                        return (
+                                            <option key={year} value={year}>
+                                                {year}
+                                            </option>
+                                        );
+                                    })}
+                                </select>
+                            </div>
                         </div>
                         <div className="chart-container" style={{ height: "350px" }}>
                             <SpinnerLoading spinner_class="h-100" />
@@ -133,8 +167,8 @@ export default function Dashboard() {
             <div className="col-12">
                 <div className="chart-card">
                     <div className="overview-header d-flex align-items-center justify-content-center justify-content-sm-between gap-2 mb-4 flex-wrap">
-                        <div className="d-flex align-items-center gap-4 flex-wrap ">
-                            <div className="d-flex align-items-center gap-2  flex-wrap" style={{
+                        <div className="d-flex align-items-center gap-2 gap-sm-4 flex-wrap ">
+                            <div className="d-flex align-items-center gap-2  flex-wrap cc-ot" style={{
                                 border: "1px solid #ccc",
                                 padding: "10px",
                                 borderRadius: "5px",
@@ -144,7 +178,7 @@ export default function Dashboard() {
                                     {dashboardData ? formatCurrency(dashboardData.totalMonthRevenue) : "$0"}
                                 </div>
                             </div>
-                            <div className="d-flex align-items-center gap-2  flex-wrap" style={{
+                            <div className="d-flex align-items-center gap-2  flex-wrap cc-ot" style={{
                                 border: "1px solid #ccc",
                                 padding: "10px",
                                 borderRadius: "5px",
@@ -154,7 +188,7 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                        <select
+                        {/* <select
                             className="form-select date-selector-input"
                             value={`${selectedMonth}-${selectedYear}`}
                             onChange={handleMonthChange}
@@ -169,7 +203,41 @@ export default function Dashboard() {
                                     </option>
                                 )
                             })}
-                        </select>
+                        </select> */}
+                        <div className="d-flex align-items-center gap-2">
+                            <select
+                                className="form-select date-selector-input"
+                                value={selectedMonth}
+                                onChange={(e) => setSelectedMonth(e.target.value)}
+                                style={{ width: "auto", fontSize: "14px" }}
+                            >
+                                {Array.from({ length: 12 }, (_, i) => {
+                                    const month = String(i + 1).padStart(2, "0");
+                                    const date = new Date(2026, i);
+
+                                    return (
+                                        <option key={month} value={month}>
+                                            {date.toLocaleDateString("en-US", { month: "long" })}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                            <select
+                                className="form-select date-selector-input"
+                                value={selectedYear}
+                                onChange={(e) => setSelectedYear(e.target.value)}
+                                style={{ width: "auto", fontSize: "14px" }}
+                            >
+                                {Array.from({ length: 5 }, (_, i) => {
+                                    const year = new Date().getFullYear() - 2 + i;
+                                    return (
+                                        <option key={year} value={year}>
+                                            {year}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        </div>
                     </div>
 
                     <div className="chart-container" style={{ height: "350px" }}>

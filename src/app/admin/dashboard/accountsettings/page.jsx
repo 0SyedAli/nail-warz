@@ -7,7 +7,8 @@ import { FaRegEdit, FaTimes } from "react-icons/fa";
 import { showErrorToast, showSuccessToast } from "src/lib/toast";
 import api from "@/lib/axios";
 import Cookies from "js-cookie";
-import Select from "react-select";
+import { PatternFormat } from "react-number-format";
+
 import MultiSelect from "@/components/MultiSelect";
 const DAYS_OF_WEEK = [
     "Monday",
@@ -224,10 +225,15 @@ const EditProfile = () => {
                 formData.append("salonName", data.salonName);
             }
 
-            if (data.phoneNumber !== existingData.phoneNumber?.toString()) {
-                formData.append("phoneNumber", data.phoneNumber);
-            }
+            // if (data.phoneNumber !== existingData.phoneNumber?.toString()) {
+            //     formData.append("phoneNumber", data.phoneNumber);
+            // }
 
+            const cleanPhone = data.phoneNumber.replace(/\D/g, "");
+
+            if (cleanPhone !== existingData.phoneNumber?.toString()) {
+                formData.append("phoneNumber", cleanPhone);
+            }
             if (data.bussinessAddress !== existingData.bussinessAddress) {
                 formData.append("bussinessAddress", data.bussinessAddress);
             }
@@ -439,10 +445,23 @@ const EditProfile = () => {
                             <div className="col-md-4">
                                 <div className="am_field">
                                     <label>Phone Number</label>
-                                    <input
+                                    {/* <input
                                         type="text"
                                         {...register("phoneNumber")}
                                         className={`form-control ${errors.phoneNumber ? "is-invalid" : ""}`}
+                                    /> */}
+                                    <PatternFormat
+                                        format="(###) ###-####"
+                                        mask="_"
+                                        defaultValue={watch("phoneNumber")}
+                                        onValueChange={(values) => {
+                                            setValue("phoneNumber", values.formattedValue, {
+                                                shouldValidate: true,
+                                            });
+                                        }}
+                                        customInput="input"
+                                        className={`form-control ${errors.phoneNumber ? "is-invalid" : ""}`}
+                                        placeholder="(123) 456-7890"
                                     />
                                     {errors.phoneNumber && (
                                         <div className="invalid-feedback">{errors.phoneNumber.message}</div>

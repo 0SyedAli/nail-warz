@@ -71,7 +71,6 @@ export default function ProductModal({ isOpen, onClose, product, onSuccess }) {
 
             // 🔥 IMAGES (VERY IMPORTANT)
             const imgs = Array.isArray(form.images) ? form.images : [];
-            console.log("form.images:", form.images, "isArray:", Array.isArray(form.images));
 
             // imgs.forEach((img) => {
             //     if (img instanceof File) {

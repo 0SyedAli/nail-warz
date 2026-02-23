@@ -64,6 +64,7 @@
 import QuantitySelector from "./QuantitySelector";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
+import { addToCart } from "@/redux/slice/cartSlice";
 
 export default function ProductInfo({ product }) {
   const dispatch = useDispatch();

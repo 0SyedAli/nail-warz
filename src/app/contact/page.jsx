@@ -10,7 +10,7 @@ export default function ContactPage() {
             <Header />
             <WebBanner bannerTitle="Contact Us" bannerPara="Please contact us with questions, inquiries, or to learn more about Nail Warz" />
 
-            <div className="container" style={{ padding: "70px 0" }}>
+            <div className="container" style={{ padding: "70px 20px" }}>
                 <ContactForm />
             </div>
             <AppCTASection />

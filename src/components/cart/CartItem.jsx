@@ -6,8 +6,7 @@ import { useDispatch } from "react-redux";
 import { removeFromCart, updateQty } from "@/redux/slice/cartSlice";
 
 export default function CartItem({ item }) {
-    console.log("item", item);
-    
+
     const dispatch = useDispatch();
 
     return (
@@ -15,7 +14,11 @@ export default function CartItem({ item }) {
 
             {/* Image */}
             <Image
-                src={item?.images ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${item?.images[0]}` : "/images/prod_paint.png" }
+                src={
+                    item?.images?.[0]
+                        ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${item.images[0]}`
+                        : "/images/prod_paint.png"
+                }
                 width={124}
                 height={124}
                 alt="Product"
@@ -39,7 +42,7 @@ export default function CartItem({ item }) {
 
                 {/* Qty */}
                 <div className="qty-box">
-                    <button  onClick={() => dispatch(updateQty({ id: item._id, qty: item.qty - 1 }))}>−</button>
+                    <button onClick={() => dispatch(updateQty({ id: item._id, qty: Math.max(0, item.qty - 1) }))}>−</button>
                     <span>{item?.qty}</span>
                     <button onClick={() => dispatch(updateQty({ id: item._id, qty: item.qty + 1 }))}>+</button>
                 </div>

@@ -126,15 +126,7 @@ export default function WeeklyCalendar() {
 
     return (
         <div
-            style={{
-                height: "85vh",
-                padding: "20px",
-                background: "linear-gradient(to bottom, #000000, #300000, #ff0000)",
-                borderRadius: "12px",
-                overflow: "hidden",
-                border: "1px solid rgba(255, 0, 0, 0.3)",
-                marginTop: "20px",
-            }}
+        className="appointment-calendere-container"
         >
             <FullCalendar
                 ref={calendarRef}

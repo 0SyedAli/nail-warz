@@ -19,6 +19,7 @@ export default function Services() {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
+  const [selectedServiceId, setSelectedServiceId] = useState(null);
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
   const { isOpen: isTechOpen, onOpen: onTechOpen, onClose: onTechClose } = useDisclosure();
   const [salonId, setSalonId] = useState("");
@@ -48,26 +49,52 @@ export default function Services() {
   }, [router]);
 
   /* ─────────────── GET ─────────────── */
-  useEffect(() => {
+  // useEffect(() => {
+  //   if (!salonId) return;
+  //   (async () => {
+  //     try {
+  //       const res = await fetch(
+  //         `${process.env.NEXT_PUBLIC_API_URL}/getAllServicesBySalonId?salonId=${salonId}`,
+  //         { cache: "no-store" }
+  //       );
+  //       if (!res.ok) throw new Error(`Server responded ${res.status}`);
+  //       const json = await res.json();
+  //       setServices(json?.data ?? []);
+  //     } catch (err) {
+  //       console.error(err);
+  //       setError("Failed to load services");
+  //       showErrorToast("Couldn’t fetch services. Please try again.");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   })();
+  // }, [salonId]);
+
+  const fetchServices = useCallback(async () => {
     if (!salonId) return;
-    (async () => {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/getAllServicesBySalonId?salonId=${salonId}`,
-          { cache: "no-store" }
-        );
-        if (!res.ok) throw new Error(`Server responded ${res.status}`);
-        const json = await res.json();
-        setServices(json?.data ?? []);
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load services");
-        showErrorToast("Couldn’t fetch services. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    })();
+
+    setLoading(true);
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/getAllServicesBySalonId?salonId=${salonId}`,
+        { cache: "no-store" }
+      );
+
+      if (!res.ok) throw new Error(`Server responded ${res.status}`);
+
+      const json = await res.json();
+      setServices(json?.data ?? []);
+    } catch (err) {
+      console.error(err);
+      showErrorToast("Couldn’t fetch services. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }, [salonId]);
+  useEffect(() => {
+    fetchServices();
+  }, [fetchServices]);
 
   /* ───────────── DELETE ───────────── */
   const handleDelete = useCallback(async () => {
@@ -86,7 +113,8 @@ export default function Services() {
 
       if (!res.ok || !data.success) throw new Error(data.message || "Delete failed");
 
-      setServices((prev) => prev.filter((s) => s._id !== selectedService._id));
+      // setServices((prev) => prev.filter((s) => s._id !== selectedService._id));
+      await fetchServices();
       showSuccessToast(data.message || "Service deleted successfully!");
       onDeleteClose(); // ✅ close modal after delete
     } catch (err) {
@@ -162,10 +190,27 @@ export default function Services() {
                         ? `${IMG_BASE}/${s.images[0]}`
                         : fallbackImg;
 
-                    const technician =
-                      s.technicianId?.[0]?.fullName ||
-                      s.technicianId?.[0]?.email ||
-                      "—";
+                    // const technician =
+                    //   s.technicianId?.[0]?.fullName ||
+                    //   s.technicianId?.[0]?.email ||
+                    //   "—";
+                    const technicians = s.technicianId || [];
+
+                    let technicianDisplay = "—";
+
+                    if (technicians.length === 1) {
+                      technicianDisplay =
+                        technicians[0]?.fullName ||
+                        technicians[0]?.email ||
+                        "—";
+                    } else if (technicians.length > 1) {
+                      const firstName =
+                        technicians[0]?.fullName ||
+                        technicians[0]?.email ||
+                        "";
+
+                      technicianDisplay = `${firstName}, ...`;
+                    }
                     const category = s.categoryId?.categoryName || "—";
 
                     return (
@@ -181,7 +226,7 @@ export default function Services() {
                         </td>
                         <td>${Number(s.price).toFixed(2)}</td>
                         <td>{category}</td>
-                        <td>{technician}</td>
+                        <td>{technicianDisplay}</td>
                         <td style={{ width: "310px" }}>
                           <div className="d-flex gap-2">
                             <AuthBtn
@@ -189,7 +234,7 @@ export default function Services() {
                               location_btn="btn  addTechBtn red"
 
                               onClick={() => {
-                                setSelectedService(s); // ✅ set selected service
+                                setSelectedServiceId(s._id); // ✅ set selected service
                                 onTechOpen();        // ✅ open modal
                               }}
                               disabled={deleting === s._id}
@@ -270,7 +315,8 @@ export default function Services() {
         btntitle="Assign Technician"
         isOpen={isTechOpen}
         onClose={onTechClose}
-        service_id={selectedService?._id}
+        service_id={selectedServiceId}
+        onSuccess={fetchServices}
       // onSuccess={() => fetchServices()} // optional refresh callback
       />
 

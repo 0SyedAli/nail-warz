@@ -43,7 +43,7 @@ export default function ManageAppointments() {
         all: 0,
         canceled: 0,
         completed: 0,
-        // pending: 0,
+        pending: 0,
         accepted: 0,
     });
 
@@ -110,10 +110,10 @@ export default function ManageAppointments() {
         const stats = data.reduce(
             (acc, appt) => {
                 acc.all++;
-
                 switch (appt.status.toLowerCase()) {
+                    case "pending":
                     case "accepted":
-                        acc.accepted++;
+                        acc.new++;
                         break;
                     case "canceled":
                         acc.canceled++;
@@ -122,12 +122,10 @@ export default function ManageAppointments() {
                         acc.completed++;
                         break;
                 }
-
                 return acc;
             },
-            { all: 0, accepted: 0, canceled: 0, completed: 0 }
+            { all: 0, new: 0, canceled: 0, completed: 0 }
         );
-
         setStats(stats);
     };
 
@@ -141,8 +139,9 @@ export default function ManageAppointments() {
         switch (status.toLowerCase()) {
             case "completed":
                 return <span className="badge py-2 bg-success">Completed</span>;
+            case "pending":
             case "accepted":
-                return <span className="badge py-2 bg-primary">Accepted</span>;
+                return <span className="badge py-2 bg-primary">New</span>;
             case "canceled":
                 return <span className="badge py-2 bg-danger">Canceled</span>;
             default:
@@ -174,22 +173,20 @@ export default function ManageAppointments() {
         router.push(`/super-admin/dashboard/manage-appointments/${id}`);
     };
 
-    const filteredAppointments = appointments
-        .filter(appt => appt.status.toLowerCase() !== "pending")
-        .filter((appt) => {
-            const name = (appt.userId?.username || "").toLowerCase();
-            const tech = (appt.technicianId?.fullName || "").toLowerCase();
-            const service = (appt.serviceId?.serviceName || "").toLowerCase();
-            const status = (appt.status || "").toLowerCase();
-            const search = searchTerm.toLowerCase();
+    const filteredAppointments = appointments.filter((appt) => {
+        const name = (appt.userId?.username || "").toLowerCase();
+        const tech = (appt.technicianId?.fullName || "").toLowerCase();
+        const service = (appt.serviceId?.serviceName || "").toLowerCase();
+        const status = (appt.status || "").toLowerCase();
+        const search = searchTerm.toLowerCase();
 
-            return (
-                name.includes(search) ||
-                tech.includes(search) ||
-                service.includes(search) ||
-                status.includes(search)
-            );
-        });
+        return (
+            name.includes(search) ||
+            tech.includes(search) ||
+            service.includes(search) ||
+            status.includes(search)
+        );
+    });
 
     const totalPages = Math.ceil(filteredAppointments.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -245,21 +242,21 @@ export default function ManageAppointments() {
             <div className="text-end mb-3">
                 <button
                     className="btn btn-outline-danger btn-sm px-4 py-2 fs-6 rounded-3"
-                    onClick={() => router.push("/dashboard/appointments")}
+                    onClick={()=> router.push("/dashboard/appointments")}
                 >
                     Calender View
                 </button>
             </div>
-            <div className="row g-2 g-sm-3 mb-4 row-cols-2 row-cols-sm-3 row-cols-lg-4">
-                {["All", "Accepted", "Completed", "Canceled"].map((label, i) => (
+            <div className="row g-2 g-sm-3 mb-4">
+                {["All", "New", "Accepted", "Completed", "Canceled"].map((label, i) => (
                     <div className="col" key={i}>
                         <div
-                            className={`card border-start border-${["", "primary", "success", "danger"][i]
+                            className={`card border-start border-${["", "primary", "warning", "success", "danger"][i]
                                 } border-4`}
                         >
-                            <div className="card-body al-cb py-3">
+                            <div className="card-body py-3">
                                 <h5>{label}</h5>
-                                <h4 className="mb-0">
+                                <h4 className="fw-bold mb-0">
                                     {stats[label.toLowerCase()] ?? 0}
                                 </h4>
                             </div>
@@ -272,7 +269,7 @@ export default function ManageAppointments() {
             <div className="card">
                 <div className="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h5 className="fw-bolder mb-0">Customer Appointments</h5>
-                    <div className="d-flex align-items-center gap-2 position-relative al-topper flex-wrap flex-md-nowrap">
+                    <div className="d-flex align-items-center gap-2 position-relative">
                         {/* Calendar button */}
                         <button
                             className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
@@ -317,11 +314,11 @@ export default function ManageAppointments() {
                             Refresh
                         </button>
 
-                        <div className="position-relative w-100">
+                        <div className="position-relative">
                             <BsSearch className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
                             <input
                                 type="text"
-                                className="form-control ps-5 w-100"
+                                className="form-control ps-5"
                                 placeholder="Search by name, service, or status..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}

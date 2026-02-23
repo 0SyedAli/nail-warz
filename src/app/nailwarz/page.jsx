@@ -40,11 +40,11 @@ export default function BattlesPage() {
     return (
         <>
             <Header />
-            <WebBanner bannerTitle="Nail Warz" bannerPara="Check out details below for our latest Battles. MAY THE BEST SET WIN!" bannerBtn={true} />
+            <WebBanner bannerTitle="Nail Warz" bannerPara="Check out our latest Battles below. MAY THE BEST SET WIN" bannerBtn={true} />
             <div className="container my-5">
                 {/* <BattleHero /> */}
                 <Battles
-                    title="Active"
+                    title="Live"
                     battles={battles.filter(b => b.status === "active")}
                 />
 

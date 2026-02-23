@@ -17,6 +17,7 @@ import { Spinner } from "@chakra-ui/react";
 import TermAndConditionModal from "@/components/Modal/TermAndConditionModal";
 import SpinnerLoading from "@/components/Spinner/SpinnerLoading";
 import BallsLoading from "@/components/Spinner/BallsLoading";
+import { useLoadScript, Autocomplete } from "@react-google-maps/api";
 
 const MAX_IMAGES = 3;
 
@@ -27,8 +28,11 @@ const schema = Yup.object({
     .min(6, "Min 6 characters")
     .matches(/^[+\d][\d\s\-()]+$/, "Invalid phone number format")
     .required("Phone number is required"),
-  locationName: Yup.string().required("Location is required"),
-  bussinessAddress: Yup.string().required("Address is required"),
+  city: Yup.string().required("City is required"),
+  state: Yup.string().required("State is required"),
+  zipCode: Yup.string()
+    .matches(/^\d{4,10}$/, "Invalid postal code")
+    .required("Postal Code is required"),
   description: Yup.string().required("Description is required"),
   workingDays: Yup.array().of(Yup.string()).min(1, "Select at least one working day"),
   startTime: Yup.string().required("Start time is required"),
@@ -61,6 +65,32 @@ export default function BussinessProfile() {
   const [pendingData, setPendingData] = useState(null); // hold form data
   const [agree, setAgree] = useState(false);
   const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [cityAutocomplete, setCityAutocomplete] = useState(null);
+  const [latLng, setLatLng] = useState({ lat: "", lng: "" });
+
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+    libraries: ["places"],
+  });
+
+  // const getLatLngFromAddress = async (city, state, zip) => {
+  //   const address = `${city}, ${state}, ${zip}`;
+
+  //   const res = await fetch(
+  //     `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+  //       address
+  //     )}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`
+  //   );
+
+  //   const data = await res.json();
+
+  //   if (data.status !== "OK") {
+  //     throw new Error("Invalid location. Please check city/state/postal code.");
+  //   }
+
+  //   return data.results[0].geometry.location;
+  // };
 
   /* RHF setup */
   const {
@@ -78,8 +108,43 @@ export default function BussinessProfile() {
       endTime: "",
       images: [],
       categories: [],
+      city: "",
+      state: "",
+      zipCode: "",
     },
   });
+
+  /* ---------------- Google City Select ---------------- */
+  const handleCitySelect = () => {
+    if (!cityAutocomplete) return;
+
+    const place = cityAutocomplete.getPlace();
+    if (!place.geometry) return;
+
+    let city = "";
+    let state = "";
+    let zip = "";
+
+    place.address_components.forEach((component) => {
+      if (component.types.includes("locality")) {
+        city = component.long_name;
+      }
+      if (component.types.includes("administrative_area_level_1")) {
+        state = component.long_name;
+      }
+      if (component.types.includes("postal_code")) {
+        zip = component.long_name;
+      }
+    });
+
+    setValue("city", city);
+    setValue("state", state);
+    setValue("zipCode", zip);
+    setLatLng({
+      lat: place.geometry.location.lat(),
+      lng: place.geometry.location.lng(),
+    });
+  };
 
   /* preview URLs for selected files */
   const images = watch("images");
@@ -103,13 +168,11 @@ export default function BussinessProfile() {
 
     try {
       const u = JSON.parse(cookie);
-        console.log("isUpdated1");
 
       // ✅ Redirect to dashboard if profile is updated
       if (u?.isUpdated === true) {
         router.replace("/dashboard");
-        console.log("isUpdated22");
-        
+
         return;
       }
 
@@ -147,9 +210,78 @@ export default function BussinessProfile() {
     setIsTermsOpen(true);
   };
 
-  /* step 2 → final submit after terms accepted */
+
+
+  // /* step 2 → final submit after terms accepted */
+  // const handleFinalSubmit = async () => {
+  //   if (!pendingData) return;
+  //   try {
+  //     setLoading(true);
+  //     const data = pendingData;
+  //     const formData = new FormData();
+  //     // 🔥 Get lat/lng from Google
+  //     const location = await getLatLngFromAddress(
+  //       data.city,
+  //       data.state,
+  //       data.zipCode
+  //     );
+  //     formData.append("id", adminId);
+  //     formData.append("salonName", data.salonName);
+  //     const cleanedPhoneNumber = data.phoneNumber.replace(/\D/g, "");
+  //     formData.append("phoneNumber", cleanedPhoneNumber);
+  //     formData.append("bussinessAddress", data.bussinessAddress);
+  //     formData.append("description", data.description);
+  //     // formData.append("locationName", data.locationName);
+  //     formData.append("city", data.city);
+  //     formData.append("state", data.state);
+  //     formData.append("zipCode", data.zipCode);
+  //     formData.append("latitude", data.lat);
+  //     formData.append("longitude", data.lng);
+  //     // formData.append("latitude", "37.0802");
+  //     // formData.append("longitude", "95.7029");
+
+  //     /* working days */
+  //     const days = data.workingDays.map((d) => ({
+  //       day: d,
+  //       isActive: true,
+  //       startTime: data.startTime,
+  //       endTime: data.endTime,
+  //     }));
+  //     formData.append("workingDays", JSON.stringify(days));
+
+  //     /* categories */
+  //     formData.append("categoryId", JSON.stringify(data.categories || []));
+
+  //     /* images */
+  //     data.images.forEach((f) => formData.append("image", f));
+
+  //     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/updateAdminProfile`, {
+  //       method: "POST",
+  //       body: formData,
+  //     });
+  //     const result = await res.json();
+
+  //     if (!res.ok || !result.success) {
+  //       throw new Error(result.message || "Profile update failed");
+  //     }
+  //     clearAllCookies();
+  //     router.push("/auth/login");
+  //     showSuccessToast(result?.message || "Profile updated successfully");
+  //   } catch (error) {
+  //     showErrorToast(error.message || "Profile update failed");
+  //   } finally {
+  //     setLoading(false);
+  //     setPendingData(null);
+  //     setAgree(false);
+  //     setIsTermsOpen(false);
+  //   }
+  // };
+
+
+  /* ---------------- Final Submit ---------------- */
   const handleFinalSubmit = async () => {
     if (!pendingData) return;
+
     try {
       setLoading(true);
       const data = pendingData;
@@ -157,15 +289,14 @@ export default function BussinessProfile() {
 
       formData.append("id", adminId);
       formData.append("salonName", data.salonName);
-      const cleanedPhoneNumber = data.phoneNumber.replace(/\D/g, "");
-      formData.append("phoneNumber", cleanedPhoneNumber);
-      formData.append("bussinessAddress", data.bussinessAddress);
+      formData.append("phoneNumber", data.phoneNumber.replace(/\D/g, ""));
       formData.append("description", data.description);
-      formData.append("locationName", data.locationName);
-      formData.append("latitude", "37.0802");
-      formData.append("longitude", "95.7029");
+      formData.append("city", data.city);
+      formData.append("state", data.state);
+      formData.append("zipCode", data.zipCode);
+      formData.append("latitude", latLng.lat);
+      formData.append("longitude", latLng.lng);
 
-      /* working days */
       const days = data.workingDays.map((d) => ({
         day: d,
         isActive: true,
@@ -173,31 +304,24 @@ export default function BussinessProfile() {
         endTime: data.endTime,
       }));
       formData.append("workingDays", JSON.stringify(days));
-
-      /* categories */
       formData.append("categoryId", JSON.stringify(data.categories || []));
 
-      /* images */
       data.images.forEach((f) => formData.append("image", f));
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/updateAdminProfile`, {
-        method: "POST",
-        body: formData,
-      });
-      const result = await res.json();
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/updateAdminProfile`,
+        { method: "POST", body: formData }
+      );
 
-      if (!res.ok || !result.success) {
-        throw new Error(result.message || "Profile update failed");
-      }
-      clearAllCookies();
+      const result = await res.json();
+      if (!res.ok || !result.success) throw new Error(result.message);
+
+      showSuccessToast("Profile updated successfully");
       router.push("/auth/login");
-      showSuccessToast(result?.message || "Profile updated successfully");
-    } catch (error) {
-      showErrorToast(error.message || "Profile update failed");
+    } catch (err) {
+      showErrorToast(err.message || "Profile update failed");
     } finally {
       setLoading(false);
-      setPendingData(null);
-      setAgree(false);
       setIsTermsOpen(false);
     }
   };
@@ -231,10 +355,11 @@ export default function BussinessProfile() {
           <h3>Business Profile Setup</h3>
 
           {/* basic fields */}
-          {[
+          {/* {[
             { label: "Salon Name", name: "salonName", ph: "Enter name" },
-            { label: "Location", name: "locationName", ph: "New York" },
-            { label: "Business Address", name: "bussinessAddress", ph: "123 Main St." },
+            { label: "City", name: "city", ph: "Enter city" },
+            { label: "State", name: "state", ph: "Enter state" },
+            { label: "Postal Code", name: "zipCode", ph: "10001" },
             { label: "Description/Bio", name: "description", ph: "Describe your business..." },
           ].map(({ label, name, ph }) => (
             <div key={name}>
@@ -242,11 +367,45 @@ export default function BussinessProfile() {
               <InputField {...register(name)} placeholder={ph} />
               {errors[name] && <p className="text-danger">{errors[name].message}</p>}
             </div>
-          ))}
+          ))} */}
+          <label>Salon Name</label>
+          <InputField {...register("salonName")} />
+          {errors.salonName && <p className="text-danger">{errors.salonName.message}</p>}
+
+          {/* CITY AUTOCOMPLETE */}
+          {isLoaded && (
+            <>
+              <label>City</label>
+              <Autocomplete
+                onLoad={(auto) => setCityAutocomplete(auto)}
+                onPlaceChanged={handleCitySelect}
+                options={{ types: ["(cities)"] }}
+              >
+                <input
+                  type="text"
+                  className="form-control classInput"
+                  placeholder=""
+                />
+              </Autocomplete>
+              {errors.city && <p className="text-danger">{errors.city.message}</p>}
+            </>
+          )}
+
+          <label>State</label>
+          <InputField {...register("state")} readOnly />
+          {errors.state && <p className="text-danger">{errors.state.message}</p>}
+
+          <label>Postal Code</label>
+          <InputField {...register("zipCode")} />
+          {errors.zipCode && <p className="text-danger">{errors.zipCode.message}</p>}
+
+          <label>Description</label>
+          <InputField {...register("description")} />
+          {errors.description && <p className="text-danger">{errors.description.message}</p>}
 
           {/* phone */}
           <label>Phone Number</label>
-          <InputField {...register("phoneNumber")} placeholder="+1 (175) 959-5268" />
+          <InputField {...register("phoneNumber")} placeholder="+1 (xxx) xxx-xxxx" />
 
           {/* working days */}
           <label>Select Working Days</label>
@@ -275,7 +434,7 @@ export default function BussinessProfile() {
           )}
 
           {/* categories */}
-          <label>Assign Filter</label>
+          <label>Assign Service Filters</label>
           <select
             defaultValue=""
             className="form-select input_field2 mt-1"
