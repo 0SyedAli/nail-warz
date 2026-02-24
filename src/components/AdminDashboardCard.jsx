@@ -9,17 +9,19 @@ const AdminDashboardCard = ({
 }) => {
   return (
 
-    <div className="col-md-6 col-xl-3">
+    <div className="col">
       <div className="card dashboard-card h-100">
-        <div className="card-body d-flex justify-content-between">
-          <div>
-            <p className="text-muted small mb-1">{title}</p>
-            <h5 className="fw-bold mb-1">{value}</h5>
-            {change && <span className="text-success small">{change}</span>}
+        <div className="card-body">
+          <div className=' d-flex justify-content-between mb-2'>
+            <div>
+              <p className="text-muted small mb-1">{title}</p>
+              <h5 className="fw-bold mb-1">{value}</h5>
+            </div>
+            <div className={`icon-box ${icon_class}`}>
+              <Icon />
+            </div>
           </div>
-          <div className={`icon-box ${icon_class}`}>
-            <Icon />
-          </div>
+          {change && <span className="text-success d-inline-block" style={{ fontSize: "12px", lineHeight: "15px" }}>{change}</span>}
         </div>
       </div>
     </div>

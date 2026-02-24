@@ -64,7 +64,7 @@ export default function VendorDetail() {
     const totalRevenue = revenueSummary?.totalRevenue ?? 0;
     const platformFee = revenueSummary?.platformFee?.amount ?? 0;
     const vendorShare = revenueSummary?.vendorShare?.amount ?? 0;
-    const availableBalance = revenueSummary?.remainingRevenue ?? 0;
+    const availableBalance = revenueSummary?.totalPayoutPending ?? 0;
 
     /* ===================== DELETE ===================== */
     const deleteVendor = async () => {

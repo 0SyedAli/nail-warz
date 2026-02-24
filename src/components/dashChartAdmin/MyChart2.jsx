@@ -83,7 +83,8 @@ export default function Dashboard() {
     const chartData =
         dashboardData?.dailyRevenue?.map((item) => ({
             date: item.day,              // day number
-            revenue: item.adminAmount,   // super admin earning
+            revenue: item.totalRevenue,   // super admin earning
+            adminShare: item.adminAmount,   // super admin earning
         })) || []
 
     if (loading) {
@@ -300,7 +301,16 @@ export default function Dashboard() {
                                     }}
                                 /> */}
                                 <Tooltip
-                                    formatter={(value) => [formatCurrency(value), "Revenue"]}
+                                    // formatter={(value) => [formatCurrency(value), "Revenue"]}
+                                    formatter={(value, name) => {
+                                        if (name === "revenue") {
+                                            return [formatCurrency(value), "Total Revenue"];
+                                        }
+                                        if (name === "adminShare") {
+                                            return [formatCurrency(value), "Admin Share"];
+                                        }
+                                        return value;
+                                    }}
                                     labelFormatter={(label) => {
                                         const day = label; // label is day number
 
@@ -321,6 +331,14 @@ export default function Dashboard() {
                                 <Area
                                     type="monotone"
                                     dataKey="revenue"
+                                    stroke="#ccc"
+                                    fillOpacity={1}
+                                    fill="url(#colorRevenue)"
+                                />
+
+                                <Area
+                                    type="monotone"
+                                    dataKey="adminShare"
                                     stroke="#ccc"
                                     fillOpacity={1}
                                     fill="url(#colorRevenue)"
