@@ -12,7 +12,8 @@ export default function Dashboard({ children }) {
 
   const content = {
     dashboard: { title: "Dashboard" },
-    users: { title: "Users Management" },
+    users: { title: "Application Users Management" },
+    usersDetails: { title: "Application User Details" },
     vendors: { title: "Vendors Management" },
     vendorsDetails: { title: "Vendor Details" }, // ✅ ADD THIS
     inventory: { title: "Inventory Management" },
@@ -29,6 +30,9 @@ export default function Dashboard({ children }) {
     const parts = pathname.split("/").filter(Boolean);
     let headerKey = parts[parts.length - 1];
 
+    if (parts[2] === "users" && parts.length > 3) {
+      headerKey = "usersDetails";
+    }
     if (parts[2] === "vendors" && parts.length > 3) {
       headerKey = "vendorsDetails";
     }

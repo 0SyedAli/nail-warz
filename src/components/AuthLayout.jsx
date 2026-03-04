@@ -32,7 +32,7 @@ export default function AuthLayout({ children }) {
       title: "Create Profile",
       description: "Enter your details to register yourself",
     },
-   
+
   };
 
   useEffect(() => {
@@ -44,21 +44,23 @@ export default function AuthLayout({ children }) {
     <div className={styles.auth_container}>
       <div className={styles.auth_image}></div>
       <div
-        className={`${styles.auth_form_container} ${
-          pathname === "/auth/login" ||
+        className={`${styles.auth_form_container} ${pathname === "/auth/login" ||
           pathname === "/admin/auth/login" ||
+          pathname === "/user-auth/login" ||
           pathname === "/auth/signup" ||
           pathname === "/admin/auth/signup" ||
+          pathname === "/user-auth/signup" ||
           pathname === "/auth/uploadservice" ||
           pathname === "/auth/forgot" ||
           pathname === "/admin/auth/forgot" ||
           pathname === "/auth/otp" ||
+          pathname === "/user-auth/otp" ||
           pathname === "/admin/auth/otp" ||
           pathname === "/auth/reset" ||
           pathname === "/admin/auth/reset"
-            ? "align-items-center"
-            : "align-items-start"
-        }`}
+          ? "align-items-center"
+          : "align-items-start"
+          }`}
       >
         <div className={styles.auth_form}>
           {/* You can use header here if needed */}

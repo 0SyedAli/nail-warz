@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { BsSearch, BsEye } from "react-icons/bs";
+import { Skeleton } from "@chakra-ui/react";
 
 const PAGE_SIZE = 10;
 
@@ -17,24 +18,35 @@ export default function SuperAdminOrders() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [statusFilter, setStatusFilter] = useState(null);
 
   // 🔐 Auth Guard
   useEffect(() => {
     if (!Cookies.get("token")) router.push("/admin/auth/login");
   }, []);
 
+  const handleStatusFilter = (status) => {
+    setStatusFilter(status);
+    setSearch("");
+    setPage(1);
+    fetchOrders(status);
+  };
+
   // 🔁 Fetch Orders
-  const fetchOrders = async () => {
+  const fetchOrders = async (status = null) => {
     setLoading(true);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/order`,
-        {
-          headers: {
-            Authorization: `Bearer ${Cookies.get("token")}`,
-          },
-        }
-      );
+      let url = `${process.env.NEXT_PUBLIC_API_URL}/order`;
+
+      if (status) {
+        url += `?status=${status}`;
+      }
+
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${Cookies.get("token")}`,
+        },
+      });
 
       const json = await res.json();
       if (!json.success) throw new Error(json.message);
@@ -50,13 +62,13 @@ export default function SuperAdminOrders() {
   };
 
   useEffect(() => {
-    fetchOrders();
+    fetchOrders(statusFilter);
   }, []);
 
   // 🔎 Search (order number or customer)
   useEffect(() => {
     const f = orders.filter(o =>
-      `${o.orderNumber} ${o.customer?.name}`
+      `${o.orderNumber} ${o.customer?.username}`
         .toLowerCase()
         .includes(search.toLowerCase())
     );
@@ -72,7 +84,6 @@ export default function SuperAdminOrders() {
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
 
-  if (loading) return <p className="m-4">Loading orders…</p>;
   if (error) return <p className="m-4 text-danger">{error}</p>;
 
   return (
@@ -97,16 +108,41 @@ export default function SuperAdminOrders() {
 
         {/* ===== TABLE ===== */}
         <div className="card">
-          <div className="card-header bg-white d-flex justify-content-between align-items-center">
-            <div className="position-relative">
-              <BsSearch className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
-              <input
-                className="form-control ps-5"
-                style={{ width: 320 }}
-                placeholder="Search by order number or customer…"
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-              />
+          <div className="card-header bg-white">
+            <div className="d-flex justify-content-between align-items-center">
+              <div className="position-relative">
+                <BsSearch className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
+                <input
+                  className="form-control ps-5"
+                  style={{ width: 320 }}
+                  placeholder="Search by order number or customer…"
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="d-flex flex-wrap gap-2 my-2 mt-3">
+              <button
+                className={`btn btn-sm ${statusFilter === null ? "btn-dark" : "btn-outline-dark"}`}
+                onClick={() => handleStatusFilter(null)}
+              >
+                All Orders
+              </button>
+
+              <button
+                className={`btn btn-sm ${statusFilter === "pending" ? "btn-dark" : "btn-outline-dark"}`}
+                onClick={() => handleStatusFilter("pending")}
+              >
+                Pending
+              </button>
+
+              <button
+                className={`btn btn-sm ${statusFilter === "completed" ? "btn-dark" : "btn-outline-dark"}`}
+                onClick={() => handleStatusFilter("completed")}
+              >
+                Completed
+              </button>
             </div>
           </div>
 
@@ -126,28 +162,41 @@ export default function SuperAdminOrders() {
                 </thead>
 
                 <tbody>
-                  {currentOrders.map(order => (
-                    <tr key={order._id}>
-                      <td className="fw-semibold">{order.orderNumber}</td>
-                      <td>{order.customer?.name || "-"}</td>
-                      <td>{order.products?.length || 0} items</td>
-                      <td>${order.total.toFixed(2)}</td>
-                      <td>{new Date(order.createdAt).toLocaleDateString()}</td>
-                      <td>
-                        <OrderStatusBadge status={order.status} />
-                      </td>
-                      <td>
-                        <button
-                          className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
-                          onClick={() => router.push(`/admin/dashboard/order/${order._id}`)}
-                        >
-                          <BsEye /> View
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {loading ? (
+                    Array.from({ length: 7 }).map((_, index) => (
+                      <tr key={index}>
+                        <td><Skeleton height="20px" width="120px" /></td>
+                        <td><Skeleton height="20px" width="100px" /></td>
+                        <td><Skeleton height="20px" width="70px" /></td>
+                        <td><Skeleton height="20px" width="60px" /></td>
+                        <td><Skeleton height="20px" width="90px" /></td>
+                        <td><Skeleton height="20px" width="70px" /></td>
+                        <td><Skeleton height="30px" width="60px" /></td>
+                      </tr>
+                    ))
+                  ) : (
+                    currentOrders.map(order => (
+                      <tr key={order._id}>
+                        <td className="fw-semibold">{order.orderNumber}</td>
+                        <td>{order.customer?.username || "-"}</td>
+                        <td>{order.products?.length || 0} items</td>
+                        <td>${order.total.toFixed(2)}</td>
+                        <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                        <td>
+                          <OrderStatusBadge status={order.status} />
+                        </td>
+                        <td>
+                          <button
+                            className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
+                            onClick={() => router.push(`/admin/dashboard/order/${order._id}`)}
+                          >
+                            <BsEye /> View
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
-
               </table>
 
             </div>

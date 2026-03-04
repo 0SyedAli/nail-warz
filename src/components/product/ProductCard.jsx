@@ -4,11 +4,20 @@ import Image from "next/image";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/redux/slice/cartSlice";
 import Link from "next/link";
+import { useState } from "react";
+import Cookies from "js-cookie";
+import { openLoginModal } from "@/redux/slice/uiSlice";
 
 export default function ProductCard({ product, actions }) {
   const dispatch = useDispatch();
 
   const handleAdd = () => {
+    const token = Cookies.get("token");
+    if (!token) {
+      dispatch(openLoginModal());
+      return;
+    }
+
     dispatch(addToCart({
       _id: product._id,
       name: product.name,

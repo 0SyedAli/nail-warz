@@ -21,12 +21,12 @@ const SideBar = () => {
     {
       href: "/admin/dashboard/users",
       icon: "/images/users.svg",
-      text: "Users Management",
+      text: "App User Management",
     },
     {
       href: "/admin/dashboard/vendors",
       icon: "/images/inventory-management.png",
-      text: "Vendors Management",
+      text: "Vendor Management",
     },
     {
       href: "/admin/dashboard/inventory",
@@ -41,7 +41,7 @@ const SideBar = () => {
     {
       href: "/admin/dashboard/battles",
       icon: "/images/warz-icon.png",
-      text: "Battles Management",
+      text: "Battle Management",
     },
     {
       href: "/admin/dashboard/content",
@@ -73,7 +73,7 @@ const SideBar = () => {
   return (
     <div className="sidebar_container">
       <div className="sidebar_header">
-        <Image src="/images/logo.png" alt="Logo" width={134} height={162} />
+        <Image src="/images/logo.png" alt="Logo" width={100} height={162} />
         <button className="hamburger" onClick={toggleSidebar}>
           ☰
         </button>

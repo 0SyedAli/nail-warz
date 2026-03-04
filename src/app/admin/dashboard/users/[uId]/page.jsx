@@ -3,13 +3,9 @@
 import { useEffect, useState, useMemo } from "react";
 import Cookies from "js-cookie";
 import { useRouter, useParams } from "next/navigation";
-import { FaPhoneAlt, FaUser } from "react-icons/fa";
-import { IoIosMail } from "react-icons/io";
-import { GiWorld } from "react-icons/gi";
-import { IoLocationSharp } from "react-icons/io5";
 
 export default function VendorDetail() {
-    const { vId } = useParams();
+    const { uId } = useParams();
     const router = useRouter();
 
     const token = Cookies.get("token");
@@ -37,7 +33,7 @@ export default function VendorDetail() {
                 setLoading(true);
 
                 const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor/${vId}`,
+                    `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor/${uId}`,
                     {
                         headers: { Authorization: `Bearer ${token}` },
                     }
@@ -62,7 +58,7 @@ export default function VendorDetail() {
         };
 
         fetchVendor();
-    }, [vId, token, router]);
+    }, [uId, token, router]);
 
     /* ===================== DERIVED VALUES ===================== */
     const totalRevenue = revenueSummary?.totalRevenue ?? 0;
@@ -76,7 +72,7 @@ export default function VendorDetail() {
 
         try {
             const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor/${vId}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor/${uId}`,
                 {
                     method: "DELETE",
                     headers: { Authorization: `Bearer ${token}` },
@@ -153,6 +149,22 @@ export default function VendorDetail() {
                 <button className="back-btn" onClick={() => router.back()}>
                     ← Back to Vendors
                 </button>
+
+                {/* HEADER */}
+                <div className="vendor-header">
+                    <div>
+                        <h4>{vendor.salonName}</h4>
+                        <p><strong>Owner:</strong> {vendor.email}</p>
+                        <p>{vendor.locationName}</p>
+                        <span className="status-badge text-capitalize active">Active</span>
+                    </div>
+
+                    <button className="delete-btn" onClick={deleteVendor}>
+                        <span className="trash">🗑</span>
+                        Delete Vendor
+                    </button>
+                </div>
+
                 {/* STATS */}
                 <div className="vendor-stats">
                     <StatBox
@@ -176,47 +188,6 @@ export default function VendorDetail() {
                         color="purple"
                     />
                 </div>
-                {/* HEADER */}
-                <div className="vendor-grid">
-                    <div className="card-box">
-                        <h6>Bussiness Info</h6>
-                        {vendor.salonName && <h5 className="d-flex align-items-center gap-2"><span><FaUser size={14} /></span>{vendor.salonName}</h5>}
-                        {vendor.bussinessEmail && <p className="d-flex align-items-center gap-2"><span><IoIosMail size={17} /></span>{vendor.bussinessEmail}</p>}
-                        {vendor.bussinessPhoneNumber && <p className="d-flex align-items-center gap-2"><span><FaPhoneAlt  size={17} /></span>{vendor.bussinessPhoneNumber}</p>}
-                        {vendor.bussinessWebsite && <p className="d-flex align-items-center gap-2"><span><GiWorld  size={17} /></span>{vendor.bussinessWebsite}</p>}
-                        {vendor.locationName && <p className="d-flex align-items-center gap-2"><span><IoLocationSharp  size={17} /></span>{vendor.locationName}</p>}
-                    </div>
-                    <div className="card-box">
-                        <h6>Owner Info</h6>
-                        {vendor.name && <h5 className="d-flex align-items-center gap-2"><span><FaUser size={14} /></span>{vendor.name}</h5>}
-                        {vendor.email && <p className="d-flex align-items-center gap-2"><span><IoIosMail size={17} /></span>{vendor.email}</p>}
-                        {vendor.city && <p className="d-flex align-items-center gap-2"><span><IoLocationSharp size={17} /></span>{vendor.city}</p>}
-                    </div>
-                </div>
-                {/* <div className="vendor-header">
-                    <div className="d-flex align-items-center gap-4">
-                    </div>
-                    <span className="status-badge text-capitalize active">Active</span>
-                    <span
-                            style={{
-                                padding: "6px 12px",
-                                borderRadius: "20px",
-                                fontSize: "12px",
-                                fontWeight: 600,
-                                backgroundColor: !vendor?.isDeleted ? "#e6f4ea" : "#f1f3f5",
-                                color: !vendor?.isDeleted ? "#1e7e34" : "#6c757d"
-                            }}
-                        >
-                            {!vendor?.isDeleted ? "Active" : "Inactive"}
-                        </span>
-
-                    <button className="delete-btn" onClick={deleteVendor}>
-                        <span className="trash">🗑</span>
-                        Delete Vendor
-                    </button>
-                </div> */}
-
-
 
                 {/* PAYOUT + SUMMARY */}
                 <div className="vendor-grid">
@@ -287,8 +258,6 @@ export default function VendorDetail() {
                         <table className="history-table">
                             <thead>
                                 <tr>
-                                    <th>TransactionId</th>
-                                    <th>Payment Method</th>
                                     <th>Date</th>
                                     <th>Amount</th>
                                     <th>Payment Method</th>
@@ -298,8 +267,6 @@ export default function VendorDetail() {
                             <tbody>
                                 {payouts.map((p, i) => (
                                     <tr key={i}>
-                                        <td>{p.transactionId}</td>
-                                        <td>{p.payoutMethod}</td>
                                         <td>
                                             {new Date(p.payoutDate).toLocaleDateString("en-GB", {
                                                 day: "2-digit",
@@ -321,90 +288,6 @@ export default function VendorDetail() {
                     )}
                 </div>
 
-                {/* RATINGS / REVIEWS */}
-                <div className="card-box mt-4">
-                    <h6>Ratings & Reviews</h6>
-
-                    <div className="d-flex align-items-center gap-3 mb-3" style={{ flexWrap: "wrap" }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                            <div style={{ fontSize: 22, fontWeight: 700 }}>
-                                {(vendor?.avgRating ?? 0).toFixed(1)}
-                            </div>
-
-                            <Stars value={vendor?.avgRating ?? 0} />
-
-                            <div className="text-muted" style={{ fontSize: 13 }}>
-                                ({vendor?.totalReviews ?? 0} reviews)
-                            </div>
-                        </div>
-                    </div>
-
-                    {(!vendor?.ratings || vendor.ratings.length === 0) ? (
-                        <p className="text-muted">No reviews yet</p>
-                    ) : (
-                        <table className="history-table">
-                            <thead>
-                                <tr>
-                                    <th>User</th>
-                                    <th>Stars</th>
-                                    <th>Message</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {vendor.ratings.map((r, i) => (
-                                    <tr key={r?._id || i}>
-                                        <td>
-                                            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                                                <img
-                                                    src={`${process.env.NEXT_PUBLIC_IMAGE_URL || ""}/${r?.userId?.image || ""}`}
-                                                    alt="user"
-                                                    onError={(e) => (e.currentTarget.style.display = "none")}
-                                                    style={{
-                                                        width: 36,
-                                                        height: 36,
-                                                        borderRadius: "50%",
-                                                        objectFit: "cover",
-                                                        border: "1px solid #eee",
-                                                    }}
-                                                />
-                                                <div>
-                                                    <div style={{ fontWeight: 600 }}>
-                                                        {r?.userId?.username || "Unknown"}
-                                                    </div>
-                                                    <div className="text-muted" style={{ fontSize: 12 }}>
-                                                        {r?.userId?.email || ""}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </td>
-
-                                        <td>
-                                            <Stars value={r?.stars ?? 0} size={16} />
-                                            <span className="text-muted" style={{ marginLeft: 8, fontSize: 12 }}>
-                                                ({r?.stars ?? 0}/5)
-                                            </span>
-                                        </td>
-
-                                        <td style={{ maxWidth: 380 }}>
-                                            {r?.message || "-"}
-                                        </td>
-
-                                        <td>
-                                            {r?.createdAt
-                                                ? new Date(r.createdAt).toLocaleDateString("en-GB", {
-                                                    day: "2-digit",
-                                                    month: "short",
-                                                    year: "numeric",
-                                                })
-                                                : "-"}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    )}
-                </div>
             </div>
         </div>
     );
@@ -417,30 +300,3 @@ const StatBox = ({ title, value, color }) => (
         <h5 className={color}>{value}</h5>
     </div>
 );
-
-const Stars = ({ value = 0, size = 18 }) => {
-    const full = Math.floor(value);
-    const hasHalf = value - full >= 0.5;
-
-    return (
-        <span style={{ display: "inline-flex", gap: 2, lineHeight: 1 }}>
-            {[1, 2, 3, 4, 5].map((i) => {
-                let star = "☆";
-                if (i <= full) star = "★";
-                else if (i === full + 1 && hasHalf) star = "★"; // simple half-look; optional advanced half below
-
-                return (
-                    <span
-                        key={i}
-                        style={{
-                            fontSize: size,
-                            color: i <= full ? "#f5b301" : "#c7c7c7",
-                        }}
-                    >
-                        {star}
-                    </span>
-                );
-            })}
-        </span>
-    );
-};

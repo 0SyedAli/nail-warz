@@ -65,11 +65,20 @@ import QuantitySelector from "./QuantitySelector";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { addToCart } from "@/redux/slice/cartSlice";
+import Cookies from "js-cookie";
+import { openLoginModal } from "@/redux/slice/uiSlice";
 
 export default function ProductInfo({ product }) {
   const dispatch = useDispatch();
   const [qty, setQty] = useState(1);
+
   const handleAddToCart = () => {
+    const token = Cookies.get("token");
+    if (!token) {
+      dispatch(openLoginModal());
+      return;
+    }
+
     dispatch(
       addToCart({
         _id: product._id,
@@ -116,24 +125,13 @@ export default function ProductInfo({ product }) {
         <QuantitySelector
           qty={qty}
           setQty={setQty}
-          max={product.stock} 
-          />
+          max={product.stock}
+        />
 
         <button
           className="btn btn-danger add-to-cart-btn"
           disabled={product.status === "outOfStock"}
-          onClick={() =>
-            dispatch(
-              addToCart({
-                _id: product._id,
-                name: product.name,
-                sku: product.sku,
-                price: product.price,
-                images: product.images,
-                qty,
-              })
-            )
-          }
+          onClick={handleAddToCart}
         >
           Add To Cart
         </button>

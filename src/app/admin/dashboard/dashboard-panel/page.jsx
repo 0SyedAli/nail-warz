@@ -20,12 +20,14 @@ import {
   LuListChecks,
   LuCircleX
 } from "react-icons/lu";
+import { FaRegCalendarAlt } from 'react-icons/fa'
 export default function SuperAdminDashboard() {
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [weeklyData, setWeeklyData] = useState(null);
   const [topVendors, setTopVendors] = useState([]);
+  const [weeklyBookingData, setWeeklyBookingData] = useState(null);
   // useEffect(() => {
   //   const token = Cookies.get('token')
 
@@ -83,8 +85,14 @@ export default function SuperAdminDashboard() {
         headers: { Authorization: `Bearer ${token}` },
       }
     )
-    Promise.all([fetchDashboard, fetchWeeklyStats, fetchTopVendors])
-      .then(([dashboardRes, weeklyRes, vendorsRes]) => {
+    const fetchWeeklyBookings = axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/weeklyBookingStats`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    Promise.all([fetchDashboard, fetchWeeklyStats, fetchTopVendors, fetchWeeklyBookings])
+      .then(([dashboardRes, weeklyRes, vendorsRes, bookingRes]) => {
 
         // Dashboard Data
         if (dashboardRes.data?.success && dashboardRes.data?.stats) {
@@ -97,6 +105,9 @@ export default function SuperAdminDashboard() {
         }
         if (vendorsRes.data?.success) {
           setTopVendors(vendorsRes.data.vendors || [])
+        }
+        if (bookingRes.data?.success) {
+          setWeeklyBookingData(bookingRes.data);
         }
       })
       .catch(err => {
@@ -156,6 +167,39 @@ export default function SuperAdminDashboard() {
       bg: "#fce5cd"
     },
   ]
+
+  const bookingStatuses = [
+    {
+      key: "totalBookings",
+      label: "Total Bookings",
+      icon: FaRegCalendarAlt,
+      bg: "#e3f2fd"
+    },
+    {
+      key: "pendingBookings",
+      label: "Pending Bookings",
+      icon: LuClock,
+      bg: "#fff3cd"
+    },
+    {
+      key: "acceptedBookings",
+      label: "Accepted Bookings",
+      icon: LuCheckCheck,
+      bg: "#d4edda"
+    },
+    {
+      key: "completedBookings",
+      label: "Completed Bookings",
+      icon: LuListChecks,
+      bg: "#e2f0d9"
+    },
+    {
+      key: "canceledBookings",
+      label: "Canceled Bookings",
+      icon: LuCircleX,
+      bg: "#f8d7da"
+    },
+  ];
   /* ---------------- Loading ---------------- */
   if (loading) {
     return (
@@ -257,7 +301,7 @@ export default function SuperAdminDashboard() {
             <div className="col-lg-6">
               <div className="card dashboard-card h-100">
                 <div className="card-body">
-                  <h6 className="fw-semibold mb-1">Weekly Orders Activity</h6>
+                  <h6 className="fw-semibold mb-1">Weekly Orders Activity (E-Store)</h6>
 
                   {weeklyData?.weekRange && (
                     <p className="text-muted small mb-3">
@@ -285,28 +329,28 @@ export default function SuperAdminDashboard() {
 
                   </ul> */}
 
-                  <ul className="list-unstyled small text-muted mb-0 row">
+                  <ul className="list-unstyled small text-muted mb-0 row gx-2">
                     {orderStatuses.map(status => {
                       const Icon = status.icon;
                       return (
                         <li
                           key={status.key}
-                          className="col-12 col-md-6 mb-3 d-flex align-items-center gap-3"
+                          className="col-12 col-md-6 mb-3 d-flex align-items-center gap-2"
                         >
                           <div
                             className="icon-box d-flex align-items-center justify-content-center"
                             style={{
                               backgroundColor: status.bg,
-                              width: "40px",
-                              height: "40px",
+                              minWidth: "30px",
+                              height: "30px",
                               borderRadius: "8px"
                             }}
                           >
-                            {Icon && <Icon size={18} />}
+                            {Icon && <Icon size={15} />}
                           </div>
 
                           <div className="d-flex flex-column">
-                            <span className="fs-6 fw-medium text-black">
+                            <span className="fw-medium text-black">
                               {status.label}
                             </span>
                             <span>
@@ -321,6 +365,52 @@ export default function SuperAdminDashboard() {
               </div>
             </div>
 
+            <div className="col-lg-6">
+              <div className="card dashboard-card h-100">
+                <div className="card-body">
+                  <h6 className="fw-semibold mb-1">Weekly Booking Activity</h6>
+
+                  {weeklyBookingData?.weekRange && (
+                    <p className="text-muted small mb-3">
+                      {weeklyBookingData.weekRange.start} - {weeklyBookingData.weekRange.end}
+                    </p>
+                  )}
+
+                  <ul className="list-unstyled small text-muted mb-0 row gx-2">
+                    {bookingStatuses.map(status => {
+                      const Icon = status.icon;
+                      return (
+                        <li
+                          key={status.key}
+                          className="col-12 col-md-6 mb-3 d-flex align-items-center gap-2"
+                        >
+                          <div
+                            className="icon-box d-flex align-items-center justify-content-center"
+                            style={{
+                              backgroundColor: status.bg,
+                              minWidth: "30px",
+                              height: "30px",
+                              borderRadius: "8px"
+                            }}
+                          >
+                            {Icon && <Icon size={15} />}
+                          </div>
+
+                          <div className="d-flex flex-column">
+                            <span className="fw-medium text-black">
+                              {status.label}
+                            </span>
+                            <span>
+                              {weeklyBookingData?.data?.[status.key]?.length || 0} Bookings
+                            </span>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </div>
+            </div>
             {/* <div className="col-lg-6">
               <div className="card dashboard-card h-100">
                 <div className="card-body">

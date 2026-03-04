@@ -28,7 +28,7 @@ export default function DeleteProductModal({ isOpen, onClose, productId, onSucce
                     Delete Product
                 </h2>
                 <p className="text-muted text-center">
-                    Are you sure you want to delete this category?
+                    Are you sure you want to delete this product?
                 </p>
                 <div className="aus_btns d-flex align-items-center justify-content-center gap-3">
                     <button

@@ -3,23 +3,41 @@
 import Image from "next/image";
 import { BsTrash, BsUpload } from "react-icons/bs";
 
-export default function MultiImageUpload({ images = [], setImages }) {
+export default function MultiImageUpload({ images = [], setImages, setRemovedMedia }) {
 
   const safeImages = Array.isArray(images) ? images : [];
 
+  // const handleSelect = (e) => {
+  //   const files = Array.from(e.target.files);
+  //   if (!files.length) return;
+
+  //   // 🔥 REPLACE old previews with new images
+  //   setImages(files);
+
+  //   e.target.value = "";
+  // };
   const handleSelect = (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
 
-    // 🔥 REPLACE old previews with new images
-    setImages(files);
+    setImages(prev => {
+      const merged = [...prev, ...files];
+      return merged.slice(0, 5); // max 5 images
+    });
 
     e.target.value = "";
   };
 
   const removeImage = (index) => {
+    const imageToRemove = safeImages[index];
+
+    // agar existing image hai (string)
+    if (typeof imageToRemove === "string") {
+      setRemovedMedia(prev => [...prev, imageToRemove]);
+    }
+
     const updated = safeImages.filter((_, i) => i !== index);
-    setImages(updated); // ✅ ARRAY ONLY
+    setImages(updated);
   };
 
   return (
@@ -49,6 +67,7 @@ export default function MultiImageUpload({ images = [], setImages }) {
               alt="product"
               width={80}
               height={80}
+              style={{ width: "80px", height: "80px" }}
             />
             <button onClick={() => removeImage(index)}>
               <BsTrash />
