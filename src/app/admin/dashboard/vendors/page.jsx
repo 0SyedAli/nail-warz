@@ -189,6 +189,8 @@ export default function SuperAdminVendors() {
                                         <th>City</th>
                                         <th>Join Date</th>
                                         <th>Total Revenue</th>
+                                        <th>Total Ratting</th>
+                                        <th>Cancel Count</th>
                                         <th>Payouts Pending</th>
                                         <th>Actions</th>
                                     </tr>
@@ -217,6 +219,8 @@ export default function SuperAdminVendors() {
                                                 </span>
                                             </td> */}
                                             <td className="fw-bold">${v.totalRevenue || 0}</td>
+                                            <td className="fw-bold">{v.totalReviews || 0}</td>
+                                            <td className="fw-bold">${v.cancelledByCount || 0}</td>
                                             <td className="fw-bold">${v.totalPayoutPending || 0}</td>
                                             <td>
                                                 <button

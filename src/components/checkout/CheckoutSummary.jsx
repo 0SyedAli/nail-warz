@@ -51,7 +51,7 @@
 import Image from "next/image";
 import { useSelector } from "react-redux";
 
-export default function CheckoutSummary() {
+export default function CheckoutSummary({ discountData }) {
     // const cart = useSelector((state) => state.cart.items);
 
     // const subtotal = cart.reduce(
@@ -65,6 +65,7 @@ export default function CheckoutSummary() {
     // const shipping = 15; 
 
     const shipping = useSelector((state) => state.cart.shippingFee);
+    const deliveryDate = useSelector((state) => state.cart.deliveryDate);
 
 
     // Calculate subtotal
@@ -73,7 +74,7 @@ export default function CheckoutSummary() {
         0
     );
 
-    const total = subtotal + shipping; // Total includes shipping fee
+    const total = discountData ? discountData.finalTotal : subtotal + shipping;
 
     return (
         <div className="checkout-summary">
@@ -109,16 +110,39 @@ export default function CheckoutSummary() {
                 </div>
 
                 {/* Shipping */}
-                <div className="d-flex justify-content-between">
+                <div className="d-flex justify-content-between mb-2">
                     <span>Shipping</span>
-                    <span>${shipping}</span> {/* You can dynamically calculate shipping if needed */}
+                    <span>{shipping === 0 ? "FREE" : `$${shipping.toFixed(2)}`}</span>
                 </div>
+
+                {/* Discount details */}
+                {discountData && (
+                    <>
+                        <div className="d-flex justify-content-between mb-2 text-success">
+                            <span>Discount ({discountData.discountType === 'percentage' ? `${discountData.discountValue}%` : `$${discountData.discountValue}`})</span>
+                            <span>-${discountData.discountAmount.toFixed(2)}</span>
+                        </div>
+                        {discountData.eligibleAmount < subtotal && (
+                            <div className="d-flex justify-content-between mb-2 small text-muted">
+                                <span>Eligible Amount</span>
+                                <span>${discountData.eligibleAmount.toFixed(2)}</span>
+                            </div>
+                        )}
+                    </>
+                )}
 
                 {/* Total */}
                 <div className="d-flex justify-content-between fw-bold fs-5 mt-3">
                     <span>Total</span>
                     <span>${total.toFixed(2)} USD</span>
                 </div>
+
+                {deliveryDate && (
+                    <div className="mt-3 p-2 bg-light rounded text-center">
+                        <span className="small text-muted">Estimated Delivery:</span><br />
+                        <span className="fw-bold text-dark">{deliveryDate}</span>
+                    </div>
+                )}
             </div>
         </div>
     );

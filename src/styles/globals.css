@@ -233,6 +233,41 @@ a {
   right: 0;
 }
 
+.btn-link.btn-link-header {
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  border: 2px solid #af2b2b;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
+  background-color: #FFF;
+  padding: 0;
+  border-radius: 100%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 11;
+  animation: pulse-animation 2s infinite;
+}
+
+.btn-link.btn-link-header span {
+  position: absolute;
+  top: -6px;
+  right: -4px;
+  border-radius: 100%;
+  background-color: #af2b2b;
+  min-width: 21px;
+  padding: 3px;
+  min-height: 21px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFF;
+  font-size: 12px;
+  line-height: normal;
+}
+
 .gender_btn {
   border: 2px solid #041e5e;
   border-radius: 8px;

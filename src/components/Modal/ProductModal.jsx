@@ -46,7 +46,7 @@ export default function ProductModal({ isOpen, onClose, product, onSuccess }) {
         category: [],
         price: "",
         stock: "",
-        unitType: "piece",
+        unitType: "",
         images: [],
         videos: [],
         isActive: true,   // ✅ ADD THIS
@@ -76,7 +76,7 @@ export default function ProductModal({ isOpen, onClose, product, onSuccess }) {
                     : [],
                 price: product.price || "",
                 stock: product.stock || "",
-                unitType: product.unitType || "piece",
+                unitType: product.unitType || "",
                 isActive: product.isActive ?? true,   // ✅ ADD THIS
                 images,
                 videos
@@ -88,7 +88,7 @@ export default function ProductModal({ isOpen, onClose, product, onSuccess }) {
                 category: [],
                 price: "",
                 stock: "",
-                unitType: "piece",
+                unitType: "",
                 images: [],
                 videos: [],
                 isActive: true,
@@ -481,6 +481,14 @@ export default function ProductModal({ isOpen, onClose, product, onSuccess }) {
                         <label>SKU</label>
                         <input name="sku" value={form.sku} onChange={handleChange} />
                     </div>
+                    <div>
+                        <label>Unit Type</label>
+                        <input name="unitType" value={form.unitType} onChange={handleChange} />
+                    </div>
+
+                </div>
+                <div className="grid-2">
+
                     <div>
                         <label className="mb-2 d-block">Status</label>
 

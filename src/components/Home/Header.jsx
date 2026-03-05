@@ -117,10 +117,11 @@ import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import Cookies from "js-cookie";
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { showSuccessToast } from "@/lib/toast";
 import { closeLoginModal } from "@/redux/slice/uiSlice";
 import LoginModal from "../Modal/LoginModal";
+import { clearCart } from "@/redux/slice/cartSlice";
 
 export default function Header() {
   const router = useRouter();
@@ -133,7 +134,10 @@ export default function Header() {
 
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
+  const pathname = usePathname();
 
+  // hide cart on these routes
+  const hideCart = pathname === "/cart" || pathname === "/checkout";
   // Read cookies on mount (and after logout)
   useEffect(() => {
     const t = Cookies.get("token") || null;
@@ -174,6 +178,8 @@ export default function Header() {
 
     setToken(null);
     setUser(null);
+    dispatch(clearCart());
+
     showSuccessToast("Logout successfully")
     router.push("/");
     router.refresh();
@@ -234,24 +240,6 @@ export default function Header() {
 
             {/* RIGHT: CART + AUTH */}
             <div className="d-flex align-items-center gap-3">
-              {totalQty > 0 && (
-                <Link
-                  href="/cart"
-                  className="btn btn-link btn-link-header text-dark px-0 py-2"
-                  aria-label="Shopping Cart"
-                >
-                  <Image
-                    src="/images/cart-head.png"
-                    alt="Cart"
-                    width={20}
-                    height={20}
-                    className="img-fluid"
-                    priority
-                  />
-                  {totalQty}
-                </Link>
-              )}
-
               {/* AUTH AREA */}
               {!isLoggedIn ? (
                 <>
@@ -325,6 +313,25 @@ export default function Header() {
         </nav>
         {/* Global Login Modal */}
       </header>
+      {!hideCart && totalQty > 0 && (
+        <Link
+          href="/cart"
+          className="btn btn-link btn-link-header px-0 py-2 text-decoration-none"
+          aria-label="Shopping Cart"
+        >
+          <Image
+            src="/images/cart-head.png"
+            alt="Cart"
+            width={20}
+            height={20}
+            className="img-fluid"
+            priority
+          />
+          <span>
+            {totalQty}
+          </span>
+        </Link>
+      )}
       <LoginModal
         show={isLoginModalOpen}
         onClose={() => dispatch(closeLoginModal())}

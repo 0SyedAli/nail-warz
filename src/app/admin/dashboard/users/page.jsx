@@ -240,6 +240,8 @@ export default function SuperAdminUsers() {
                                         <th>Email</th>
                                         <th>Join Date</th>
                                         <th>Orders</th>
+                                        <th>Cancel Orders</th>
+                                        <th>Wallet Balance</th>
                                         <th>Total Spent</th>
                                         {smartFilter === "inactive" ? (<th>Status</th>) : null}
                                         <th>Enable / Disable</th>
@@ -262,6 +264,8 @@ export default function SuperAdminUsers() {
                                             <td>{u.email}</td>
                                             <td>{new Date(u.createdAt).toLocaleDateString()}</td>
                                             <td>{u.purchaseCount}</td>
+                                            <td>{u.cancelledByCount}</td>
+                                            <td>${u.walletBalance}</td>
                                             <td className="fw-bold ">
                                                 ${u.totalSpend}
                                             </td>

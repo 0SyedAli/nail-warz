@@ -43,9 +43,12 @@ import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 import { useSelector } from "react-redux";
+import BallsLoading from "@/components/Spinner/BallsLoading";
 
 export default function CheckoutPage() {
     const [clientSecret, setClientSecret] = useState(null)
+    const [finalAmount, setFinalAmount] = useState(null);
+    const [discountData, setDiscountData] = useState(null);
     const cart = useSelector((state) => state.cart.items);
     // Shipping fee
     // const shipping = 15;
@@ -57,14 +60,11 @@ export default function CheckoutPage() {
 
     const hasCreatedIntent = useRef(false);
 
-    const onSubmit = async () => {
+    const onSubmit = async (intentData) => {
         try {
-
             const res = await axios.post(
                 `${process.env.NEXT_PUBLIC_API_URL}/order/createPaymentIntent`,
-                {
-                    amount: totalAmount,
-                }
+                intentData
             );
 
             const result = res.data;
@@ -73,22 +73,15 @@ export default function CheckoutPage() {
                 throw new Error(result?.message || "Payment intent failed");
             }
             setClientSecret(result?.clientSecret);
-
-            showSuccessToast("Payment intent created successfully");
-
+            if (result?.finalAmount) {
+                setFinalAmount(result.finalAmount);
+            }
+            return result.clientSecret;
         } catch (err) {
             showErrorToast(err.message || "Something went wrong");
+            throw err;
         }
     };
-    useEffect(() => {
-        if (!amount || amount <= 0) return;
-        if (hasCreatedIntent.current) return; // 🔥 PREVENT DOUBLE CALL
-
-        hasCreatedIntent.current = true;
-        onSubmit();
-    }, [amount]);
-
-    if (!clientSecret) return <>loading</>;
 
     return (
         <>
@@ -99,10 +92,16 @@ export default function CheckoutPage() {
                 <div className="container checkout-page py-5">
                     <div className="row g-5">
                         <div className="col-lg-7">
-                            <CheckoutForm clientSecret={clientSecret} />
+                            <CheckoutForm
+                                clientSecret={clientSecret}
+                                createIntent={onSubmit}
+                                setDiscountData={setDiscountData}
+                                discountData={discountData}
+                                finalAmount={finalAmount}
+                            />
                         </div>
                         <div className="col-lg-5">
-                            <CheckoutSummary />
+                            <CheckoutSummary discountData={discountData} />
                         </div>
                     </div>
                 </div>

@@ -65,20 +65,12 @@ import QuantitySelector from "./QuantitySelector";
 import { useDispatch } from "react-redux";
 import { useState } from "react";
 import { addToCart } from "@/redux/slice/cartSlice";
-import Cookies from "js-cookie";
-import { openLoginModal } from "@/redux/slice/uiSlice";
 
 export default function ProductInfo({ product }) {
   const dispatch = useDispatch();
   const [qty, setQty] = useState(1);
 
   const handleAddToCart = () => {
-    const token = Cookies.get("token");
-    if (!token) {
-      dispatch(openLoginModal());
-      return;
-    }
-
     dispatch(
       addToCart({
         _id: product._id,

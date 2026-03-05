@@ -10,6 +10,7 @@ import SpinnerLoading from "./Spinner/SpinnerLoading";
 import AppointmentDetail from "./Modal/AppointmentDetail";
 import Cookies from "js-cookie";
 import { useDisclosure } from "@chakra-ui/react";
+import BallsLoading from "./Spinner/BallsLoading";
 
 export default function ManageAppointments() {
     const searchParams = useSearchParams();
@@ -218,7 +219,7 @@ export default function ManageAppointments() {
                     className="d-flex justify-content-center align-items-center"
                     style={{ minHeight: "400px" }}
                 >
-                    <SpinnerLoading />
+                    <BallsLoading />
                 </div>
             </div>
         );

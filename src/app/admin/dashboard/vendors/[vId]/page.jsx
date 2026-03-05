@@ -24,6 +24,7 @@ export default function VendorDetail() {
     const [revenueSummary, setRevenueSummary] = useState(null);
     const [revenueStats, setRevenueStats] = useState(null);
     const [payouts, setPayouts] = useState([]);
+    const [payoutSearch, setPayoutSearch] = useState("");
 
     /* ===================== FETCH VENDOR ===================== */
     useEffect(() => {
@@ -140,6 +141,23 @@ export default function VendorDetail() {
         }
     };
 
+    /* ===================== FILTERED PAYOUTS ===================== */
+    const filteredPayouts = useMemo(() => {
+        if (!payoutSearch.trim()) return payouts;
+        const q = payoutSearch.toLowerCase();
+        return payouts.filter((p) => {
+            const dateStr = new Date(p.payoutDate).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+            }).toLowerCase();
+            return (
+                p.transactionId?.toLowerCase().includes(q) ||
+                dateStr.includes(q)
+            );
+        });
+    }, [payouts, payoutSearch]);
+
     /* ===================== STATES ===================== */
     if (loading) return <p className="m-4">Loading vendor…</p>;
     if (error) return <p className="m-4 text-danger">{error}</p>;
@@ -182,13 +200,13 @@ export default function VendorDetail() {
                         <h6>Bussiness Info</h6>
                         {vendor.salonName && <h5 className="d-flex align-items-center gap-2"><span><FaUser size={14} /></span>{vendor.salonName}</h5>}
                         {vendor.bussinessEmail && <p className="d-flex align-items-center gap-2"><span><IoIosMail size={17} /></span>{vendor.bussinessEmail}</p>}
-                        {vendor.bussinessPhoneNumber && <p className="d-flex align-items-center gap-2"><span><FaPhoneAlt  size={17} /></span>{vendor.bussinessPhoneNumber}</p>}
-                        {vendor.bussinessWebsite && <p className="d-flex align-items-center gap-2"><span><GiWorld  size={17} /></span>{vendor.bussinessWebsite}</p>}
-                        {vendor.locationName && <p className="d-flex align-items-center gap-2"><span><IoLocationSharp  size={17} /></span>{vendor.locationName}</p>}
+                        {vendor.bussinessPhoneNumber && <p className="d-flex align-items-center gap-2"><span><FaPhoneAlt size={17} /></span>{vendor.bussinessPhoneNumber}</p>}
+                        {vendor.bussinessWebsite && <p className="d-flex align-items-center gap-2"><span><GiWorld size={17} /></span>{vendor.bussinessWebsite}</p>}
+                        {vendor.locationName && <p className="d-flex align-items-center gap-2"><span><IoLocationSharp size={17} /></span>{vendor.locationName}</p>}
                     </div>
                     <div className="card-box">
                         <h6>Owner Info</h6>
-                        {vendor.name && <h5 className="d-flex align-items-center gap-2"><span><FaUser size={14} /></span>{vendor.name}</h5>}
+                        {vendor.name && <h5 className="d-flex align-items-center gap-2 mb-3"><span><FaUser size={14} /></span>{vendor.name}</h5>}
                         {vendor.email && <p className="d-flex align-items-center gap-2"><span><IoIosMail size={17} /></span>{vendor.email}</p>}
                         {vendor.city && <p className="d-flex align-items-center gap-2"><span><IoLocationSharp size={17} /></span>{vendor.city}</p>}
                     </div>
@@ -259,6 +277,14 @@ export default function VendorDetail() {
                             <span>Total Revenue</span>
                             <span>${revenueSummary?.totalRevenue}</span>
                         </div>
+                        <div className="summary-row purple">
+                            <span>Total Paid Out</span>
+                            <span>${revenueSummary?.totalPaidAmount}</span>
+                        </div>
+                        <div className="summary-row purple">
+                            <span>Remaining Revenue</span>
+                            <span>${revenueSummary?.remainingRevenue}</span>
+                        </div>
 
                         <div className="summary-row red">
                             <span>Platform Fee (15%)</span>
@@ -269,55 +295,65 @@ export default function VendorDetail() {
                             <span>Vendor Share (85%)</span>
                             <span>${revenueSummary?.vendorShare?.amount}</span>
                         </div>
-
-                        <div className="summary-row purple">
-                            <span>Total Paid Out</span>
-                            <span>${revenueSummary?.totalPaidAmount}</span>
+                        <div className="summary-row">
+                            <span><strong>Remaining Balance</strong></span>
+                            <span>${revenueSummary?.totalPayoutPending}</span>
                         </div>
                     </div>
                 </div>
 
-                {/* PAYOUT HISTORY */}
                 <div className="card-box mt-4">
-                    <h6>Payout History</h6>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h6 className="mb-0">Payout History</h6>
+                        <input
+                            type="text"
+                            className="form-control w-25"
+                            placeholder="Search by ID or Date..."
+                            value={payoutSearch}
+                            onChange={(e) => setPayoutSearch(e.target.value)}
+                            style={{ maxWidth: "250px" }}
+                        />
+                    </div>
 
                     {payouts.length === 0 ? (
                         <p className="text-muted">No payouts yet</p>
                     ) : (
-                        <table className="history-table">
-                            <thead>
-                                <tr>
-                                    <th>TransactionId</th>
-                                    <th>Payment Method</th>
-                                    <th>Date</th>
-                                    <th>Amount</th>
-                                    <th>Payment Method</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {payouts.map((p, i) => (
-                                    <tr key={i}>
-                                        <td>{p.transactionId}</td>
-                                        <td>{p.payoutMethod}</td>
-                                        <td>
-                                            {new Date(p.payoutDate).toLocaleDateString("en-GB", {
-                                                day: "2-digit",
-                                                month: "short",
-                                                year: "numeric",
-                                            })}
-                                        </td>
-                                        <td>${p.amount}</td>
-                                        <td>{p.remarks}</td>
-                                        <td>
-                                            <span className={`status-badge text-capitalize bg-success ${p.status === "Paid" ? "completed" : ""}`}>
-                                                {p.status}
-                                            </span>
-                                        </td>
+                        <div className="table-responsive" style={{ height: "400px", overflowY: "scroll" }}>
+                            <table className="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>TransactionId</th>
+                                        <th>Payment Method</th>
+                                        <th>Date</th>
+                                        <th>Amount</th>
+                                        <th>Payment Method</th>
+                                        <th>Status</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {filteredPayouts.map((p, i) => (
+                                        <tr key={i}>
+                                            <td>{p.transactionId}</td>
+                                            <td>{p.payoutMethod}</td>
+                                            <td>
+                                                {new Date(p.payoutDate).toLocaleDateString("en-GB", {
+                                                    day: "2-digit",
+                                                    month: "short",
+                                                    year: "numeric",
+                                                })}
+                                            </td>
+                                            <td>${p.amount}</td>
+                                            <td>{p.remarks}</td>
+                                            <td>
+                                                <span className={`status-badge text-capitalize bg-success ${p.status === "Paid" ? "completed" : ""}`}>
+                                                    {p.status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     )}
                 </div>
 

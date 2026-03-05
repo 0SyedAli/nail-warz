@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import api from "@/lib/axios";
 import ScoreRow from "./ScoreRow";
+import BallsLoading from "../Spinner/BallsLoading";
 
 export default function VotingScores() {
   const searchParams = useSearchParams();
@@ -48,7 +49,11 @@ export default function VotingScores() {
   }, [battleId]);
 
   if (loading) {
-    return <div className="text-center py-5">Loading scores...</div>;
+    return (
+      <div className="page d-flex align-items-center" style={{ height: "100vh" }}>
+        <BallsLoading borderWidth="mx-auto" />
+      </div>
+    );
   }
 
   return (

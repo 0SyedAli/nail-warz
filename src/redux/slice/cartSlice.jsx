@@ -4,6 +4,8 @@ const initialState = {
   items: [], // products
   shippingType: "flat",
   shippingFee: 7,
+  deliveryDate: null,
+  deliveryDays: null,
 };
 
 // const cartSlice = createSlice({
@@ -53,9 +55,11 @@ const cartSlice = createSlice({
     },
 
     setShipping: (state, action) => {
-      const { type, fee } = action.payload;
+      const { type, fee, deliveryDate, deliveryDays } = action.payload;
       state.shippingType = type;
       state.shippingFee = fee;
+      state.deliveryDate = deliveryDate;
+      state.deliveryDays = deliveryDays;
     },
 
     removeFromCart: (state, action) => {
@@ -82,6 +86,8 @@ const cartSlice = createSlice({
       state.items = [];
       state.shippingType = "flat";
       state.shippingFee = 7;
+      state.deliveryDate = null;
+      state.deliveryDays = null;
     },
   },
 });

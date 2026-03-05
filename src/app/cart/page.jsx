@@ -7,19 +7,33 @@ import RelatedProducts from "@/components/product/RelatedProducts";
 import CartItem from "@/components/cart/CartItem";
 import OrderSummary from "@/components/cart/OrderSummary";
 import Link from "next/link";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import { openLoginModal } from "@/redux/slice/uiSlice";
 
 export default function AddToCart() {
     const items = useSelector(state => state.cart.items);
     console.log(items);
     const router = useRouter()
+    const dispatch = useDispatch();
+
     useEffect(() => {
         if (items.length === 0) {
             router.push("/store")
         }
     }, [items])
+
+    const handleCheckout = (e) => {
+        e.preventDefault();
+        const token = Cookies.get("token");
+        if (!token) {
+            dispatch(openLoginModal());
+        } else {
+            router.push("/checkout");
+        }
+    };
     return (
         <>
             <Header />
@@ -52,9 +66,9 @@ export default function AddToCart() {
                         <Link href="/store" className="btn w-100 checkout-btn-outline">
                             Back To Store
                         </Link>
-                        <Link href="/checkout" className="btn w-100 checkout-btn">
+                        <button onClick={handleCheckout} className="btn w-100 checkout-btn">
                             Continue to Checkout
-                        </Link>
+                        </button>
                     </div>
                     <RelatedProducts />
                 </div>

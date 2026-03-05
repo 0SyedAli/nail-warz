@@ -1,10 +1,10 @@
 "use client";
-
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginModal({ show, onClose }) {
     const [isClient, setIsClient] = useState(false);
+    const router = useRouter();
 
     useEffect(() => {
         setIsClient(true);
@@ -43,9 +43,12 @@ export default function LoginModal({ show, onClose }) {
                             <button className="btn btn-secondary px-4" onClick={onClose}>
                                 Cancel
                             </button>
-                            <Link href="/user-auth/login" className="btn btn-danger px-4">
+                            <button onClick={() => {
+                                onClose();
+                                router.push("/user-auth/login")
+                            }} className="btn btn-danger px-4">
                                 Login
-                            </Link>
+                            </button>
                         </div>
                     </div>
                 </div>

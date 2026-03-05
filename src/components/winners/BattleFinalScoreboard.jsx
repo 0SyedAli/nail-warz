@@ -6,6 +6,7 @@ import Image from "next/image";
 import api from "@/lib/axios";
 import VotingScores from "./VotingScores";
 import PodiumItem from "./PodiumItem";
+import BallsLoading from "../Spinner/BallsLoading";
 
 export default function BattleFinalScoreboard() {
     const searchParams = useSearchParams();
@@ -53,7 +54,11 @@ export default function BattleFinalScoreboard() {
             router.push("/nailwarz");
         }
     }, [winner, loading, router]);
-    if (loading) return <div className="text-center py-5">Loading final scores...</div>;
+    if (loading) return (
+        <div className="page d-flex align-items-center" style={{ height: "100vh" }}>
+            <BallsLoading borderWidth="mx-auto" />
+        </div>
+    );
     return (
         <div className="battle-leaderboard my-5">
             <h4 className="fs-h4 mb-4">Final Scoreboard</h4>

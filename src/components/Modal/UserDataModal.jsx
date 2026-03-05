@@ -76,7 +76,7 @@ export default function UserDataModal({ isOpen, onClose, user }) {
                 <div className="row g-3 mb-4">
                     <Info label="Phone Number" value={user?.phone || "-"} />
                     <Info label="Device Type" value={user.deviceType || "-"} />
-                    <Info label="Stripe ID" value={user.stripeCustomerId || "-"} />
+                    {/* <Info label="Stripe ID" value={user.stripeCustomerId || "-"} /> */}
                     <Info label="Joined" value={new Date(user.createdAt).toLocaleString()} />
                 </div>
 
@@ -94,6 +94,7 @@ export default function UserDataModal({ isOpen, onClose, user }) {
                 <div className="row g-3 mb-4">
                     <Info label="Total Orders" value={user.purchaseCount ?? 0} />
                     <Info label="Total Appointment" value={user.appointmentCount ?? 0} />
+                    <Info label="Last Appointment" value={user.lastAppointmentDate ? new Date(user.lastAppointmentDate).toLocaleString() : "-"} />
                 </div>
 
                 {/* FAVOURITES */}
