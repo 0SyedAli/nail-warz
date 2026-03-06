@@ -448,6 +448,7 @@ export default function SuperAdminDashboard() {
                       name={vendor.salonName || "N/A"}
                       location={vendor.locationName || vendor.city || "Unknown"}
                       amount={`$${(vendor.totalSales ?? 0).toLocaleString()}`}
+                      vendorId={vendor._id}
                     />
                   ))}
 

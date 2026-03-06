@@ -25,6 +25,8 @@ export default function Dashboard({ children }) {
     contentDetails: { title: "Participant Details" }, // ✅ ADD THIS
     categories: { title: "Filter Management" }, // ✅ ADD THIS
     pushnotification: { title: "Push Notification" },
+    disputes: { title: "Disputes Management" }, // ✅ ADD THIS
+    disputesDetails: { title: "Dispute Details" }, // ✅ ADD THIS
   };
   useEffect(() => {
     const parts = pathname.split("/").filter(Boolean);
@@ -44,6 +46,9 @@ export default function Dashboard({ children }) {
     }
     if (parts[2] === "content" && parts.length > 3) {
       headerKey = "contentDetails";
+    }
+    if (parts[2] === "disputes" && parts.length > 3) {
+      headerKey = "disputesDetails";
     }
 
     setHeader(content[headerKey]);

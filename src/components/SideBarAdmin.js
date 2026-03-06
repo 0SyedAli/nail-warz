@@ -54,11 +54,16 @@ const SideBar = () => {
       text: "Filter Management",
     },
     {
+      href: "/admin/dashboard/disputes",
+      icon: "/images/layer-icon.png",
+      text: "Dispute Management",
+    },
+    {
       href: "/admin/dashboard/pushnotification",
       icon: "/images/notification.png",
       text: "Push Notification",
     },
-   
+
   ];
   useEffect(() => {
     setActiveTab(pathname);
@@ -125,7 +130,7 @@ const SideBar = () => {
             </li>
           ))}
           <li className="sc2_sid">
-            <LogoutButton path="/admin/auth/login"/>
+            <LogoutButton path="/admin/auth/login" />
           </li>
         </ul>
       </div>

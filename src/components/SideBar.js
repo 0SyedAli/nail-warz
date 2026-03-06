@@ -212,6 +212,12 @@ const SideBar = () => {
       text: "Account Settings",
       related: ["/dashboard/accountsettings"],
     },
+    {
+      href: "/dashboard/disputes",
+      icon: "/images/act.png",
+      text: "Disputes",
+      related: ["/dashboard/disputes"],
+    },
   ];
 
   const isActive = (item) => {

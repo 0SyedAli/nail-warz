@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import React from 'react'
 import { LuUsers } from 'react-icons/lu'
 
@@ -5,10 +6,11 @@ const AdminVendorRow = ({
   name,
   location,
   amount,
+  vendorId,
 }) => {
 
   return (
-    <div className="d-flex justify-content-between align-items-center mb-3">
+    <Link href={`/admin/dashboard/vendors/${vendorId}`} className="d-flex justify-content-between align-items-center mb-3">
       <div className='d-flex align-items-center gap-3'>
         <div
           className="icon-box d-flex align-items-center justify-content-center"
@@ -27,7 +29,7 @@ const AdminVendorRow = ({
         </div>
       </div>
       <div className="fw-semibold text-success">{amount}</div>
-    </div>
+    </Link>
 
   )
 }

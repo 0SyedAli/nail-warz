@@ -24,6 +24,8 @@ export default function Dashboard({ children }) {
     payouthistory: { title: "Payout History" },
     accountsettings: { title: "Account Settings" },
     categories: { title: "Manage Vendor Catagories" },
+    disputes: { title: "Disputes" },
+    disputeDetails: { title: "Dispute Details" },
   };
 
   useEffect(() => {
@@ -39,6 +41,9 @@ export default function Dashboard({ children }) {
     if (parts[1] === "services" && parts.length > 2) {
       headerKey = "serviceDetails";
     }
+    if (parts[1] === "disputes" && parts.length > 2) {
+      headerKey = "disputeDetails";
+    }
 
     setHeader(content[headerKey]);
   }, [pathname, searchParams]);
@@ -50,7 +55,7 @@ export default function Dashboard({ children }) {
         <TopBar header={header?.title} />
         {children}
       </div>
-         <CancelBooking
+      <CancelBooking
         title="Delete Coupon"
         message="Are you sure you want to delete this coupon?"
       />
