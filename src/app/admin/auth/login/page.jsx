@@ -56,10 +56,16 @@ export default function LoginPage() {
         sameSite: "Strict",
       });
 
+      Cookies.set("role", "admin", {
+        expires: 7,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+      });
+
       showSuccessToast(result?.message || "Login Successful")
       // Success
       router.push("/admin/dashboard");
-     
+
     } catch (err) {
       const message = err?.response?.data?.message || err.message || "Login error";
       showErrorToast(message);

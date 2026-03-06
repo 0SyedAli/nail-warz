@@ -57,6 +57,12 @@ export default function LoginPage() {
         sameSite: "Strict",
       });
 
+      Cookies.set("role", "vendor", {
+        expires: 7,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+      });
+
       showSuccessToast(result?.message || "Login Successful")
       // Success
       if (result?.data?.isUpdated === true) {
@@ -119,6 +125,12 @@ export default function LoginPage() {
         sameSite: "Strict",
       });
       Cookies.set("user", JSON.stringify(result?.data), {
+        expires: 7,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+      });
+
+      Cookies.set("role", "vendor", {
         expires: 7,
         secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",

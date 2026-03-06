@@ -58,6 +58,12 @@ export default function UserLoginPage() {
                 sameSite: "Strict",
             });
 
+            Cookies.set("role", "user", {
+                expires: 7,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "Strict",
+            });
+
             showSuccessToast(result?.message || "Login Successful");
             setSuccess(true);
             router.push("/"); // Directing to home page for users
@@ -123,6 +129,12 @@ export default function UserLoginPage() {
                 sameSite: "Strict",
             });
             Cookies.set("user", JSON.stringify(result?.data), {
+                expires: 7,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "Strict",
+            });
+
+            Cookies.set("role", "user", {
                 expires: 7,
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "Strict",

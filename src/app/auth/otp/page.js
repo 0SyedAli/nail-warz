@@ -82,6 +82,12 @@ export default function VerifyOtpPage() {
           secure: process.env.NODE_ENV === "production",
           sameSite: "Strict",
         });
+
+        Cookies.set("role", "vendor", {
+          expires: 7,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "Strict",
+        });
         router.push("/auth/bussinessprofile");
       }
     } catch (err) {

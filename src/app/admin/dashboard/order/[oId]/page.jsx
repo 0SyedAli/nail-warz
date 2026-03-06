@@ -145,6 +145,16 @@ export default function OrderDetailsPage() {
                                     <span className="text-muted">${order.total.toFixed(2)}</span>
                                 </div>
                                 <hr />
+                                <div className="d-flex justify-content-between">
+                                    <span className="text-muted">Discount Price</span>
+                                    <span className="text-muted">${order.discountAmount.toFixed(2)}</span>
+                                </div>
+                                <hr />
+                                <div className="d-flex justify-content-between">
+                                    <span className="text-muted">Shipping Price</span>
+                                    <span className="text-muted">${order.shippingCharges.toFixed(2)}</span>
+                                </div>
+                                <hr />
                                 <div className="d-flex justify-content-between fw-bold mt-2">
                                     <span>Total</span>
                                     <span>${order.total.toFixed(2)}</span>
@@ -229,7 +239,7 @@ const OrderStatusBadge = ({ status }) => {
     };
 
     return (
-        <span className={`badge ${map[status] || "bg-secondary "} p-2`} style={{fontSize:"14px"}}>
+        <span className={`badge ${map[status] || "bg-secondary "} p-2`} style={{ fontSize: "14px" }}>
             {status}
         </span>
     );

@@ -10,43 +10,70 @@ export default function AuthRedirectHandler() {
   useEffect(() => {
     const token = Cookies.get("token");
     const userData = Cookies.get("user");
+    const role = Cookies.get("role");
 
-    // Allow login and signup pages to be accessible without auth
-    const publicRoutes = ["/auth/login", "/auth/signup"];
-    const isPublicRoute = publicRoutes.includes(pathname);
+    // Define public routes for each flow
+    const vendorPublicRoutes = ["/auth/login", "/auth/signup", "/auth/forgot", "/auth/reset"];
+    const userPublicRoutes = ["/user-auth/login", "/user-auth/signup", "/user-auth/forgot", "/user-auth/reset"];
+    const adminPublicRoutes = ["/admin/auth/login"];
 
-    // If token or userData doesn't exist, redirect to login (except on public routes)
-    if (!token || !userData) {
+    const isVendorPublic = vendorPublicRoutes.includes(pathname);
+    const isUserPublic = userPublicRoutes.includes(pathname);
+    const isAdminPublic = adminPublicRoutes.includes(pathname);
+    const isPublicRoute = isVendorPublic || isUserPublic || isAdminPublic;
+
+    // 1. No token or no role -> redirect to respective login if on protected route
+    if (!token || !role) {
       if (!isPublicRoute) {
-        router.replace("/auth/login");
+        if (pathname.startsWith("/admin")) {
+          router.replace("/admin/auth/login");
+        } else if (pathname.startsWith("/dashboard") || pathname.startsWith("/auth")) {
+          router.replace("/auth/login");
+        } else if (pathname.startsWith("/user-auth")) {
+          router.replace("/user-auth/login");
+        }
       }
       return;
     }
 
+    // 2. Role exists -> Check if on "wrong" dashboard or wrong login
     try {
-      const parsedUser = JSON.parse(userData);
+      const parsedUser = JSON.parse(userData || "{}");
 
-      // If `isUpdated` is missing in userData, do nothing (no redirect)
-      if (!parsedUser?.hasOwnProperty('isUpdated')) {
-        return; // Prevent redirect if `isUpdated` is missing
+      // Admin Protection
+      if (pathname.startsWith("/admin") && role !== "admin") {
+        router.replace("/admin/auth/login");
+        return;
       }
 
-      // Redirect to proper route only if already on login/signup
+      // Vendor Protection
+      if ((pathname.startsWith("/dashboard") || (pathname.startsWith("/auth") && !isVendorPublic)) && role !== "vendor") {
+        router.replace("/auth/login");
+        return;
+      }
+
+      // 3. Already logged in -> Redirect away from login pages to proper dashboard
       if (isPublicRoute) {
-        if (parsedUser?.isUpdated === true) {
-          router.replace("/dashboard");
-        } else {
-          router.replace("/auth/bussinessprofile");
+        if (role === "admin") {
+          router.replace("/admin/dashboard");
+        } else if (role === "vendor") {
+          if (parsedUser?.isUpdated === true) {
+            router.replace("/dashboard");
+          } else {
+            router.replace("/auth/bussinessprofile");
+          }
+        } else if (role === "user") {
+          router.replace("/");
         }
       }
     } catch (error) {
       console.error("Failed to parse user cookie:", error);
       Cookies.remove("token");
       Cookies.remove("user");
+      Cookies.remove("role");
 
-      // Redirect to login page if cookie parsing fails
       if (!isPublicRoute) {
-        router.replace("/auth/login");
+        router.replace("/user-auth/login");
       }
     }
   }, [pathname]);

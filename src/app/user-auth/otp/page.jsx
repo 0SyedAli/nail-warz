@@ -84,6 +84,12 @@ export default function UserVerifyOtpPage() {
                     sameSite: "Strict",
                 });
 
+                Cookies.set("role", "user", {
+                    expires: 7,
+                    secure: process.env.NODE_ENV === "production",
+                    sameSite: "Strict",
+                });
+
                 // Push user to home, not business profile
                 router.push("/");
             }
