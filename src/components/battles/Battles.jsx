@@ -14,7 +14,7 @@ export default function Battles({ title, battles }) {
             {isEmpty ? (
                 <div className="text-center active-battle-card py-5 empty-battle-box">
                     <h5 className="fw-semibold mb-2">
-                        No {title?.toLowerCase()} battles available
+                        No Active Battles
                     </h5>
                     <p className="text-muted mb-0">
                         Please check back later for new battles.

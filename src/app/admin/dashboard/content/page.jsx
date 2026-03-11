@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { BsSearch, BsEye } from "react-icons/bs";
+import BallsLoading from "@/components/Spinner/BallsLoading";
 
 const PAGE_SIZE = 10;
 
@@ -61,7 +62,16 @@ export default function ContentManagement() {
     return filtered.slice(start, start + PAGE_SIZE);
   }, [filtered, page]);
 
-  if (loading) return <p className="m-4">Loading submissions…</p>;
+  if (loading) return
+  <div className="page pt-4 px-0">
+    <div
+      className="d-flex justify-content-center align-items-center"
+      style={{ minHeight: "400px" }}
+    >
+      <BallsLoading />
+    </div>
+  </div>
+    ;
 
   return (
     <div className="page">

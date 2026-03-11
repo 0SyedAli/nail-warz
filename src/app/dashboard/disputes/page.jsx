@@ -17,10 +17,6 @@ export default function Disputes() {
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
 
-    // 🔐 Auth Guard
-    useEffect(() => {
-        if (!Cookies.get("token")) router.push("/admin/auth/login");
-    }, []);
 
     // 🔁 Fetch contents
     useEffect(() => {
@@ -144,7 +140,7 @@ export default function Disputes() {
                                                 <button
                                                     className="btn btn-outline-dark btn-sm px-3 rounded-pill d-inline-flex align-items-center gap-1"
                                                     onClick={() =>
-                                                        router.push(`/admin/dashboard/disputes/${c._id}`)
+                                                        router.push(`/dashboard/disputes/${c._id}`)
                                                     }
                                                 >
                                                     <BsEye /> View

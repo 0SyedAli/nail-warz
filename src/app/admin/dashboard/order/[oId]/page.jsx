@@ -43,12 +43,12 @@ export default function OrderDetailsPage() {
     }, [oId]);
 
     // ✅ Update Status
-    const markAsCompleted = async () => {
+    const updateStatus = async (newStatus) => {
         setUpdating(true);
         try {
             await api.patch(
                 `/order/${oId}`,
-                { status: "completed" },
+                { status: newStatus },
                 {
                     headers: {
                         Authorization: `Bearer ${Cookies.get("token")}`,
@@ -84,14 +84,47 @@ export default function OrderDetailsPage() {
                             <p className="text-muted">
                                 Placed on {new Date(order.createdAt).toLocaleDateString()}
                             </p>
-                            {order.status !== "completed" && (
-                                <button
-                                    className="btn btn-dark fw-normal"
-                                    disabled={updating}
-                                    onClick={markAsCompleted}
-                                >
-                                    {updating ? "Updating…" : "Mark as Complete"}
-                                </button>
+                            {!(order.status?.toLowerCase() === "completed" || order.status?.toLowerCase() === "cancelled") ? (
+                                <div className="d-flex align-items-center gap-2 mt-2 pt-1 border-top border-light">
+                                    <div className="small text-muted mb-0 me-1 fw-bold text-uppercase">Update Status:</div>
+                                    <select
+                                        className="form-select form-select-sm border shadow-sm"
+                                        style={{ width: "200px", borderRadius: "8px" }}
+                                        value={order.status?.toLowerCase()}
+                                        disabled={updating}
+                                        onChange={(e) => updateStatus(e.target.value)}
+                                    >
+                                        <option value="" >Select Next Status</option>
+
+                                        {order.status?.toLowerCase() === "pending" && (
+                                            <>
+                                                <option value="processing">Processing</option>
+                                                <option value="shipped">Shipped</option>
+                                                <option value="completed">Completed</option>
+                                                <option value="cancelled">Cancelled</option>
+                                            </>
+                                        )}
+
+                                        {order.status?.toLowerCase() === "processing" && (
+                                            <>
+                                                <option value="shipped">Shipped</option>
+                                                <option value="completed">Completed</option>
+                                                <option value="cancelled">Cancelled</option>
+                                            </>
+                                        )}
+
+                                        {order.status?.toLowerCase() === "shipped" && (
+                                            <>
+                                                <option value="completed">Completed</option>
+                                            </>
+                                        )}
+                                    </select>
+                                    {updating && <small className="text-muted ms-1">Updating…</small>}
+                                </div>
+                            ) : (
+                                <div className="mt-2 pt-2 border-top border-light">
+                                    <small className="text-muted fw-bold text-uppercase">Order Finalized</small>
+                                </div>
                             )}
                         </div>
 
@@ -172,11 +205,13 @@ export default function OrderDetailsPage() {
                                 <h6 className="fw-bold mb-2">Customer Information</h6>
 
                                 <small className="mb-0 text-muted">Name</small>
-                                <p className="mb-1">{order.customer.name}</p>
+                                <p className="mb-1">{order.customer.username}</p>
                                 <small className="mb-0 text-muted">Email</small>
                                 <p className="mb-1">{order.customer.email}</p>
                                 <small className="mb-0 text-muted">Phone</small>
                                 <p className="mb-0">{order.customer.phone}</p>
+                                <small className="mb-0 text-muted">Device Type</small>
+                                <p className="mb-0 text-capitalize">{order.customer.deviceType}</p>
                             </div>
                         </div>
 
@@ -234,13 +269,17 @@ export default function OrderDetailsPage() {
 const OrderStatusBadge = ({ status }) => {
     const map = {
         pending: "bg-secondary2 text-dark",
-        completed: "bg-dark",
-        cancelled: "bg-danger",
+        processing: "bg-info text-dark",
+        shipped: "bg-primary text-white",
+        completed: "bg-dark text-white",
+        cancelled: "bg-danger text-white",
     };
 
+    const currentStatus = status?.toLowerCase() || "pending";
+
     return (
-        <span className={`badge ${map[status] || "bg-secondary "} p-2`} style={{ fontSize: "14px" }}>
-            {status}
+        <span className={`badge ${map[currentStatus] || "bg-secondary "} p-2`} style={{ fontSize: "14px" }}>
+            {currentStatus}
         </span>
     );
 };

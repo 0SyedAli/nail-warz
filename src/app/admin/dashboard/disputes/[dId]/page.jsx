@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Cookies from "js-cookie";
 import { useRouter, useParams } from "next/navigation";
 import { BsArrowLeft, BsSend, BsX } from "react-icons/bs";
 import api from "@/lib/axios";
 import { showSuccessToast, showErrorToast } from "@/lib/toast";
 import Image from "next/image";
+import Link from "next/link";
 
 const AttachmentWithFallback = ({ url, fallbackText, size = 100 }) => {
     const [error, setError] = useState(false);
@@ -20,16 +21,16 @@ const AttachmentWithFallback = ({ url, fallbackText, size = 100 }) => {
     }
 
     return (
-        <a href={url} target="_blank" rel="noreferrer">
+        <Link href={url} target="_blank" rel="noreferrer">
             <Image
                 src={url}
                 width={size}
                 height={size}
                 alt="attachment"
-                className="object-fit-cover rounded-2"
+                className="object-fit-cover rounded-2 w-100 h-100"
                 onError={() => setError(true)}
             />
-        </a>
+        </Link>
     );
 };
 
@@ -42,15 +43,18 @@ export default function DisputeDetails() {
     const [message, setMessage] = useState("");
     const [images, setImages] = useState([]);
     const [submitting, setSubmitting] = useState(false);
+    const [showStatusModal, setShowStatusModal] = useState(false);
+    const [updateForm, setUpdateForm] = useState({
+        status: "",
+        adminNote: "",
+        resolvedInFavorOf: "User"
+    });
+    const chatEndRef = useRef(null);
 
-    // 🔐 Auth Guard
-    useEffect(() => {
-        if (!Cookies.get("token")) router.push("/admin/auth/login");
-    }, []);
 
     // 🔁 Fetch Dispute Data
-    const fetchDispute = async () => {
-        setLoading(true);
+    const fetchDispute = async (silent = false) => {
+        if (!silent) setLoading(true);
         try {
             const res = await api.get(`/dispute/${dId}`);
             if (res.data.success) {
@@ -60,13 +64,17 @@ export default function DisputeDetails() {
             console.error("Error fetching dispute details:", error);
             showErrorToast("Failed to load dispute details");
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     };
 
     useEffect(() => {
         fetchDispute();
     }, [dId]);
+
+    useEffect(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [dispute?.responses]);
 
     const handleFileUpload = (e) => {
         const files = Array.from(e.target.files);
@@ -108,11 +116,34 @@ export default function DisputeDetails() {
                 showSuccessToast("Response sent successfully");
                 setMessage("");
                 setImages([]);
-                fetchDispute(); // Refresh data to show new response
+                fetchDispute(true); // Refresh data to show new response
             }
         } catch (error) {
             console.error("Error sending response:", error);
             showErrorToast("Failed to send response");
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleUpdateStatus = async (e) => {
+        e.preventDefault();
+        setSubmitting(true);
+        try {
+            const res = await api.patch(`/dispute/admin/${dId}/status`, updateForm, {
+                headers: {
+                    "Authorization": `Bearer ${Cookies.get("token")}`,
+                },
+            });
+
+            if (res.data.success) {
+                showSuccessToast("Status updated successfully");
+                setShowStatusModal(false);
+                fetchDispute();
+            }
+        } catch (error) {
+            console.error("Error updating status:", error);
+            showErrorToast(error.response?.data?.message || "Failed to update status");
         } finally {
             setSubmitting(false);
         }
@@ -159,7 +190,7 @@ export default function DisputeDetails() {
                                         <div className="d-flex align-items-center gap-3 p-3 bg-light rounded-3">
                                             <div className="avatar2 rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center overflow-hidden" style={{ width: 48, height: 48 }}>
                                                 {dispute.vendorId?.image?.[0] ? (
-                                                    <Image src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${dispute.vendorId.image[0]}`} width={48} height={48} alt="vendor" className="object-fit-cover" />
+                                                    <Image src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${dispute.vendorId.image[0]}`} width={48} height={48} alt="vendor" className="object-fit-cover w-100 h-100" />
                                                 ) : (
                                                     dispute.vendorId?.salonName?.charAt(0)
                                                 )}
@@ -182,7 +213,7 @@ export default function DisputeDetails() {
 
                                 <div className="mb-4">
                                     <label className="text-muted small text-uppercase fw-bold mb-2">Description</label>
-                                    <div className="p-3 border rounded-3 text-secondary">
+                                    <div className="p-3 bg-light rounded-3 fw-medium">
                                         {dispute.description || "No description provided."}
                                     </div>
                                 </div>
@@ -200,9 +231,9 @@ export default function DisputeDetails() {
                                                         {isImage && file ? (
                                                             <AttachmentWithFallback url={fileUrl} fallbackText="IMG" />
                                                         ) : !isImage && file ? (
-                                                            <a href={fileUrl} target="_blank" rel="noreferrer" className="btn btn-light d-flex align-items-center justify-content-center w-100 h-100 overflow-hidden">
+                                                            <Link href={fileUrl} target="_blank" rel="noreferrer" className="btn btn-light d-flex align-items-center justify-content-center w-100 h-100 overflow-hidden">
                                                                 <div className="text-center small p-2">View Video</div>
-                                                            </a>
+                                                            </Link>
                                                         ) : (
                                                             <div className="w-100 h-100 bg-light d-flex align-items-center justify-content-center text-muted fw-bold rounded-2">
                                                                 {isImage ? "IMG" : "VID"}
@@ -223,12 +254,12 @@ export default function DisputeDetails() {
                                 <h5 className="mb-0 fw-bold">Response History</h5>
                             </div>
                             <div className="card-body bg-light-subtle">
-                                <div className="chat-container">
+                                <div className="chat-container" style={{ maxHeight: "450px", overflowY: "auto", paddingRight: "20px" }}>
                                     {dispute.responses?.length > 0 ? dispute.responses.map((res, idx) => (
-                                        <div key={idx} className={`d-flex flex-column mb-4 ${res.respondent === 'Admin' ? 'align-items-end' : 'align-items-start'}`}>
+                                        <div key={idx} className={`d-flex flex-column mb-4 ${res.respondent === 'User' || res.respondent === 'Admin' ? 'align-items-end' : 'align-items-start'}`}>
                                             <div className="small text-muted mb-1 px-2">{res.respondent} • {new Date(res.createdAt).toLocaleString()}</div>
-                                            <div className={`p-3 rounded-4 shadow-sm ${res.respondent === 'Admin' ? 'bg-primary text-white' : 'bg-white'}`} style={{ maxWidth: '85%' }}>
-                                                <div>{res.message}</div>
+                                            <div className={`p-3 border rounded-3  ${res.respondent === 'User' || res.respondent === 'Admin' ? 'bg-light text-dark' : 'bg-white'}`} style={{ maxWidth: '85%' }}>
+                                                <div className="fw-medium">{res.message}</div>
                                                 {res.attachments?.length > 0 && (
                                                     <div className="mt-2 pt-2 border-top border-opacity-10 d-flex flex-wrap gap-1">
                                                         {res.attachments.map((file, i) => {
@@ -246,78 +277,11 @@ export default function DisputeDetails() {
                                     )) : (
                                         <div className="text-center py-5 text-muted">No responses yet.</div>
                                     )}
+                                    <div ref={chatEndRef} />
                                 </div>
                             </div>
                         </div>
 
-                        {/* RESPONSE FORM */}
-                        <div className="card shadow-sm border-0 rounded-4 overflow-hidden mb-5">
-                            <div className="card-body p-4">
-                                <form onSubmit={handleSubmitResponse}>
-                                    <div className="mb-3">
-                                        <textarea
-                                            className="form-control border-0 bg-light p-3"
-                                            placeholder="Write your response here..."
-                                            rows="4"
-                                            value={message}
-                                            onChange={(e) => setMessage(e.target.value)}
-                                            style={{ borderRadius: '15px' }}
-                                        ></textarea>
-                                    </div>
-                                    <div className="d-flex justify-content-between align-items-center">
-                                        <div className="d-flex flex-column gap-3">
-                                            <div className="d-flex align-items-center gap-2 position-relative">
-                                                <input
-                                                    type="file"
-                                                    multiple
-                                                    accept="image/*"
-                                                    className="form-control form-control-sm opacity-0 position-absolute top-0 start-0 w-100 h-100"
-                                                    style={{ cursor: 'pointer' }}
-                                                    onChange={handleFileUpload}
-                                                    disabled={images.length >= 3}
-                                                />
-                                                <label className={`btn ${images.length >= 3 ? 'btn-secondary' : 'btn-primary'} px-4 py-2 rounded-pill d-flex align-items-center gap-2 shadow-sm mb-0`}>
-                                                    {images.length >= 3 ? "Limit Reached" : "Upload Images"}
-                                                </label>
-                                            </div>
-
-                                            {images.length > 0 && (
-                                                <div className="d-flex flex-wrap gap-3">
-                                                    {images.map((img, idx) => (
-                                                        <div key={idx} className="position-relative">
-                                                            <div className="preview-container rounded-3 overflow-hidden border shadow-sm" style={{ width: 60, height: 60 }}>
-                                                                <Image
-                                                                    src={URL.createObjectURL(img)}
-                                                                    alt="preview"
-                                                                    width={60}
-                                                                    height={60}
-                                                                    className="object-fit-cover w-100 h-100"
-                                                                />
-                                                            </div>
-                                                            <button
-                                                                type="button"
-                                                                className="btn btn-danger btn-sm rounded-circle position-absolute top-0 start-100 translate-middle p-0 d-flex align-items-center justify-content-center border border-white"
-                                                                style={{ width: 22, height: 22 }}
-                                                                onClick={() => removeImage(idx)}
-                                                            >
-                                                                <BsX size={18} />
-                                                            </button>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <button
-                                            type="submit"
-                                            className="btn btn-primary px-4 py-2 rounded-pill d-flex align-items-center gap-2 shadow-sm"
-                                            disabled={submitting || dispute.status === 'Completed' || dispute.status === 'Refunded'}
-                                        >
-                                            {submitting ? "Sending..." : <>Send Response <BsSend /></>}
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
                     </div>
 
                     {/* RIGHT COLUMN: APPOINTMENT INFO */}
@@ -355,9 +319,22 @@ export default function DisputeDetails() {
                                         </div>
                                         <hr />
                                         <div className="mb-0 text-center">
-                                            <div className={`badge py-2 px-3 fs-6 rounded-pill ${dispute.status === 'Refunded' ? 'bg-success' : 'bg-warning text-dark'}`}>
+                                            <div className={`badge py-2 px-3 fs-6 rounded-pill mb-3 ${dispute.status === 'Refunded' ? 'bg-success' : 'bg-warning text-dark'}`}>
                                                 Status: {dispute.status}
                                             </div>
+                                            <button
+                                                className="btn btn-primary w-100 rounded-pill shadow-sm py-2 fw-bold"
+                                                onClick={() => {
+                                                    setUpdateForm({
+                                                        status: dispute.status,
+                                                        adminNote: dispute.adminNote || "",
+                                                        resolvedInFavorOf: dispute.resolvedInFavorOf || "User"
+                                                    });
+                                                    setShowStatusModal(true);
+                                                }}
+                                            >
+                                                Update Status
+                                            </button>
                                         </div>
                                     </>
                                 ) : (
@@ -368,6 +345,76 @@ export default function DisputeDetails() {
                     </div>
                 </div>
             </div>
+
+            {/* STATUS UPDATE MODAL */}
+            {showStatusModal && (
+                <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <div className="modal-dialog modal-dialog-centered">
+                        <div className="modal-content border-0 rounded-4 shadow">
+                            <div className="modal-header border-bottom-0 pb-0">
+                                <h5 className="modal-title fw-bold">Update Dispute Status</h5>
+                                <button type="button" className="btn-close" onClick={() => setShowStatusModal(false)}></button>
+                            </div>
+                            <form onSubmit={handleUpdateStatus}>
+                                <div className="modal-body py-4">
+                                    <div className="mb-4">
+                                        <label className="form-label text-muted small text-uppercase fw-bold">Select Status</label>
+                                        <select
+                                            className="form-select border-0 bg-light p-3 rounded-3"
+                                            value={updateForm.status}
+                                            onChange={(e) => setUpdateForm({ ...updateForm, status: e.target.value })}
+                                            required
+                                        >
+                                            <option value="">Select Status</option>
+                                            <option value="Under_Review">Under Review</option>
+                                            <option value="Resolved">Resolved</option>
+                                            <option value="Rejected">Rejected</option>
+                                            <option value="Refunded">Refunded (Charge Vendor)</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <label className="form-label text-muted small text-uppercase fw-bold">Admin Note</label>
+                                        <textarea
+                                            className="form-control border-0 bg-light p-3 rounded-3"
+                                            rows="4"
+                                            placeholder="Add a note about this decision..."
+                                            value={updateForm.adminNote}
+                                            onChange={(e) => setUpdateForm({ ...updateForm, adminNote: e.target.value })}
+                                        ></textarea>
+                                    </div>
+
+                                    <div className="mb-0">
+                                        <label className="form-label text-muted small text-uppercase fw-bold mb-3">Resolved In Favor Of</label>
+                                        <div className="d-flex gap-3 bg-light p-2 rounded-pill">
+                                            <button
+                                                type="button"
+                                                className={`btn flex-grow-1 rounded-pill py-2 fw-bold border-0 ${updateForm.resolvedInFavorOf === 'User' ? 'bg-white shadow-sm text-primary' : 'text-muted'}`}
+                                                onClick={() => setUpdateForm({ ...updateForm, resolvedInFavorOf: 'User' })}
+                                            >
+                                                User
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`btn flex-grow-1 rounded-pill py-2 fw-bold border-0 ${updateForm.resolvedInFavorOf === 'Vendor' ? 'bg-white shadow-sm text-primary' : 'text-muted'}`}
+                                                onClick={() => setUpdateForm({ ...updateForm, resolvedInFavorOf: 'Vendor' })}
+                                            >
+                                                Vendor
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="modal-footer border-top-0 pt-0 pb-4 px-4">
+                                    <button type="button" className="btn btn-light rounded-pill px-4" onClick={() => setShowStatusModal(false)}>Cancel</button>
+                                    <button type="submit" className="btn btn-primary rounded-pill px-4 shadow-sm" disabled={submitting}>
+                                        {submitting ? "Updating..." : "Update Dispute"}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

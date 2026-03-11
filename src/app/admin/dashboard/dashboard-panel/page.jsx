@@ -21,6 +21,7 @@ import {
   LuCircleX
 } from "react-icons/lu";
 import { FaRegCalendarAlt } from 'react-icons/fa'
+import BallsLoading from '@/components/Spinner/BallsLoading'
 export default function SuperAdminDashboard() {
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -28,34 +29,6 @@ export default function SuperAdminDashboard() {
   const [weeklyData, setWeeklyData] = useState(null);
   const [topVendors, setTopVendors] = useState([]);
   const [weeklyBookingData, setWeeklyBookingData] = useState(null);
-  // useEffect(() => {
-  //   const token = Cookies.get('token')
-
-  //   if (!token) {
-  //     setError('Authentication token missing')
-  //     setLoading(false)
-  //     return
-  //   }
-
-  //   axios
-  //     .get(`${process.env.NEXT_PUBLIC_API_URL}/superAdmin/dashboard`, {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     })
-  //     .then(res => {
-  //       if (res.data?.success && res.data?.stats) {
-  //         setStats(res.data.stats)
-  //       } else {
-  //         setStats(null)
-  //       }
-  //     })
-  //     .catch(err => {
-  //       console.error(err)
-  //       setError('Failed to load dashboard data')
-  //     })
-  //     .finally(() => setLoading(false))
-  // }, [])
 
   useEffect(() => {
     const token = Cookies.get('token')
@@ -203,11 +176,19 @@ export default function SuperAdminDashboard() {
   /* ---------------- Loading ---------------- */
   if (loading) {
     return (
-      <div className="page">
-        <div className="dashboard_panel_inner">
-          <div className="my-4 d-flex mb-0">
-            <div className="spinner-border text-primary" />
-          </div>
+      // <div className="page">
+      //   <div className="dashboard_panel_inner">
+      //     <div className="my-4 d-flex mb-0">
+      //       <div className="spinner-border text-primary" />
+      //     </div>
+      //   </div>
+      // </div>
+      <div className="page pt-4 px-0">
+        <div
+          className="d-flex justify-content-center align-items-center"
+          style={{ minHeight: "400px" }}
+        >
+          <BallsLoading />
         </div>
       </div>
     )

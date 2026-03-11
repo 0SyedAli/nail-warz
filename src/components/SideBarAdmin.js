@@ -55,7 +55,7 @@ const SideBar = () => {
     },
     {
       href: "/admin/dashboard/disputes",
-      icon: "/images/layer-icon.png",
+      icon: "/images/dispute.png",
       text: "Dispute Management",
     },
     {

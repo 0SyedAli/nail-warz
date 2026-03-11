@@ -7,6 +7,7 @@ import AreYouSure2 from "@/components/Modal/AreYouSure2";
 import { useDisclosure } from "@chakra-ui/react";
 import AddCategory from "@/components/Modal/AddFilterCategory";
 import { FaExclamationCircle } from "react-icons/fa";
+import BallsLoading from "@/components/Spinner/BallsLoading";
 const ManageCategory = () => {
   const popoverRef = useRef(null);
   const [open, setOpen] = useState(false);
@@ -80,7 +81,16 @@ const ManageCategory = () => {
   };
 
   const renderCategories = () => {
-    if (loading) return <p>Loading...</p>;
+    if (loading) return
+    <div className="page pt-4 px-0">
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ minHeight: "400px" }}
+      >
+        <BallsLoading />
+      </div>
+    </div>
+      ;
     if (error) return <p>{error}</p>;
     if (categories.length === 0) return <p>No filter found.</p>;
 

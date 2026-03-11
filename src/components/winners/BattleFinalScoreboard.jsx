@@ -88,7 +88,7 @@ export default function BattleFinalScoreboard() {
                         {leaderboard[0] && (
                             <PodiumItem
                                 data={leaderboard[0]}
-                                className="rn2"
+                                className="rn2 text-danger"
                             />
                         )}
 

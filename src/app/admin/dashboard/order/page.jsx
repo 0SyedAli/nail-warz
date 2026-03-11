@@ -100,8 +100,10 @@ export default function SuperAdminOrders() {
         {stats && (
           <div className="row g-3 mb-4">
             <StatCard title="Total Orders" value={stats.totalOrders} />
-            <StatCard title="Pending Orders" value={stats.pendingOrders} valueClass="text-warning" />
-            <StatCard title="Completed Orders" value={stats.completedOrders} valueClass="text-success" />
+            <StatCard title="Pending" value={stats.pendingOrders || 0} valueClass="text-warning" />
+            <StatCard title="Processing" value={stats.processingOrders || 0} valueClass="text-info" />
+            <StatCard title="Shipped" value={stats.shippedOrders || 0} valueClass="text-primary" />
+            <StatCard title="Completed" value={stats.completedOrders || 0} valueClass="text-success" />
             <StatCard title="Total Revenue" value={`$${stats.totalRevenue.toFixed(2)}`} valueClass="text-primary2" />
           </div>
         )}
@@ -135,6 +137,20 @@ export default function SuperAdminOrders() {
                 onClick={() => handleStatusFilter("pending")}
               >
                 Pending
+              </button>
+
+              <button
+                className={`btn btn-sm ${statusFilter === "processing" ? "btn-dark" : "btn-outline-dark"}`}
+                onClick={() => handleStatusFilter("processing")}
+              >
+                Processing
+              </button>
+
+              <button
+                className={`btn btn-sm ${statusFilter === "shipped" ? "btn-dark" : "btn-outline-dark"}`}
+                onClick={() => handleStatusFilter("shipped")}
+              >
+                Shipped
               </button>
 
               <button
@@ -249,13 +265,17 @@ const StatCard = ({ title, value, valueClass = "" }) => (
 const OrderStatusBadge = ({ status }) => {
   const map = {
     pending: "bg-secondary2 text-dark",
-    completed: "bg-dark",
-    cancelled: "bg-danger",
+    processing: "bg-info text-dark",
+    shipped: "bg-primary text-white",
+    completed: "bg-dark text-white",
+    cancelled: "bg-danger text-white",
   };
 
+  const currentStatus = status?.toLowerCase() || "pending";
+
   return (
-    <span className={`badge text-capitalize ${map[status] || "bg-secondary"} py-2`}>
-      {status}
+    <span className={`badge text-capitalize ${map[currentStatus] || "bg-secondary"} py-2`}>
+      {currentStatus}
     </span>
   );
 };

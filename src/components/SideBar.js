@@ -214,7 +214,7 @@ const SideBar = () => {
     },
     {
       href: "/dashboard/disputes",
-      icon: "/images/act.png",
+      icon: "/images/dispute.png",
       text: "Disputes",
       related: ["/dashboard/disputes"],
     },

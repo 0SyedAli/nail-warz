@@ -73,7 +73,13 @@ export default function AuthRedirectHandler() {
       Cookies.remove("role");
 
       if (!isPublicRoute) {
-        router.replace("/user-auth/login");
+        if (role === "admin" && !pathname.startsWith("/admin")) {
+          router.replace("/admin/dashboard");
+        } else if (role === "vendor" && !pathname.startsWith("/dashboard")) {
+          router.replace("/dashboard");
+        } else if (role === "user" && (pathname.startsWith("/admin") || pathname.startsWith("/dashboard"))) {
+          router.replace("/");
+        }
       }
     }
   }, [pathname]);

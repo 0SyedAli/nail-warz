@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { BsSearch } from "react-icons/bs";
 import UserDataModal from "@/components/Modal/UserDataModal";
 import { showErrorToast, showSuccessToast } from "src/lib/toast";
+import BallsLoading from "@/components/Spinner/BallsLoading";
 
 const PAGE_SIZE = 10;
 
@@ -144,8 +145,13 @@ export default function SuperAdminUsers() {
     };
     if (loading)
         return (
-            <div className="page">
-                <p className="m-4">Loading users…</p>
+            <div className="page pt-4 px-0">
+                <div
+                    className="d-flex justify-content-center align-items-center"
+                    style={{ minHeight: "400px" }}
+                >
+                    <BallsLoading />
+                </div>
             </div>
         );
 

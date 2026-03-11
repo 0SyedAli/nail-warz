@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Cookies from "js-cookie";
 import { useRouter, useParams } from "next/navigation";
 import { BsArrowLeft, BsSend, BsX } from "react-icons/bs";
@@ -42,15 +42,12 @@ export default function DisputeDetails() {
     const [message, setMessage] = useState("");
     const [images, setImages] = useState([]);
     const [submitting, setSubmitting] = useState(false);
+    const chatEndRef = useRef(null);
 
-    // 🔐 Auth Guard
-    useEffect(() => {
-        if (!Cookies.get("token")) router.push("/admin/auth/login");
-    }, []);
 
     // 🔁 Fetch Dispute Data
-    const fetchDispute = async () => {
-        setLoading(true);
+    const fetchDispute = async (silent = false) => {
+        if (!silent) setLoading(true);
         try {
             const res = await api.get(`/dispute/${dId}`);
             if (res.data.success) {
@@ -60,13 +57,17 @@ export default function DisputeDetails() {
             console.error("Error fetching dispute details:", error);
             showErrorToast("Failed to load dispute details");
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     };
 
     useEffect(() => {
         fetchDispute();
     }, [dId]);
+
+    useEffect(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [dispute?.responses]);
 
     const handleFileUpload = (e) => {
         const files = Array.from(e.target.files);
@@ -108,7 +109,7 @@ export default function DisputeDetails() {
                 showSuccessToast("Response sent successfully");
                 setMessage("");
                 setImages([]);
-                fetchDispute(); // Refresh data to show new response
+                fetchDispute(true); // Refresh data to show new response
             }
         } catch (error) {
             console.error("Error sending response:", error);
@@ -223,12 +224,12 @@ export default function DisputeDetails() {
                                 <h5 className="mb-0 fw-bold">Response History</h5>
                             </div>
                             <div className="card-body bg-light-subtle">
-                                <div className="chat-container">
+                                <div className="chat-container" style={{ maxHeight: "450px", overflowY: "auto", paddingRight: "20px" }}>
                                     {dispute.responses?.length > 0 ? dispute.responses.map((res, idx) => (
-                                        <div key={idx} className={`d-flex flex-column mb-4 ${res.respondent === 'Admin' ? 'align-items-end' : 'align-items-start'}`}>
+                                        <div key={idx} className={`d-flex flex-column mb-4 ${res.respondent === 'User' || res.respondent === 'Admin' ? 'align-items-end' : 'align-items-start'}`}>
                                             <div className="small text-muted mb-1 px-2">{res.respondent} • {new Date(res.createdAt).toLocaleString()}</div>
-                                            <div className={`p-3 rounded-4 shadow-sm ${res.respondent === 'Admin' ? 'bg-primary text-white' : 'bg-white'}`} style={{ maxWidth: '85%' }}>
-                                                <div>{res.message}</div>
+                                            <div className={`p-3 border rounded-3  ${res.respondent === 'User' || res.respondent === 'Admin' ? 'bg-light text-dark' : 'bg-white'}`} style={{ maxWidth: '85%' }}>
+                                                <div className="fw-medium">{res.message}</div>
                                                 {res.attachments?.length > 0 && (
                                                     <div className="mt-2 pt-2 border-top border-opacity-10 d-flex flex-wrap gap-1">
                                                         {res.attachments.map((file, i) => {
@@ -246,6 +247,7 @@ export default function DisputeDetails() {
                                     )) : (
                                         <div className="text-center py-5 text-muted">No responses yet.</div>
                                     )}
+                                    <div ref={chatEndRef} />
                                 </div>
                             </div>
                         </div>
@@ -276,7 +278,7 @@ export default function DisputeDetails() {
                                                     onChange={handleFileUpload}
                                                     disabled={images.length >= 3}
                                                 />
-                                                <label className={`btn ${images.length >= 3 ? 'btn-secondary' : 'btn-primary'} px-4 py-2 rounded-pill d-flex align-items-center gap-2 shadow-sm mb-0`}>
+                                                <label className={`btn ${images.length >= 3 ? 'btn-secondary' : 'btn-outline-secondary'} px-4 py-2 rounded-pill d-flex align-items-center gap-2 shadow-sm mb-0`}>
                                                     {images.length >= 3 ? "Limit Reached" : "Upload Images"}
                                                 </label>
                                             </div>
