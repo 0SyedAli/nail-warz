@@ -2,73 +2,111 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import LogoutButton from "./Logout";
 import { RxCross2 } from "react-icons/rx";
 
 const SideBar = () => {
   const pathname = usePathname();
   const router = useRouter(); // Initialize the useRouter hook
-  const [activeTab, setActiveTab] = useState(pathname);
+  // const [activeTab, setActiveTab] = useState(pathname);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [loading, setLoading] = useState(false); // New loading state
+  // const [loading, setLoading] = useState(false); // New loading state
   const navigationRouters = [
     {
       href: "/admin/dashboard",
       icon: "/images/dash.png",
       text: "Dashboard",
+      related: [
+        "/admin/dashboard"
+      ],
     },
     {
       href: "/admin/dashboard/users",
       icon: "/images/users.svg",
       text: "App User Management",
+      related: [
+        "/admin/dashboard/users"
+      ],
     },
     {
       href: "/admin/dashboard/vendors",
       icon: "/images/inventory-management.png",
       text: "Vendor Management",
+      related: [
+        "/admin/dashboard/vendors"
+      ],
     },
     {
       href: "/admin/dashboard/inventory",
       icon: "/images/invent-icon.png",
       text: "Inventory Management",
+      related: [
+        "/admin/dashboard/inventory"
+      ],
     },
     {
       href: "/admin/dashboard/order",
       icon: "/images/cart-2.png",
       text: "Order Management",
+      related: [
+        "/admin/dashboard/order"
+      ],
     },
     {
       href: "/admin/dashboard/battles",
       icon: "/images/warz-icon.png",
       text: "Battle Management",
+      related: [
+        "/admin/dashboard/battles"
+      ],
     },
     {
       href: "/admin/dashboard/content",
       icon: "/images/report-data.png",
       text: "Participation Requests",
+      related: [
+        "/admin/dashboard/content"
+      ],
     },
     {
       href: "/admin/dashboard/categories",
       icon: "/images/layer-icon.png",
       text: "Filter Management",
+      related: [
+        "/admin/dashboard/categories"
+      ],
     },
     {
       href: "/admin/dashboard/disputes",
       icon: "/images/dispute.png",
       text: "Dispute Management",
+      related: [
+        "/admin/dashboard/disputes"
+      ],
     },
     {
       href: "/admin/dashboard/pushnotification",
       icon: "/images/notification.png",
       text: "Push Notification",
+      related: [
+        "/admin/dashboard/pushnotification"
+      ],
     },
 
   ];
-  useEffect(() => {
-    setActiveTab(pathname);
-  }, [pathname]);
+  // useEffect(() => {
+  //   setActiveTab(pathname);
+  // }, [pathname]);
 
+  const isActive = (item) => {
+    if (item.href === "/admin/dashboard") {
+      return pathname === "/admin/dashboard";
+    }
+    return item.related.some((route) =>
+      pathname.startsWith(route)
+    );
+  };
   const handleHover = (href) => {
     router.prefetch(href); // Prefetch on hover
   };
@@ -116,7 +154,8 @@ const SideBar = () => {
             // </li>
             <li
               key={index}
-              className={activeTab === item?.href ? "active" : ""}
+              // className={activeTab === item?.href ? "active" : ""}
+              className={isActive(item) ? "active" : ""}
               onMouseEnter={() => handleHover(item?.href)}
             >
               <Link href={item?.href} onClick={() => setIsSidebarOpen(false)}>

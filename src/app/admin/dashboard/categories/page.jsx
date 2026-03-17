@@ -142,26 +142,20 @@ const ManageCategory = () => {
             <div className="position-relative w-100 d-inline-flex align-items-center gap-1">
               <h3 className="d-flex align-items-center gap-2 mb-0 cat-top2" >
                 All Filters
-                {/* <FaExclamationCircle
+                <FaExclamationCircle
                   color="#000"
                   style={{ cursor: "pointer" }}
                   onClick={() => setOpen(!open)}
-                /> */}
+                />
               </h3>
 
-              {/* {open && (
+              {open && (
                 <div ref={popoverRef} className="filter-popover filter-popover2">
-                  Select all services offered by your
-                  salon. These service filters help
-                  customers within the Nail Warz app
-                  search by specific service needs and
-                  display your salon profile to users
-                  looking for those services in your area. <br />
-                  <strong>Tip:</strong> Accurately selecting all applicable
-                  services improves your visibility and
-                  helps customers find you more easily.
+                  Service Filters are discovery tags used in the Nail Warz app to help customers find vendors based on the services they offer. Super Admin manages the list of available filters to maintain consistency and prevent duplicate or unnecessary tags across the platform. Vendors can only select filters from this approved list.
+                  <br /> <br />
+                  <strong>Tip:</strong> Keep the filter list clear and relevant so customers can easily find the right vendors.
                 </div>
-              )} */}
+              )}
             </div>
           </div>
           <div onClick={onNotfOpen} className="btn btntheme3">

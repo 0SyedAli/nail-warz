@@ -14,12 +14,12 @@ export default function AppCTASection() {
             height={178}
             priority
             className="img-fluid"
-            style={{ height: '178px', objectFit:"contain" }}
+            style={{ height: '178px', objectFit: "contain" }}
           />
         </div>
-        <h3 className="text-white mb-2 fw-medium">Love Our Application?</h3>
+        <h3 className="text-white mb-2 fw-medium">Join the Nail Warz Community</h3>
         <h3 className="text-white mb-2 fw-bolder">Download Now</h3>
-        
+
         <p className="text-white fs-6 mb-4" style={{ opacity: 0.9 }}>
           Your One-Stop Shop for the Nail Care Industry
         </p>

@@ -8,6 +8,7 @@ import api from "@/lib/axios";
 import { showSuccessToast, showErrorToast } from "@/lib/toast";
 import Image from "next/image";
 import Link from "next/link";
+import BallsLoading from "@/components/Spinner/BallsLoading";
 
 const AttachmentWithFallback = ({ url, fallbackText, size = 100 }) => {
     const [error, setError] = useState(false);
@@ -49,7 +50,7 @@ export default function DisputeDetails() {
         adminNote: "",
         resolvedInFavorOf: "User"
     });
-    const chatEndRef = useRef(null);
+    const messagesContainerRef = useRef(null);
 
 
     // 🔁 Fetch Dispute Data
@@ -73,7 +74,9 @@ export default function DisputeDetails() {
     }, [dId]);
 
     useEffect(() => {
-        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
     }, [dispute?.responses]);
 
     const handleFileUpload = (e) => {
@@ -149,7 +152,7 @@ export default function DisputeDetails() {
         }
     };
 
-    if (loading) return <p className="m-5 text-center">Loading dispute details...</p>;
+    if (loading) return <div className="page  min-vh-100"><div className="dashboard_panel_inner pt-4 container-fluid"><div className="d-flex justify-content-center align-items-center" style={{ minHeight: "400px" }}><BallsLoading /></div></div></div>;
     if (!dispute) return <p className="m-5 text-center">Dispute not found</p>;
 
     return (
@@ -254,7 +257,12 @@ export default function DisputeDetails() {
                                 <h5 className="mb-0 fw-bold">Response History</h5>
                             </div>
                             <div className="card-body bg-light-subtle">
-                                <div className="chat-container" style={{ maxHeight: "450px", overflowY: "auto", paddingRight: "20px" }}>
+                                {/* <div className="chat-container" style={{ maxHeight: "450px", overflowY: "auto", paddingRight: "20px" }}> */}
+                                <div
+                                    ref={messagesContainerRef}
+                                    className="chat-container"
+                                    style={{ maxHeight: "450px", overflowY: "auto", paddingRight: "20px" }}
+                                >
                                     {dispute.responses?.length > 0 ? dispute.responses.map((res, idx) => (
                                         <div key={idx} className={`d-flex flex-column mb-4 ${res.respondent === 'User' || res.respondent === 'Admin' ? 'align-items-end' : 'align-items-start'}`}>
                                             <div className="small text-muted mb-1 px-2">{res.respondent} • {new Date(res.createdAt).toLocaleString()}</div>
@@ -277,7 +285,7 @@ export default function DisputeDetails() {
                                     )) : (
                                         <div className="text-center py-5 text-muted">No responses yet.</div>
                                     )}
-                                    <div ref={chatEndRef} />
+                                    {/* <div ref={chatEndRef} /> */}
                                 </div>
                             </div>
                         </div>
@@ -322,19 +330,24 @@ export default function DisputeDetails() {
                                             <div className={`badge py-2 px-3 fs-6 rounded-pill mb-3 ${dispute.status === 'Refunded' ? 'bg-success' : 'bg-warning text-dark'}`}>
                                                 Status: {dispute.status}
                                             </div>
-                                            <button
-                                                className="btn btn-primary w-100 rounded-pill shadow-sm py-2 fw-bold"
-                                                onClick={() => {
-                                                    setUpdateForm({
-                                                        status: dispute.status,
-                                                        adminNote: dispute.adminNote || "",
-                                                        resolvedInFavorOf: dispute.resolvedInFavorOf || "User"
-                                                    });
-                                                    setShowStatusModal(true);
-                                                }}
-                                            >
-                                                Update Status
-                                            </button>
+                                            {dispute.status === 'Refunded' && <div className={`badge d-block mx-auto py-2 px-3 fs-6 rounded-pill mb-3 bg-warning text-dark`} style={{ width: "fit-content" }}>
+                                                Resolved By: {dispute.resolvedInFavorOf}
+                                            </div>}
+                                            {dispute.status !== "Refunded" && (
+                                                <button
+                                                    className="btn btn-primary w-100 rounded-pill shadow-sm py-2 fw-bold"
+                                                    onClick={() => {
+                                                        setUpdateForm({
+                                                            status: dispute.status,
+                                                            adminNote: dispute.adminNote || "",
+                                                            resolvedInFavorOf: dispute.resolvedInFavorOf || "User"
+                                                        });
+                                                        setShowStatusModal(true);
+                                                    }}
+                                                >
+                                                    Update Status
+                                                </button>
+                                            )}
                                         </div>
                                     </>
                                 ) : (
@@ -362,7 +375,7 @@ export default function DisputeDetails() {
                                         <select
                                             className="form-select border-0 bg-light p-3 rounded-3"
                                             value={updateForm.status}
-                                            onChange={(e) => setUpdateForm({ ...updateForm, status: e.target.value })}
+                                            onChange={(e) => setUpdateForm({ ...updateForm, status: e.target.value, resolvedInFavorOf: e.target.value === "Resolved" ? "User" : "" })}
                                             required
                                         >
                                             <option value="">Select Status</option>
@@ -383,26 +396,28 @@ export default function DisputeDetails() {
                                             onChange={(e) => setUpdateForm({ ...updateForm, adminNote: e.target.value })}
                                         ></textarea>
                                     </div>
+                                    {updateForm.status === "Resolved" && (
 
-                                    <div className="mb-0">
-                                        <label className="form-label text-muted small text-uppercase fw-bold mb-3">Resolved In Favor Of</label>
-                                        <div className="d-flex gap-3 bg-light p-2 rounded-pill">
-                                            <button
-                                                type="button"
-                                                className={`btn flex-grow-1 rounded-pill py-2 fw-bold border-0 ${updateForm.resolvedInFavorOf === 'User' ? 'bg-white shadow-sm text-primary' : 'text-muted'}`}
-                                                onClick={() => setUpdateForm({ ...updateForm, resolvedInFavorOf: 'User' })}
-                                            >
-                                                User
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className={`btn flex-grow-1 rounded-pill py-2 fw-bold border-0 ${updateForm.resolvedInFavorOf === 'Vendor' ? 'bg-white shadow-sm text-primary' : 'text-muted'}`}
-                                                onClick={() => setUpdateForm({ ...updateForm, resolvedInFavorOf: 'Vendor' })}
-                                            >
-                                                Vendor
-                                            </button>
+                                        <div className="mb-0">
+                                            <label className="form-label text-muted small text-uppercase fw-bold mb-3">Resolved In Favor Of</label>
+                                            <div className="d-flex gap-3 bg-light p-2 rounded-pill">
+                                                <button
+                                                    type="button"
+                                                    className={`btn flex-grow-1 rounded-pill py-2 fw-bold border-0 ${updateForm.resolvedInFavorOf === 'User' ? 'bg-white shadow-sm text-primary' : 'text-muted'}`}
+                                                    onClick={() => setUpdateForm({ ...updateForm, resolvedInFavorOf: 'User' })}
+                                                >
+                                                    User
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className={`btn flex-grow-1 rounded-pill py-2 fw-bold border-0 ${updateForm.resolvedInFavorOf === 'Vendor' ? 'bg-white shadow-sm text-primary' : 'text-muted'}`}
+                                                    onClick={() => setUpdateForm({ ...updateForm, resolvedInFavorOf: 'Vendor' })}
+                                                >
+                                                    Vendor
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
                                 <div className="modal-footer border-top-0 pt-0 pb-4 px-4">
                                     <button type="button" className="btn btn-light rounded-pill px-4" onClick={() => setShowStatusModal(false)}>Cancel</button>

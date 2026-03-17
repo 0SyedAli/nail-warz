@@ -3,7 +3,7 @@ import Image from "next/image";
 export default function AboutHero() {
   return (
     <div className="row align-items-center py-3 py-sm-5 gy-4">
-      <div className="col-md-5 w-100">
+      <div className="col-md-5">
         <div className="battle-hero-img battle-hero-img2">
           <Image
             src="/images/logo.png"

@@ -12,6 +12,7 @@ import moment from "moment";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { groupAppointments } from "@/utils/appointmentToEvents";
+import BallsLoading from "@/components/Spinner/BallsLoading";
 
 moment.locale("en-GB");
 
@@ -92,17 +93,13 @@ export default function WeeklyCalendar() {
 
     if (loading) {
         return (
-            <div
-                style={{
-                    height: "75vh",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "18px",
-                    marginTop: "20px",
-                }}
-            >
-                Loading calendar...
+            <div className="page pt-4 px-0">
+                <div
+                    className="d-flex justify-content-center align-items-center"
+                    style={{ minHeight: "400px" }}
+                >
+                    <BallsLoading />
+                </div>
             </div>
         );
     }
@@ -126,7 +123,7 @@ export default function WeeklyCalendar() {
 
     return (
         <div
-        className="appointment-calendere-container"
+            className="appointment-calendere-container"
         >
             <FullCalendar
                 ref={calendarRef}

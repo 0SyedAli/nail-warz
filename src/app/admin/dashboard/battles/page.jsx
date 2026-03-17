@@ -56,7 +56,7 @@ export default function BattleManagementPage() {
                 <div className="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-4">
                     <div>
                         <h4 className="fw-bold">Warz Management</h4>
-                        <p className="text-muted">Create and manage nail art battles</p>
+                        <p className="text-muted mb-0">Create and manage nail art battles</p>
                     </div>
                     <button
                         className="btn btn-dark"

@@ -123,7 +123,7 @@ export default function ContentDetail() {
                 <InfoRow label="Name" value={item.name} />
                 <InfoRow label="Phone" value={item.phone} />
                 <InfoRow label="Email" value={item.email} />
-                <InfoRow label="Business Address" value={item.address} />
+                <InfoRow label="Address" value={item.address} />
 
                 <div className="info-row">
                   <span className="label">Social Media</span>

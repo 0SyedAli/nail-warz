@@ -9,9 +9,9 @@ export default function ScoreRow({ position, name, score, images }) {
             ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${images[0]}`
             : "/images/warz-dummy.png"
     );
-
+    console.log(position)
     return (
-        <div className="score-row d-flex align-items-center justify-content-between">
+        <div className={`score-row d-flex align-items-center justify-content-between ${position === 1 ? "bg-danger-light" : ""}`}>
 
             <div className="d-flex align-items-center gap-3">
                 <span className="fw-bold">{position}</span>
@@ -26,6 +26,7 @@ export default function ScoreRow({ position, name, score, images }) {
                 />
 
                 <span className="fw-semibold">{name}</span>
+                {position === 1 && <span className="fw-bold">🏆</span>}
             </div>
 
             <strong>{score}</strong>

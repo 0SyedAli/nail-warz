@@ -251,6 +251,15 @@ a {
   animation: pulse-animation 2s infinite;
 }
 
+/* .chat-container {
+  display: flex;
+  flex-direction: column-reverse;
+} */
+
+.bg-danger-light {
+  background: #ffd7d7;
+}
+
 .btn-link.btn-link-header span {
   position: absolute;
   top: -6px;
@@ -508,7 +517,7 @@ input::placeholder {
 }
 
 .sidebar_container ul {
-  padding: 0 0 0 50px;
+  padding: 0 0 0 40px;
   margin: 20px 0 0;
   /* max-height: 70vh; */
   overflow: auto;
@@ -994,6 +1003,7 @@ table.table.caption-top th {
   padding: 12.5px;
   border: 1px solid #ccc;
   border-radius: 8px;
+  height: 100%;
 }
 
 .manage_order_body {
@@ -4963,6 +4973,12 @@ span.prod_stock_status {
   }
 }
 
+@media only screen and (max-width: 1199px) {
+  .sidebar_container ul {
+    padding: 0 0 0 20px;
+  }
+}
+
 @media only screen and (max-width: 1080px) {
   .OverviewCards p {
     font-size: 14px;
@@ -5139,7 +5155,8 @@ span.prod_stock_status {
     color: #FFF;
   }
 
-  .sidebar_menu.open ul li a {
+  .sidebar_menu.open ul li a,
+  .sidebar_container .sc2_sid .logout_btn {
     color: #000;
   }
 
@@ -5168,7 +5185,8 @@ span.prod_stock_status {
     width: 70px;
   }
 
-  .sidebar_container ul li a span img {
+  .sidebar_container ul li a span img,
+  .sidebar_container .sc2_sid .logout_btn img {
     filter: brightness(0) saturate(100%) invert(12%) sepia(62%) saturate(7476%) hue-rotate(358deg) brightness(89%) contrast(91%);
   }
 

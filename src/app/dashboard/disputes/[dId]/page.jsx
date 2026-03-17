@@ -7,6 +7,7 @@ import { BsArrowLeft, BsSend, BsX } from "react-icons/bs";
 import api from "@/lib/axios";
 import { showSuccessToast, showErrorToast } from "@/lib/toast";
 import Image from "next/image";
+import BallsLoading from "@/components/Spinner/BallsLoading";
 
 const AttachmentWithFallback = ({ url, fallbackText, size = 100 }) => {
     const [error, setError] = useState(false);
@@ -42,8 +43,8 @@ export default function DisputeDetails() {
     const [message, setMessage] = useState("");
     const [images, setImages] = useState([]);
     const [submitting, setSubmitting] = useState(false);
-    const chatEndRef = useRef(null);
-
+    // const chatEndRef = useRef(null);
+    const messagesContainerRef = useRef(null);
 
     // 🔁 Fetch Dispute Data
     const fetchDispute = async (silent = false) => {
@@ -65,10 +66,17 @@ export default function DisputeDetails() {
         fetchDispute();
     }, [dId]);
 
-    useEffect(() => {
-        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [dispute?.responses]);
+    // useEffect(() => {
+    //     if (dispute?.responses) {
+    //         chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    //     }
+    // }, [dispute?.responses]);
 
+    useEffect(() => {
+        if (messagesContainerRef.current) {
+            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
+    }, [dispute?.responses]);
     const handleFileUpload = (e) => {
         const files = Array.from(e.target.files);
         if (images.length + files.length > 3) {
@@ -119,7 +127,15 @@ export default function DisputeDetails() {
         }
     };
 
-    if (loading) return <p className="m-5 text-center">Loading dispute details...</p>;
+    if (loading) return <div className="page pt-4 px-0">
+        <div
+            className="d-flex justify-content-center align-items-center"
+            style={{ minHeight: "400px" }}
+        >
+            <BallsLoading />
+        </div>
+    </div>
+
     if (!dispute) return <p className="m-5 text-center">Dispute not found</p>;
 
     return (
@@ -160,7 +176,7 @@ export default function DisputeDetails() {
                                         <div className="d-flex align-items-center gap-3 p-3 bg-light rounded-3">
                                             <div className="avatar2 rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center overflow-hidden" style={{ width: 48, height: 48 }}>
                                                 {dispute.vendorId?.image?.[0] ? (
-                                                    <Image src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${dispute.vendorId.image[0]}`} width={48} height={48} alt="vendor" className="object-fit-cover" />
+                                                    <Image src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${dispute.vendorId.image[0]}`} width={48} height={48} alt="vendor" className="object-fit-cover  w-100 h-100" />
                                                 ) : (
                                                     dispute.vendorId?.salonName?.charAt(0)
                                                 )}
@@ -183,7 +199,7 @@ export default function DisputeDetails() {
 
                                 <div className="mb-4">
                                     <label className="text-muted small text-uppercase fw-bold mb-2">Description</label>
-                                    <div className="p-3 border rounded-3 text-secondary">
+                                    <div className="p-3 bg-light rounded-3 fw-medium">
                                         {dispute.description || "No description provided."}
                                     </div>
                                 </div>
@@ -224,7 +240,12 @@ export default function DisputeDetails() {
                                 <h5 className="mb-0 fw-bold">Response History</h5>
                             </div>
                             <div className="card-body bg-light-subtle">
-                                <div className="chat-container" style={{ maxHeight: "450px", overflowY: "auto", paddingRight: "20px" }}>
+                                {/* <div className="chat-container" style={{ maxHeight: "450px", overflowY: "auto", paddingRight: "20px" }}> */}
+                                <div
+                                    ref={messagesContainerRef}
+                                    className="chat-container"
+                                    style={{ maxHeight: "450px", overflowY: "auto", paddingRight: "20px" }}
+                                >
                                     {dispute.responses?.length > 0 ? dispute.responses.map((res, idx) => (
                                         <div key={idx} className={`d-flex flex-column mb-4 ${res.respondent === 'User' || res.respondent === 'Admin' ? 'align-items-end' : 'align-items-start'}`}>
                                             <div className="small text-muted mb-1 px-2">{res.respondent} • {new Date(res.createdAt).toLocaleString()}</div>
@@ -247,7 +268,7 @@ export default function DisputeDetails() {
                                     )) : (
                                         <div className="text-center py-5 text-muted">No responses yet.</div>
                                     )}
-                                    <div ref={chatEndRef} />
+                                    {/* <div ref={chatEndRef} /> */}
                                 </div>
                             </div>
                         </div>

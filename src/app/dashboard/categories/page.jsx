@@ -154,7 +154,14 @@ const ManageCategory = () => {
 
               {open && (
                 <div ref={popoverRef} className="filter-popover filter-popover2">
-                  These are service categories which will categorize the services a Salon provide in the Salon Profile. You can choose any category you want the service to be highlighted under while adding a new Service and you can change them as well.
+                  Service Categories organize the services
+                  displayed on your Salon Profile. Nail Warz
+                  provides a standardized list of categories to
+                  ensure consistency across the platform. When
+                  adding a new service, simply select the category
+                  that best describes it. This helps present your
+                  service menu clearly to customers browsing your
+                  profile.
                 </div>
               )}
             </div>

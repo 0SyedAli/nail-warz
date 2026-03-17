@@ -96,8 +96,11 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
         <div className="aus_dialog appoint_detail">
           <h3>Appointment Information</h3>
           <div className="row align-items-end gy-2 mb-4">
-            <div className="col-12">
+            <div className="col-6">
               <h5><strong>Service:</strong> {serviceId?.serviceName}</h5>
+            </div>
+            <div className="col-6">
+              <h5><strong>Status:</strong> <span className={`badge py-2 ${booking?.status?.toLowerCase() === "accepted" ? "bg-success" : booking?.status?.toLowerCase() === "cancelled" || booking?.status?.toLowerCase() === "canceled" ? "bg-danger" : "bg-warning"}`}>{booking?.status}</span></h5>
             </div>
             <div className="col-6">
               <h5><strong>Employee Name:</strong> {technicianId?.fullName}</h5>
@@ -149,7 +152,7 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
               {booking.status.toLowerCase() === "accepted" && (
                 booking?.rescheduleStatus === "Pending" ? (
                   <p className="text-warning fw-bold mb-0">
-                    Reschedule request is pending approval…
+                    Reschedule request sent. Waiting for customer approval.
                   </p>
                 ) : (
                   <>
@@ -182,7 +185,7 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
               )}
 
               {/* ✅ If Booking is Canceled */}
-              {booking.status.toLowerCase() === "canceled" && (
+              {(booking.status.toLowerCase() === "canceled" || booking.status.toLowerCase() === "cancelled") && (
                 <button className="appoint_btn cancel" disabled>
                   Booking Canceled
                 </button>

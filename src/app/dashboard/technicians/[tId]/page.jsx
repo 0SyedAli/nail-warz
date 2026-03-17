@@ -123,7 +123,7 @@ export default function TechnicianPage({ params }) {
                                     <h1 className="h2 fw-bold text-dark mb-1">
                                         {technicianData.fullName || "Unknown"}
                                     </h1>
-                                    <p className="text-muted mb-0">{technicianData.designation || "empty description"}</p>
+                                    <p className="text-muted mb-0">{technicianData.description || "empty description"}</p>
                                 </div>
                             </div>
 
@@ -154,10 +154,10 @@ export default function TechnicianPage({ params }) {
                                     Technician Details
                                 </h5>
                                 <div className="tech_info d-flex flex-column gap-3">
-                                    {technicianData.designation &&
+                                    {technicianData.description &&
                                         <div className="d-flex align-items-center gap-2">
                                             <FaUserCircle color="#C11111" />
-                                            <span className="small">{technicianData.designation}</span>
+                                            <span className="small">{technicianData.description}</span>
                                         </div>
                                     }
                                     {technicianData.email &&
@@ -197,7 +197,7 @@ export default function TechnicianPage({ params }) {
                                     <button className="btn btn_tech" onClick={onDeleteOpen}>
                                         Delete Technician
                                     </button>
-                                    <button className="btn btn_tech2 btn-outline-dark" onClick={()=> router.back()}>
+                                    <button className="btn btn_tech2 btn-outline-dark" onClick={() => router.back()}>
                                         Go Back
                                     </button>
                                 </div>

@@ -114,7 +114,7 @@ export default function AddToBattleModal({
                                 >
                                     <div className="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <h6 className="mb-1">{battle.name}</h6>
+                                            <h6 className="mb-1">{battle.name} - <span className={`badge py-1 ${battle.status === "upcoming" ? "bg-warning" : "bg-success"}`}>{battle.status}</span></h6>
                                             <small className="text-muted">
                                                 {new Date(battle.startDate).toLocaleDateString()} →
                                                 {new Date(battle.endDate).toLocaleDateString()}

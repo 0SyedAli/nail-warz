@@ -12,10 +12,10 @@ export default function BattleCard({ title, battles, onEdit, emptyMessage = "No 
 
   return (
     <div className="col-lg-4 ">
-      <h6 className="fw-bold mb-3 text-capitalize">{title}</h6>
+      <h5 className="fw-bold mb-3 text-capitalize">{title}</h5>
 
       {battles.length === 0 ? (
-        <div className="text-muted">
+        <div className="text-muted small">
           {emptyMessage}
         </div>
       ) : (
@@ -86,9 +86,9 @@ export default function BattleCard({ title, battles, onEdit, emptyMessage = "No 
                       View Participants
                     </button>
                   </div>
-                  <span className="add-user">
+                  {/* <span className="add-user">
                     <MdPersonAdd />
-                  </span>
+                  </span> */}
                 </div>
               )}
               {(b.status === "active") && (

@@ -186,7 +186,7 @@ export default function SuperAdminUsers() {
                                 <BsSearch className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
                                 <input
                                     type="text"
-                                    className="form-control ps-5"
+                                    className="form-control ps-5 w-100 my-2"
                                     placeholder="Search by email, name or ID"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}

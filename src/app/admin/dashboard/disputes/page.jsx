@@ -94,12 +94,12 @@ export default function Disputes() {
 
                 {/* ===== TABLE ===== */}
                 <div className="card ">
-                    <div className="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <div className="card-header bg-white py-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <h5 className="mb-0 fw-bold">Disputes List</h5>
-                        <div className="position-relative">
+                        <div className="position-relative" style={{ width: 350 }}>
                             <BsSearch className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
                             <input
-                                className="form-control ps-5"
+                                className="form-control w-100 ps-5"
                                 placeholder="Search by user, vendor, or reason..."
                                 style={{ width: 350, borderRadius: '8px' }}
                                 value={search}

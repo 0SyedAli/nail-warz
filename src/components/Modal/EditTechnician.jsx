@@ -34,7 +34,6 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
       phoneNumber: "",
       email: "",
       description: "",
-      designation: "",
       image: null,
     },
   });
@@ -84,7 +83,6 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
           phoneNumber: technician.phoneNumber,
           email: technician.email,
           description: technician.description,
-          designation: technician.designation,
           image: null
         });
 
@@ -125,7 +123,6 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
         fd.append("phoneNumber", cleanedPhoneNumber);
       }
       if (dirtyFields.description) fd.append("description", data.description);
-      if (dirtyFields.designation) fd.append("designation", data.designation);
 
       // if (
       //   dirtyFields.workingDays ||
@@ -258,7 +255,7 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
             </>
           )}
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <div>
             <label className=" text-sm font-medium mb-0">Full Name</label>
             <InputField {...register("fullName")} placeholder="Full name" />
@@ -277,12 +274,12 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
             />
           </div>
 
-          <div>
-            <label className=" text-sm font-medium mb-0">Designation</label>
-            <InputField {...register("designation")} placeholder="Designation" />
-          </div>
-          <div className="edit_textarea">
+          {/* <div>
             <label className=" text-sm font-medium mb-0">Description</label>
+            <InputField {...register("description")} placeholder="Description" />
+          </div> */}
+          <div className="edit_textarea">
+            <label className=" text-sm font-medium mb-1">Description</label>
             <textarea
               {...register("description")}
               placeholder="Description"

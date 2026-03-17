@@ -121,9 +121,13 @@ export default function OrderDetailsPage() {
                                     </select>
                                     {updating && <small className="text-muted ms-1">Updating…</small>}
                                 </div>
+                            ) : (order.status?.toLowerCase() === "cancelled") ? (
+                                <div className="mt-2 p-2 border-2 border-danger rounded-2 d-flex align-items-center justify-content-center">
+                                    <small className="text-danger fw-bold text-uppercase">Order Cancelled</small>
+                                </div>
                             ) : (
-                                <div className="mt-2 pt-2 border-top border-light">
-                                    <small className="text-muted fw-bold text-uppercase">Order Finalized</small>
+                                <div className="mt-2 p-2 border-2 border-success rounded-2 d-flex align-items-center justify-content-center">
+                                    <small className="text-success fw-bold text-uppercase">Order Completed</small>
                                 </div>
                             )}
                         </div>

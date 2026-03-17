@@ -11,7 +11,7 @@ export default function Dashboard({ children }) {
   const [header, setHeader] = useState();
 
   const content = {
-    dashboard: { title: "Dashboard" },
+    dashboard: { title: "Admin Dashboard" },
     users: { title: "Application Users Management" },
     usersDetails: { title: "Application User Details" },
     vendors: { title: "Vendors Management" },

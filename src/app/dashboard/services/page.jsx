@@ -262,46 +262,48 @@ export default function Services() {
                 </tbody>
               </table>
 
-              {/* ─────────── Pagination ─────────── */}
-              {services.length > itemsPerPage && (
-                <div className="d-flex justify-content-between align-items-center mt-3">
-                  <button
-                    className="btn btn-sm btn-outline-secondary"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </button>
 
-                  <div>
-                    {Array.from({ length: totalPages }, (_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => handlePageChange(i + 1)}
-                        className={`btn btn-sm mx-1 ${currentPage === i + 1
-                          ? "btn-primary"
-                          : "btn-outline-secondary"
-                          }`}
-                      >
-                        {i + 1}
-                      </button>
-                    ))}
-                  </div>
-
-                  <button
-                    className="btn btn-sm btn-outline-secondary"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
 
               {/* Add Service Button */}
 
             </div>
+
           </div>
+          {/* ─────────── Pagination ─────────── */}
+          {services.length > itemsPerPage && (
+            <div className="d-flex justify-content-between align-items-center mt-3">
+              <button
+                className="btn btn-sm btn-outline-secondary"
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+
+              <div>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handlePageChange(i + 1)}
+                    className={`btn btn-sm mx-1 ${currentPage === i + 1
+                      ? "btn-primary"
+                      : "btn-outline-secondary"
+                      }`}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                className="btn btn-sm btn-outline-secondary"
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

@@ -178,7 +178,7 @@ const Technicians = () => {
                     <th>Email</th>
                     <th>Start Date</th>
                     <th>Phone Number</th>
-                    <th>Designation</th>
+                    <th>Description</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -192,7 +192,7 @@ const Technicians = () => {
                       <td>{new Date(t.createdAt).toLocaleDateString()}</td>
                       {/* <td>{t.phoneNumber || "-"}</td> */}
                       <td>{formatUSPhone(t.phoneNumber)}</td>
-                      <td>{t.designation || "-"}</td>
+                      <td>{t.description || "-"}</td>
                       <td>
                         <div className="d-flex gap-2">
                           <button

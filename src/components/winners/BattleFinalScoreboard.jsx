@@ -105,6 +105,9 @@ export default function BattleFinalScoreboard() {
 
                 {/* RIGHT: ALL PARTICIPANTS */}
                 <div className="col-lg-6">
+                    <div className="d-flex align-items-center justify-content-center mb-3">
+                        <Image src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${winner?.images[0]}`} alt="Podium" width={150} height={150} className="img-fluid rounded-circle" style={{ width: "150px", height: "150px", objectFit: "cover", border: "5px solid #ffd7d7", boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)" }} />
+                    </div>
                     <VotingScores leaderboard={leaderboard} />
                 </div>
 

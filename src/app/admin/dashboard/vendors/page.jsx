@@ -150,7 +150,7 @@ export default function SuperAdminVendors() {
                             <div className="position-relative">
                                 <BsSearch className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
                                 <input
-                                    className="form-control ps-5"
+                                    className="form-control w-100 ps-5"
                                     style={{ width: 280 }}
                                     placeholder="Search vendors…"
                                     value={search}
@@ -202,6 +202,7 @@ export default function SuperAdminVendors() {
                                         <th>Total Ratting</th>
                                         <th>Cancel Count</th>
                                         <th>Payouts Pending</th>
+                                        <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -213,7 +214,12 @@ export default function SuperAdminVendors() {
                                             {/* <td>{v.email}</td> */}
                                             <td>{v?.city || "-"}</td>
                                             <td>{new Date(v.createdAt).toLocaleDateString()}</td>
-                                            {/* <td>
+
+                                            <td className="fw-bold">${v.totalRevenue || 0}</td>
+                                            <td className="fw-bold">{v.totalReviews || 0}</td>
+                                            <td className="fw-bold">{v.cancelledByCount || 0}</td>
+                                            <td className="fw-bold">${v.totalPayoutPending || 0}</td>
+                                            <td>
 
                                                 <span
                                                     style={{
@@ -227,11 +233,7 @@ export default function SuperAdminVendors() {
                                                 >
                                                     {!v?.isDeleted ? "Active" : "Inactive"}
                                                 </span>
-                                            </td> */}
-                                            <td className="fw-bold">${v.totalRevenue || 0}</td>
-                                            <td className="fw-bold">{v.totalReviews || 0}</td>
-                                            <td className="fw-bold">${v.cancelledByCount || 0}</td>
-                                            <td className="fw-bold">${v.totalPayoutPending || 0}</td>
+                                            </td>
                                             <td>
                                                 <button
                                                     className="btn btn-outline-secondary btn-sm text-nowrap"

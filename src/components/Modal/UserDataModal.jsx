@@ -9,7 +9,10 @@ export default function UserDataModal({ isOpen, onClose, user }) {
     return (
         <Modal isOpen={isOpen} onClose={onClose} size="lg">
             <div className="px-3">
-
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h2 className="fw-bold mb-0">App User Details</h2>
+                    <button className="btn-close" onClick={onClose}></button>
+                </div>
                 {/* HEADER */}
                 <div className="d-flex justify-content-between align-items-start mb-4">
                     <div className="d-flex align-items-center gap-3">
@@ -67,7 +70,6 @@ export default function UserDataModal({ isOpen, onClose, user }) {
                         </div>
                     </div>
 
-                    <button className="btn-close" onClick={onClose}></button>
                 </div>
 
                 {/* ACCOUNT INFO */}
@@ -98,7 +100,7 @@ export default function UserDataModal({ isOpen, onClose, user }) {
                 </div>
 
                 {/* FAVOURITES */}
-                <SectionTitle title="Favourite Salons" />
+                <SectionTitle title="Favorite Salons" />
 
                 {user.favourite?.length > 0 ? (
                     user.favourite.map((salon) => (
@@ -128,7 +130,7 @@ export default function UserDataModal({ isOpen, onClose, user }) {
 
                     ))
                 ) : (
-                    <div className="text-muted small">No favourite salons added</div>
+                    <div className="text-muted small">No favorite salons added</div>
                 )}
 
             </div>

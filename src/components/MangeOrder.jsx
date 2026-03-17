@@ -117,6 +117,7 @@ export default function ManageAppointments() {
                         acc.accepted++;
                         break;
                     case "canceled":
+                    case "cancelled":
                         acc.canceled++;
                         break;
                     case "completed":
@@ -139,12 +140,14 @@ export default function ManageAppointments() {
     }, [salonId, timing]);
 
     const getStatusBadge = (status) => {
+        console.log(status);
         switch (status.toLowerCase()) {
             case "completed":
                 return <span className="badge py-2 bg-success">Completed</span>;
             case "accepted":
                 return <span className="badge py-2 bg-primary">Accepted</span>;
             case "canceled":
+            case "cancelled":
                 return <span className="badge py-2 bg-danger">Canceled</span>;
             default:
                 return <span className="badge py-2 bg-secondary">{status}</span>;

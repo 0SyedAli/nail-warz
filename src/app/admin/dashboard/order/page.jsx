@@ -101,8 +101,8 @@ export default function SuperAdminOrders() {
           <div className="row g-3 mb-4">
             <StatCard title="Total Orders" value={stats.totalOrders} />
             <StatCard title="Pending" value={stats.pendingOrders || 0} valueClass="text-warning" />
-            <StatCard title="Processing" value={stats.processingOrders || 0} valueClass="text-info" />
-            <StatCard title="Shipped" value={stats.shippedOrders || 0} valueClass="text-primary" />
+            {/* <StatCard title="Processing" value={stats.processingOrders || 0} valueClass="text-info" />
+            <StatCard title="Shipped" value={stats.shippedOrders || 0} valueClass="text-primary" /> */}
             <StatCard title="Completed" value={stats.completedOrders || 0} valueClass="text-success" />
             <StatCard title="Total Revenue" value={`$${stats.totalRevenue.toFixed(2)}`} valueClass="text-primary2" />
           </div>
@@ -112,54 +112,55 @@ export default function SuperAdminOrders() {
         <div className="card">
           <div className="card-header bg-white">
             <div className="d-flex justify-content-between align-items-center">
-              <div className="position-relative">
+              <div className="position-relative" style={{ width: 350 }}>
                 <BsSearch className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
                 <input
-                  className="form-control ps-5"
-                  style={{ width: 320 }}
+                  className="form-control w-100 ps-5"
+
                   placeholder="Search by order number or customer…"
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                 />
               </div>
+              <div className="d-flex flex-wrap gap-2 my-2">
+                <button
+                  className={`btn btn-sm ${statusFilter === null ? "btn-dark" : "btn-outline-dark"}`}
+                  onClick={() => handleStatusFilter(null)}
+                >
+                  All Orders
+                </button>
+
+                <button
+                  className={`btn btn-sm ${statusFilter === "pending" ? "btn-dark" : "btn-outline-dark"}`}
+                  onClick={() => handleStatusFilter("pending")}
+                >
+                  Pending
+                </button>
+
+                <button
+                  className={`btn btn-sm ${statusFilter === "processing" ? "btn-dark" : "btn-outline-dark"}`}
+                  onClick={() => handleStatusFilter("processing")}
+                >
+                  Processing
+                </button>
+
+                <button
+                  className={`btn btn-sm ${statusFilter === "shipped" ? "btn-dark" : "btn-outline-dark"}`}
+                  onClick={() => handleStatusFilter("shipped")}
+                >
+                  Shipped
+                </button>
+
+                <button
+                  className={`btn btn-sm ${statusFilter === "completed" ? "btn-dark" : "btn-outline-dark"}`}
+                  onClick={() => handleStatusFilter("completed")}
+                >
+                  Completed
+                </button>
+              </div>
             </div>
 
-            <div className="d-flex flex-wrap gap-2 my-2 mt-3">
-              <button
-                className={`btn btn-sm ${statusFilter === null ? "btn-dark" : "btn-outline-dark"}`}
-                onClick={() => handleStatusFilter(null)}
-              >
-                All Orders
-              </button>
 
-              <button
-                className={`btn btn-sm ${statusFilter === "pending" ? "btn-dark" : "btn-outline-dark"}`}
-                onClick={() => handleStatusFilter("pending")}
-              >
-                Pending
-              </button>
-
-              <button
-                className={`btn btn-sm ${statusFilter === "processing" ? "btn-dark" : "btn-outline-dark"}`}
-                onClick={() => handleStatusFilter("processing")}
-              >
-                Processing
-              </button>
-
-              <button
-                className={`btn btn-sm ${statusFilter === "shipped" ? "btn-dark" : "btn-outline-dark"}`}
-                onClick={() => handleStatusFilter("shipped")}
-              >
-                Shipped
-              </button>
-
-              <button
-                className={`btn btn-sm ${statusFilter === "completed" ? "btn-dark" : "btn-outline-dark"}`}
-                onClick={() => handleStatusFilter("completed")}
-              >
-                Completed
-              </button>
-            </div>
           </div>
 
           <div className="dash_list card-body p-0">

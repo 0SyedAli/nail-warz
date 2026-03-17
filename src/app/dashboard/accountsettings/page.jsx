@@ -54,49 +54,23 @@ const EditProfile = () => {
             images: [],
             category: [],
             salonName: "",
+            name: "",
             phoneNumber: "",
             // bussinessAddress: "",
             // locationName: "",
             city: "",
             state: "",
             zipCode: "",
-            description: ""
+            streetAddress: "",
+            description: "",
+            bussinessPhoneNumber: "",
+            bussinessWebsite: "",
+            bussinessEmail: "",
         },
     });
 
     const images = watch("images");
     const [previews, setPreviews] = useState([]);
-
-
-    // const handleCitySelect = () => {
-    //     if (!cityAutocomplete) return;
-
-    //     const place = cityAutocomplete.getPlace();
-
-    //     let city = "";
-    //     let state = "";
-    //     let zip = "";
-
-    //     place.address_components.forEach((component) => {
-    //         if (component.types.includes("locality")) {
-    //             city = component.long_name;
-    //         }
-
-    //         if (component.types.includes("administrative_area_level_1")) {
-    //             state = component.long_name;
-    //         }
-
-    //         if (component.types.includes("postal_code")) {
-    //             zip = component.long_name;
-    //         }
-    //     });
-
-    //     setValue("city", city);
-    //     setValue("state", state);
-    //     setValue("zipCode", zip);
-    // };
-
-    // Handle image previews
 
     const handleCitySelect = () => {
         if (!cityAutocomplete) return;
@@ -123,6 +97,8 @@ const EditProfile = () => {
         setValue("city", city, { shouldValidate: true });
         setValue("state", state, { shouldValidate: true });
         setValue("zipCode", zip, { shouldValidate: true });
+
+
     };
 
     useEffect(() => {
@@ -185,14 +161,20 @@ const EditProfile = () => {
                     });
                     // Set form values
                     reset({
+                        name: profileData.name || "",
                         salonName: profileData.salonName || "",
                         phoneNumber: profileData.phoneNumber?.toString() || "",
                         // bussinessAddress: profileData.bussinessAddress || "",
                         // locationName: profileData.locationName || "",
                         city: profileData.city || "",
+                        locationName: profileData.city || "",
                         state: profileData.state || "",
                         zipCode: profileData.zipCode || "",
+                        streetAddress: profileData.streetAddress || "",
                         description: profileData.description || "",
+                        bussinessPhoneNumber: profileData.bussinessPhoneNumber || "",
+                        bussinessWebsite: profileData.bussinessWebsite || "",
+                        bussinessEmail: profileData.bussinessEmail || "",
                         // workingDays: profileData.workingDays?.map(d => d.day) || [],
                         workingDays: workingDaysObj,   // <-- set here
                         startTime: allSameTimes ? firstDay?.startTime : "",
@@ -223,66 +205,6 @@ const EditProfile = () => {
     }, [router, reset]);
     const [isClient, setIsClient] = useState(false);
     useEffect(() => setIsClient(true), []);
-    // const onSubmit = async (data) => {
-    //     setIsLoading(true);
-    //     try {
-    //         const formData = new FormData();
-    //         formData.append("id", adminId);
-    //         formData.append("salonName", data.salonName);
-    //         formData.append("phoneNumber", data.phoneNumber);
-    //         formData.append("bussinessAddress", data.bussinessAddress);
-    //         formData.append("description", data.description);
-    //         formData.append("locationName", data.locationName);
-    //         formData.append("latitude", existingData?.latitude?.toString() || "37.0802");
-    //         formData.append("longitude", existingData?.longitude?.toString() || "95.7029");
-
-    //         // Working days payload
-    //         // const days = data.workingDays.map((day) => ({
-    //         //     day,
-    //         //     isActive: true,
-    //         //     startTime: data.startTime,
-    //         //     endTime: data.endTime,
-    //         // }));
-    //         // Build workingDays payload correctly
-    //         const daysPayload = DAYS_OF_WEEK.map(day => {
-    //             const item = data.workingDays?.[day] || {};
-    //             return {
-    //                 day,
-    //                 isActive: !!item.isActive,
-    //                 startTime: item.startTime || "",
-    //                 endTime: item.endTime || ""
-    //             };
-    //         });
-    //         formData.append("workingDays", JSON.stringify(daysPayload));
-    //         // formData.append("workingDays", JSON.stringify(days));
-
-    //         // Category IDs
-    //         // formData.append("categoryId", JSON.stringify([data.category]));
-    //         formData.append(
-    //             "categoryId",
-    //             JSON.stringify(data.category.map(c => c.value))
-    //         );
-    //         // Append new images
-    //         data.images.forEach((file) => formData.append("image", file));
-
-    //         const res = await api.post("/updateAdminProfile", formData, {
-    //             headers: {
-    //                 "Content-Type": "multipart/form-data",
-    //             },
-    //         });
-
-    //         if (res.data.success) {
-    //             showSuccessToast("Profile updated successfully!");
-    //             router.refresh();
-    //         } else {
-    //             throw new Error(res.data.message || "Profile update failed");
-    //         }
-    //     } catch (error) {
-    //         showErrorToast(error.message || "Failed to update profile");
-    //     } finally {
-    //         setIsLoading(false);
-    //     }
-    // };
 
     const onSubmit = async (data) => {
         setIsLoading(true);
@@ -292,6 +214,9 @@ const EditProfile = () => {
             formData.append("id", adminId);
 
             // only send salonName if changed
+            if (data.name !== existingData.name) {
+                formData.append("name", data.name);
+            }
             if (data.salonName !== existingData.salonName) {
                 formData.append("salonName", data.salonName);
             }
@@ -320,6 +245,9 @@ const EditProfile = () => {
             if (data.city !== existingData.city) {
                 formData.append("city", data.city);
             }
+            if (data.locationName !== existingData.locationName) {
+                formData.append("locationName", data.city);
+            }
 
             if (data.state !== existingData.state) {
                 formData.append("state", data.state);
@@ -327,6 +255,17 @@ const EditProfile = () => {
 
             if (data.zipCode !== existingData.zipCode) {
                 formData.append("zipCode", data.zipCode);
+            }
+
+            if (data.bussinessPhoneNumber !== existingData.bussinessPhoneNumber) {
+                formData.append("bussinessPhoneNumber", data.bussinessPhoneNumber);
+            }
+            if (data.bussinessWebsite !== existingData.bussinessWebsite) {
+                formData.append("bussinessWebsite", data.bussinessWebsite);
+            }
+
+            if (data.bussinessEmail !== existingData.bussinessEmail) {
+                formData.append("bussinessEmail", data.bussinessEmail);
             }
 
             // category changed?
@@ -527,14 +466,14 @@ const EditProfile = () => {
                             {/* Salon Name */}
                             <div className="col-md-4">
                                 <div className="am_field">
-                                    <label>Salon Name</label>
+                                    <label>Owner Name</label>
                                     <input
                                         type="text"
-                                        {...register("salonName")}
-                                        className={`form-control ${errors.salonName ? "is-invalid" : ""}`}
+                                        {...register("name")}
+                                        className={`form-control ${errors.name ? "is-invalid" : ""}`}
                                     />
-                                    {errors.salonName && (
-                                        <div className="invalid-feedback">{errors.salonName.message}</div>
+                                    {errors.name && (
+                                        <div className="invalid-feedback">{errors.name.message}</div>
                                     )}
                                 </div>
                             </div>
@@ -542,7 +481,7 @@ const EditProfile = () => {
                             {/* Phone Number */}
                             <div className="col-md-4">
                                 <div className="am_field">
-                                    <label>Phone Number</label>
+                                    <label>Owner Phone Number</label>
                                     {/* <input
                                         type="text"
                                         {...register("phoneNumber")}
@@ -569,6 +508,19 @@ const EditProfile = () => {
                                 </div>
                             </div>
 
+                            <div className="col-md-4">
+                                <div className="am_field">
+                                    <label>Salon Name</label>
+                                    <input
+                                        type="text"
+                                        {...register("salonName")}
+                                        className={`form-control ${errors.salonName ? "is-invalid" : ""}`}
+                                    />
+                                    {errors.salonName && (
+                                        <div className="invalid-feedback">{errors.salonName.message}</div>
+                                    )}
+                                </div>
+                            </div>
                             {/* Business Address */}
                             {/* <div className="col-md-4">
                                 <div className="am_field">
@@ -598,7 +550,20 @@ const EditProfile = () => {
                                     )}
                                 </div>
                             </div> */}
-
+                            {/* Street Address */}
+                            <div className="col-md-4">
+                                <div className="am_field">
+                                    <label>Street Address</label>
+                                    <input
+                                        type="text"
+                                        {...register("streetAddress")}
+                                        className={`form-control ${errors.streetAddress ? "is-invalid" : ""}`}
+                                    />
+                                    {errors.state && (
+                                        <div className="invalid-feedback">{errors.state.message}</div>
+                                    )}
+                                </div>
+                            </div>
                             {/* City */}
                             <div className="col-md-4">
                                 <div className="am_field">
@@ -669,10 +634,64 @@ const EditProfile = () => {
                                 </div>
                             </div>
 
-                            {/* Description */}
+                            {/* Phone Number */}
                             <div className="col-md-4">
                                 <div className="am_field">
-                                    <label>Business Bio</label>
+                                    <label>Salon Phone Number</label>
+                                    {/* <input
+                                        type="text"
+                                        {...register("phoneNumber")}
+                                        className={`form-control ${errors.phoneNumber ? "is-invalid" : ""}`}
+                                    /> */}
+
+                                    <PatternFormat
+                                        format="+1 (###) ###-####"
+                                        mask="_"
+                                        value={watch("bussinessPhoneNumber") || ""}
+                                        onValueChange={(values) => {
+                                            setValue("bussinessPhoneNumber", values.formattedValue, {
+                                                shouldValidate: true,
+                                            });
+                                        }}
+                                        customInput="input"
+                                        className={`form-control ${errors.bussinessPhoneNumber ? "is-invalid" : ""}`}
+                                        placeholder="+1 (123) 456-7890"
+                                    />
+
+                                    {errors.bussinessPhoneNumber && (
+                                        <div className="invalid-feedback">{errors.bussinessPhoneNumber.message}</div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Business Email */}
+                            <div className="col-md-4">
+                                <div className="am_field">
+                                    <label>Salon Email</label>
+                                    <input
+                                        type="text"
+                                        {...register("bussinessEmail")}
+                                        className="form-control"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Business Bio */}
+                            <div className="col-md-4">
+                                <div className="am_field">
+                                    <label>Salon Website</label>
+                                    <input
+                                        type="text"
+                                        {...register("bussinessWebsite")}
+                                        className="form-control"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Business Bio */}
+                            <div className="col-md-4">
+                                <div className="am_field">
+                                    <label>Salon Bio</label>
                                     <input
                                         type="text"
                                         {...register("description")}
@@ -696,15 +715,14 @@ const EditProfile = () => {
 
                                         {open && (
                                             <div ref={popoverRef} className="filter-popover fw-bold">
-                                                Select all services offered by your
-                                                salon. These service filters help
-                                                customers within the Nail Warz app
-                                                search by specific service needs and
-                                                display your salon profile to users
-                                                looking for those services in your area. <br /><br />
-                                                Tip: Accurately selecting all applicable
-                                                services improves your visibility and
-                                                helps customers find you more easily.
+                                                Service Filters help customers find your business when searching
+                                                for specific services in the Nail Warz app. Select all filters that
+                                                accurately reflect the services you offer. These filters are
+                                                managed by Nail Warz to ensure consistent search results across
+                                                the platform.
+                                                <br /> <br />
+                                                Tip: Choosing all relevant filters improves your visibility and helps
+                                                nearby customers discover your services more easily.
                                             </div>
                                         )}
                                     </div>

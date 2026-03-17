@@ -139,12 +139,12 @@ export default function SuperAdminInventory() {
                 {/* ===== TABLE ===== */}
                 <div className="card">
                     <div className="card-header bg-white">
-                        <div className="d-flex justify-content-between align-items-center">
+                        <div className="d-flex justify-content-between align-items-center gap-2 flex-wrap">
 
                             <div className="position-relative">
                                 <BsSearch className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
                                 <input
-                                    className="form-control ps-5"
+                                    className="form-control w-100 ps-5"
                                     style={{ width: 320 }}
                                     placeholder="Search products…"
                                     value={search}
@@ -162,7 +162,7 @@ export default function SuperAdminInventory() {
                                 Add Product
                             </button>
                         </div>
-                        <div className="d-flex flex-wrap gap-2 my-2">
+                        <div className="d-flex flex-wrap gap-2 my-2 justify-content-center">
                             <button
                                 className={`btn btn-sm ${showAll === true && smartStatus === null && smartFilter === null ? "btn-dark" : "btn-outline-dark"}`}
                                 onClick={() => handleSmartShowAll(true)}
