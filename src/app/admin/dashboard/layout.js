@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import DashboardLayout from "@/components/DashboardLayoutAdmin"; // adjust path if your AuthLayout is not in components
 import BallsLoading from "@/components/Spinner/BallsLoading";
-import AuthRedirectHandler from "@/utils/AuthHandler";
+// import AuthRedirectHandler from "@/utils/AuthHandler";
 
 export default function DashboardLayoutWrapper({ children }) {
   return (
@@ -12,7 +12,7 @@ export default function DashboardLayoutWrapper({ children }) {
         <BallsLoading />
       </div>
     }>
-      <AuthRedirectHandler />
+      {/* <AuthRedirectHandler /> */}
       <DashboardLayout>{children}</DashboardLayout>
     </Suspense>
   );

@@ -9,6 +9,7 @@ import { Providers } from './providers';
 import ReduxProvider from "@/utils/redux-provider"; // ✅ ADD THIS
 import NextTopLoader from 'nextjs-toploader';
 import SmoothScrollProvider from '@/components/animations/SmoothScrollProvider';
+// import AuthRedirectHandler from '@/utils/AuthHandler';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,13 +33,14 @@ export default function RootLayout({ children }) {
     >
       <body cz-shortcut-listen="true">
         <NextTopLoader showSpinner={false} color="#C11111" speed={500} height={2} />
-          <ReduxProvider> {/* ✅ REDUX WRAP */}
-            <ToastProvider />
-            <Providers>
-              {children}
-            </Providers>
-            <BootstrapClients />
-          </ReduxProvider>
+        <ReduxProvider>
+          {/* <AuthRedirectHandler /> */}
+          <ToastProvider />
+          <Providers>
+            {children}
+          </Providers>
+          <BootstrapClients />
+        </ReduxProvider>
       </body>
     </html>
   );

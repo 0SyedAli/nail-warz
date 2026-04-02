@@ -11,7 +11,7 @@ import { showErrorToast, showSuccessToast } from "src/lib/toast";
 import Link from "next/link";
 import Cookies from "js-cookie";
 import api from "@/lib/axios";
-import AuthRedirectHandler from "@/utils/AuthHandler";
+// import AuthRedirectHandler from "@/utils/AuthHandler";
 import BallsLoading from "@/components/Spinner/BallsLoading";
 
 // ✅ Validation schema using Yup

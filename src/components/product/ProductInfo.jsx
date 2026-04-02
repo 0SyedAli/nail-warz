@@ -76,6 +76,7 @@ export default function ProductInfo({ product }) {
         _id: product._id,
         name: product.name,
         sku: product.sku,
+        stock: product.stock,
         price: product.price,
         images: product.images,
         qty,
@@ -103,8 +104,12 @@ export default function ProductInfo({ product }) {
         )}
       </div>
 
-      <p className="product-desc">
+      <p className="product-desc mb-2">
         SKU: <strong>{product.sku}</strong>
+      </p>
+
+      <p className="product-desc mb-2">
+        Stock: <strong>{product.stock}</strong>
       </p>
 
       <p className="product-desc">

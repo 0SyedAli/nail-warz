@@ -8,9 +8,6 @@ import Header from "@/components/Home/Header";
 import Footer from "@/components/Home/Footer";
 import WebBanner from "@/components/Home/WebBanner";
 import AppCTASection from "@/components/Home/AppCTASection";
-
-import ImageGallery from "@/components/product/ImageGallery";
-import ProductInfo from "@/components/product/ProductInfo";
 import RelatedProducts from "@/components/product/RelatedProducts";
 
 export default function ProductPage() {
@@ -78,11 +75,7 @@ export default function ProductPage() {
                     <>
                         <div className="row">
                             <div className="col-lg-6">
-                                <ImageGallery images={product.images} />
-                            </div>
-
-                            <div className="col-lg-6">
-                                <ProductInfo product={product} />
+                                0
                             </div>
                         </div>
 

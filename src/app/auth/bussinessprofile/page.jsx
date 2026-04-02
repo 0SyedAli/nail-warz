@@ -12,7 +12,7 @@ import Image from "next/image";
 import { RxCross2 } from "react-icons/rx";
 import { showErrorToast, showSuccessToast } from "src/lib/toast";
 import api from "@/lib/axios";
-import AuthRedirectHandler from "@/utils/AuthHandler";
+// import AuthRedirectHandler from "@/utils/AuthHandler";
 import { Spinner } from "@chakra-ui/react";
 import TermAndConditionModal from "@/components/Modal/TermAndConditionModal";
 import SpinnerLoading from "@/components/Spinner/SpinnerLoading";
@@ -347,7 +347,7 @@ export default function BussinessProfile() {
   /* ----------------------- UI ----------------------- */
   return (
     <>
-      <AuthRedirectHandler />
+      {/* <AuthRedirectHandler /> */}
       {loading ? (
         <BallsLoading borderWidth="mx-auto" />
       ) : (
@@ -373,6 +373,8 @@ export default function BussinessProfile() {
           {errors.salonName && <p className="text-danger">{errors.salonName.message}</p>}
 
           {/* CITY AUTOCOMPLETE */}
+          {console.log(isLoaded)}
+
           {isLoaded && (
             <>
               <label>City</label>

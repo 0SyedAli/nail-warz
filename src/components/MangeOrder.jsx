@@ -22,7 +22,6 @@ export default function ManageAppointments() {
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
     const [showCalendar, setShowCalendar] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
     const [bookingDetail, setBookingDetail] = useState(null);
@@ -422,6 +421,7 @@ export default function ManageAppointments() {
                 onClose={onClose}
                 modalClass="appoint_detail_container"
                 booking={bookingDetail}
+                onUpdated={() => fetchAppointments()}
             />
         </div>
     );

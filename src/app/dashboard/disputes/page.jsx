@@ -10,13 +10,11 @@ const PAGE_SIZE = 10;
 
 export default function Disputes() {
     const router = useRouter();
-
     const [items, setItems] = useState([]);
     const [stats, setStats] = useState(null);
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
-
 
     // 🔁 Fetch contents
     useEffect(() => {
@@ -30,11 +28,25 @@ export default function Disputes() {
                 });
 
                 if (res.data.success) {
-                    setItems(res.data.disputes);
+                    let vendorIdCookie = null;
+                    try {
+                        const userCookieStr = Cookies.get("user");
+                        if (userCookieStr) {
+                            vendorIdCookie = JSON.parse(userCookieStr)._id;
+                        }
+                    } catch (e) {
+                        console.error("Error parsing user cookie", e);
+                    }
+
+                    const filteredDisputes = vendorIdCookie 
+                        ? res.data.disputes.filter(d => d.vendorId?._id === vendorIdCookie) 
+                        : res.data.disputes;
+
+                    setItems(filteredDisputes);
                     setStats({
-                        total: res.data.count,
-                        pending: res.data.disputes.filter(d => d.status === 'pending').length,
-                        resolved: res.data.disputes.filter(d => d.status === 'Refunded' || d.status === 'Completed').length,
+                        total: filteredDisputes.length,
+                        pending: filteredDisputes.filter(d => d.status === 'pending').length,
+                        resolved: filteredDisputes.filter(d => d.status === 'Refunded' || d.status === 'Completed').length,
                     });
                 }
             } catch (error) {

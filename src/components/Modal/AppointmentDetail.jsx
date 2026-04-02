@@ -43,14 +43,21 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
       }
 
       setMessage("Reschedule successful ✅");
-      if (onUpdated) onUpdated();
-      rescheduleDisc.onClose(); // close modal
+      
+      // Close modals first
+      rescheduleDisc.onClose();
+      onClose();
+
+      // Delay refetching so modals can animate out
+      setTimeout(() => {
+        if (onUpdated) onUpdated();
+      }, 400);
+
     } catch (err) {
       console.error("Reschedule Error:", err);
       setMessage(err.message || "Something went wrong");
     } finally {
       setLoading(false);
-      onClose();
     }
   };
   /* ───── API Call for Completed ───── */
@@ -76,8 +83,16 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
 
       setMessage(`Booking marked as ${newStatus} ✅`);
 
-      if (onUpdated) onUpdated(); // refresh list
-      onClose(); // close modal
+      // Close all modals first
+      cancelDisc.onClose();
+      completedDisc.onClose();
+      onClose();
+
+      // Delay refetching so modals can animate out and clean up portals
+      setTimeout(() => {
+        if (onUpdated) onUpdated();
+      }, 400);
+
     } catch (err) {
       console.error("Update Status Error:", err);
       setMessage(err.message || "Something went wrong");

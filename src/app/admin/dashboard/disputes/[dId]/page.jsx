@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import Cookies from "js-cookie";
 import { useRouter, useParams } from "next/navigation";
-import { BsArrowLeft, BsSend, BsX } from "react-icons/bs";
+import { BsArrowLeft } from "react-icons/bs";
 import api from "@/lib/axios";
 import { showSuccessToast, showErrorToast } from "@/lib/toast";
 import Image from "next/image";
@@ -382,7 +382,7 @@ export default function DisputeDetails() {
                                             <option value="Under_Review">Under Review</option>
                                             <option value="Resolved">Resolved</option>
                                             <option value="Rejected">Rejected</option>
-                                            <option value="Refunded">Refunded (Charge Vendor)</option>
+                                            <option value="Refunded">Refunded</option>
                                         </select>
                                     </div>
 

@@ -11,7 +11,7 @@ import { showErrorToast, showSuccessToast } from "src/lib/toast";
 import Link from "next/link";
 import Cookies from "js-cookie"; // ✅ Import js-cookie
 import api from "@/lib/axios";
-import AuthRedirectHandler from "@/utils/AuthHandler";
+// import AuthRedirectHandler from "@/utils/AuthHandler";
 import BallsLoading from "@/components/Spinner/BallsLoading";
 // ✅ Validation schema using Yup
 const schema = Yup.object().shape({
@@ -151,7 +151,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <AuthRedirectHandler />
+      {/* <AuthRedirectHandler /> */}
       {success ? <BallsLoading borderWidth="mx-auto" /> : (
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="d-flex align-items-center justify-content-center mb-3">
