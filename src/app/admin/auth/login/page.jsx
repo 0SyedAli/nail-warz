@@ -161,7 +161,7 @@ export default function LoginPage() {
           <InputField
             id="password"
             type={show ? "text" : "password"}
-            classInput="classInput"
+            classInput="classInput mb-3"
             placeholder="Enter password"
             show={show}
             handleClick={() => setShow(!show)}

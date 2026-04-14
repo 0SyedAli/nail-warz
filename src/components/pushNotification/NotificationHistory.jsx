@@ -113,7 +113,7 @@ const NotificationHistory = ({ history, loading, onRefresh }) => {
                         <div className="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
                             <div className="modal-header border-0 p-4 pb-0 d-flex justify-content-between align-items-center">
                                 <h5 className="fw-bold mb-0 d-flex align-items-center gap-2">
-                                    <span className="bg-primary bg-opacity-10 p-2 rounded-3 text-primary"><FiInfo size={20} /></span>
+                                    <span className="bg-danger bg-opacity-10 p-2 rounded-3 text-danger"><FiInfo size={20} /></span>
                                     Broadcast Details
                                 </h5>
                                 <button
@@ -126,49 +126,67 @@ const NotificationHistory = ({ history, loading, onRefresh }) => {
                                 </button>
                             </div>
                             <div className="modal-body p-4">
-                                <div className="mb-4">
-                                    <h4 className="fw-bold text-dark">{selectedItem.title}</h4>
-                                    <div className="p-3 bg-light rounded-3 mt-2 border border-secondary border-opacity-10" style={{ fontSize: '15px', lineHeight: '1.6' }}>
-                                        {selectedItem.body}
+                                <div className="mb-3">
+                                    {/* Title */}
+                                    <small className="text-muted d-block mb-1">Notification Title</small>
+                                    <h5 className="fw-bold text-dark text-capitalize mb-3">
+                                        {selectedItem.title}
+                                    </h5>
+
+                                    {/* Body */}
+                                    <small className="text-muted d-block mb-1">Notification Content</small>
+                                    <div
+                                        className="mb-3"
+                                        style={{ fontSize: "15px", lineHeight: "1.6" }}
+                                    >
+                                        {selectedItem.body || "No content available"}
+                                    </div>
+
+                                    {/* System Message */}
+                                    <small className="text-muted d-block mb-1">System Message</small>
+                                    <div
+                                        className=""
+                                        style={{ fontSize: "14px", lineHeight: "1.5" }}
+                                    >
+                                        {selectedItem.message || "No message"}
                                     </div>
                                 </div>
-
                                 <div className="row g-3">
                                     <div className="col-6">
-                                        <label className="text-muted small fw-bold text-uppercase mb-1 d-block">Status</label>
+                                        <small className="text-muted d-block mb-1">Status</small>
                                         <div>{getStatusBadge(selectedItem.status)}</div>
                                     </div>
                                     <div className="col-6">
-                                        <label className="text-muted small fw-bold text-uppercase mb-1 d-block">Target Audience</label>
+                                        <small className="text-muted d-block mb-1">Target Audience</small>
                                         <div className="d-flex align-items-center gap-2 fw-semibold">
-                                            <FiUser className="text-primary" /> {getRecipientLabel(selectedItem.recipientType)}
+                                            <FiUser className="text-danger" /> {getRecipientLabel(selectedItem.recipientType)}
                                         </div>
                                     </div>
                                     <div className="col-6">
-                                        <label className="text-muted small fw-bold text-uppercase mb-1 d-block">Execution Data</label>
+                                        <small className="text-muted d-block mb-1">Execution Data</small>
                                         <div className="d-flex flex-column gap-1">
                                             <div className="small"><span className="text-success fw-bold">{selectedItem.sentCount || 0}</span> Successfully Sent</div>
                                             <div className="small"><span className="text-danger fw-bold">{selectedItem.failedCount || 0}</span> Failed Attempts</div>
                                         </div>
                                     </div>
-                                    <div className="col-6">
-                                        <label className="text-muted small fw-bold text-uppercase mb-1 d-block">Broadcast ID</label>
+                                    {/* <div className="col-6">
+                                        <small className="text-muted d-block mb-1">Broadcast ID</small>
                                         <code className="small text-muted">{selectedItem._id || 'N/A'}</code>
-                                    </div>
-                                    
+                                    </div> */}
+
                                     <div className="col-12 border-top pt-3 mt-3">
                                         <div className="d-flex flex-column gap-2 text-muted small">
                                             <div className="d-flex align-items-center gap-2">
-                                                <FiClock size={14} /> 
+                                                <FiClock size={14} />
                                                 <strong>Scheduled Deployment:</strong> {selectedItem.scheduledAt ? new Date(selectedItem.scheduledAt).toLocaleString() : 'Executed Immediately'}
                                             </div>
                                             <div className="d-flex align-items-center gap-2">
-                                                <FiActivity size={14} /> 
+                                                <FiActivity size={14} />
                                                 <strong>Created On:</strong> {new Date(selectedItem.createdAt).toLocaleString()}
                                             </div>
                                             {selectedItem.adminId && (
                                                 <div className="d-flex align-items-center gap-2">
-                                                    <FiUser size={14} /> 
+                                                    <FiUser size={14} />
                                                     <strong>Initiated By:</strong> {selectedItem.adminId.email}
                                                 </div>
                                             )}
@@ -179,10 +197,10 @@ const NotificationHistory = ({ history, loading, onRefresh }) => {
                             <div className="modal-footer border-0 p-4 pt-0">
                                 <button
                                     type="button"
-                                    className="btn btn-primary w-100 rounded-pill py-3 fw-bold shadow-sm"
+                                    className="btn btn-danger w-100 rounded-pill py-3 fw-bold shadow-sm"
                                     onClick={() => setShowModal(false)}
                                 >
-                                    Dismiss Details
+                                    Close
                                 </button>
                             </div>
                         </div>

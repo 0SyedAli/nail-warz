@@ -17,7 +17,7 @@ const CreateNotificationCard = ({
     return (
         <div className="card border-0 shadow-sm p-4 h-100" style={{ borderRadius: '16px' }}>
             <div className="d-flex align-items-center gap-2 mb-4">
-                <div className="bg-primary bg-opacity-10 p-2 rounded-3 text-primary">
+                <div className="bg-danger bg-opacity-10 p-2 rounded-3 text-danger">
                     <BsSend size={20} />
                 </div>
                 <h5 className="fw-bold mb-0">Create Broadcast</h5>
@@ -88,7 +88,7 @@ const CreateNotificationCard = ({
 
             <div className="mt-auto pt-3">
                 <button
-                    className="btn btn-primary btn-lg w-100 py-3 d-flex align-items-center justify-content-center gap-2 shadow-sm transition-all"
+                    className="btn btn-danger btn-lg w-100 py-3 d-flex align-items-center justify-content-center gap-2 shadow-sm transition-all"
                     style={{ borderRadius: '12px', fontWeight: '600' }}
                     onClick={onSend}
                     disabled={loading}
