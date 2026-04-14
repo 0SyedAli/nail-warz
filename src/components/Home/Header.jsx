@@ -238,64 +238,12 @@ export default function Header() {
               </div>
             </div>
 
-            {/* RIGHT: CART + AUTH */}
+            {/* RIGHT: CART */}
             <div className="d-flex align-items-center gap-3">
-              {/* AUTH AREA */}
-              {!isLoggedIn ? (
-                <>
-                  <Link href="/user-auth/login" className="btn btn-outline-dark">
-                    Login
-                  </Link>
-
-                  <Link href="/user-auth/signup" className="btn btn-header">
-                    Join as a Professional
-                  </Link>
-                </>
-              ) : (
-                <div className="dropdown header-dropdown2">
-                  <button
-                    className="btn btn-light d-flex align-items-center gap-2 dropdown-toggle"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    {/* <Image
-                    src={avatarSrc}
-                    alt={displayName}
-                    width={32}
-                    height={32}
-                    className="rounded-circle"
-                    priority
-                  /> */}
-                    <div className="user-avatar2">
-                      {displayName.slice(0, 1).toUpperCase()}
-                    </div>
-                    <span className="fw-medium text-dark text-capitalize">{displayName}</span>
-                  </button>
-
-                  <ul className="dropdown-menu dropdown-menu-end shadow">
-                    {/* <li>
-                    <Link className="dropdown-item" href="/profile">
-                      Profile
-                    </Link>
-                  </li>
-                  <li>
-                    <Link className="dropdown-item" href="/orders">
-                      Orders
-                    </Link>
-                  </li>
-                  <li>
-                    <hr className="dropdown-divider" />
-                  </li> */}
-                    <li>
-                      <button className="dropdown-item text-danger" onClick={handleLogout}>
-                        Logout
-                      </button>
-                    </li>
-                  </ul>
-                </div>
-              )}
-
+              {/* Removed Auth Area for Guest-only flow */}
+              <Link href="/contact" className="btn btn-header">
+                Join as a Professional
+              </Link>
               {/* MOBILE TOGGLER */}
               <button
                 className="navbar-toggler border-0"
