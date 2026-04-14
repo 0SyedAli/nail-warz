@@ -174,13 +174,13 @@ export default function LoginPage() {
             disabled={loading}
           />
           {/* ✅ Google Signup/Login Button */}
-          <div id="googleSignInDiv" className="mt-3 text-center"></div>
+          {/* <div id="googleSignInDiv" className="mt-3 text-center"></div>
           <div className="register_link">
             <h5 style={{ fontSize: "15px" }}>
               {"Don't have an account? "}
               <Link href="signup" style={{ fontSize: "15px" }}>Sign Up</Link>
             </h5>
-          </div>
+          </div> */}
         </form>
       )}
     </>
