@@ -192,12 +192,12 @@ export default function LoginPage() {
           />
           {/* ✅ Google Signup/Login Button */}
           <div id="googleSignInDiv" className="mt-3 text-center"></div>
-          <div className="register_link d-flex align-items-center justify-content-between">
-            <h5 style={{ fontSize: "15px" }}>
+          <div className="register_link d-flex align-items-center justify-content-between flex-wrap gap-2 mt-2">
+            <h5 style={{ fontSize: "15px", margin: 0 }}>
               {"Don't have an account? "}
-              <Link href="signup" style={{ fontSize: "15px" }}>Sign Up</Link>
+              <Link href="signup" style={{ fontSize: "15px", margin: 0 }}>Sign Up</Link>
             </h5>
-            <h5 style={{ fontSize: "15px" }}><a href="forgot" style={{ fontSize: "15px" }}>Forgot password?</a></h5>
+            <h5 style={{ fontSize: "15px", margin: 0 }}><a href="forgot" style={{ fontSize: "15px", margin: 0 }}>Forgot password?</a></h5>
           </div>
         </form>
       )}

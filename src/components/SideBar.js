@@ -45,11 +45,17 @@ const SideBar = () => {
         "/dashboard/addnewservice"
       ],
     },
+    // {
+    //   href: "/dashboard/categories",
+    //   icon: "/images/layer-icon.png",
+    //   text: "Service Categories",
+    //   related: ["/dashboard/categories"],
+    // },
     {
-      href: "/dashboard/categories",
-      icon: "/images/layer-icon.png",
-      text: "Service Categories",
-      related: ["/dashboard/categories"],
+      href: "/dashboard/categoryrequest",
+      icon: "/images/report-data.png", // Using an appropriate icon
+      text: "Category Requests",
+      related: ["/dashboard/categoryrequest"],
     },
     {
       href: "/dashboard/payouthistory",

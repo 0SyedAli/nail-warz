@@ -242,15 +242,16 @@ export default function SuperAdminUsers() {
                                 <thead className="table-light">
                                     <tr>
                                         <th># ID</th>
-                                        <th>Username</th>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
                                         <th>Email</th>
                                         <th>Join Date</th>
-                                        <th>Orders</th>
-                                        <th>Cancel Orders</th>
+                                        <th>Total Bookings</th>
+                                        <th>Cancel Bookings</th>
                                         <th>Wallet Balance</th>
                                         <th>Total Spent</th>
-                                        {smartFilter === "inactive" ? (<th>Status</th>) : null}
-                                        <th>Enable / Disable</th>
+                                        {smartFilter === "inactive" ? (<th>Last Active</th>) : null}
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
 
@@ -266,10 +267,11 @@ export default function SuperAdminUsers() {
                                             }}
                                         >
                                             <td>#{u._id.slice(-5)}</td>
-                                            <td>{u.username || "-"}</td>
+                                            <td>{u.firstName || "-"}</td>
+                                            <td>{u.lastName || "-"}</td>
                                             <td>{u.email}</td>
                                             <td>{new Date(u.createdAt).toLocaleDateString()}</td>
-                                            <td>{u.purchaseCount}</td>
+                                            <td>{u.appointmentCount}</td>
                                             <td>{u.cancelledByCount}</td>
                                             <td>${u.walletBalance}</td>
                                             <td className="fw-bold ">
@@ -317,7 +319,7 @@ export default function SuperAdminUsers() {
                                             }
 
                                             <td className="user-toggle" onClick={(e) => e.stopPropagation()}>
-                                                <div className="form-check form-switch d-flex align-items-center gap-2 m-0">
+                                                <div className="form-check form-switch d-flex align-items-center ps-0 gap-2 m-0">
                                                     <input
                                                         className="form-check-input"
                                                         type="checkbox"

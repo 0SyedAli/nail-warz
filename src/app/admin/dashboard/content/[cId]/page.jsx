@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 import Image from "next/image";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import { MdHistory } from "react-icons/md";
 import AddToBattleModal from "@/components/Modal/AddToBattleModal";
 
 export default function ContentDetail() {
@@ -33,20 +34,27 @@ export default function ContentDetail() {
     fetchOne();
   }, [cId]);
 
-  const updateStatus = async (status, goBack = true) => {
-    await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/content/${cId}`,
-      {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${Cookies.get("token")}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status }),
+  const updateStatus = async (status, goBack = false) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/content/${cId}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status }),
+        }
+      );
+      const json = await res.json();
+      if (json.success) {
+        setItem((prev) => ({ ...prev, status }));
+        if (goBack) router.back();
       }
-    );
-
-    if (goBack) router.back();
+    } catch (error) {
+      console.error("Failed to update status", error);
+    }
   };
   function Avatar({ src, alt }) {
     const [imgSrc, setImgSrc] = useState(src || "/images/profile-avatar.jpg");
@@ -73,10 +81,7 @@ export default function ContentDetail() {
     // 1️⃣ update status first
     await updateStatus("selected", false);
 
-    // 2️⃣ update UI instantly
-    setItem(prev => ({ ...prev, status: "selected" }));
-
-    // 3️⃣ open battle modal
+    // 2️⃣ open battle modal
     setBattleModalOpen(true);
   };
 
@@ -127,37 +132,56 @@ export default function ContentDetail() {
 
                 <div className="info-row">
                   <span className="label">Social Media</span>
-                  <a
+                  {/* <a
                     href="#"
                     className="value social-link"
-                  >
-                    @{item.social?.name}
-                  </a>
+                  > */}
+                  <span className="value">
+                    <div className="d-inline text-capitalize">{item.social?.platform}</div> : {item.social?.name}
+                  </span>
+                  {/* </a> */}
                 </div>
+                <InfoRow label="Nail Technician Name" value={item.nailTechnicianName} />
+                <InfoRow label="Salon Name" value={item.salonName} />
 
                 <InfoRow
                   label="Submitted"
                   value={new Date(item.createdAt).toLocaleString()}
                 />
 
-                <InfoRow label="Consent Given" value="Yes" />
+                {/* <InfoRow label="Consent Given" value="Yes" /> */}
               </div>
 
               {/* ===== REVIEW ACTIONS ===== */}
               <div className="card sidebar-card">
                 <h6 className="fw-semibold mb-3">Review Actions</h6>
 
-                {/* PENDING */}
-                {item.status === "pending" && (
-                  <>
+                {/* ACTION BUTTONS */}
+                <div className="d-flex flex-column gap-2">
+                  {/* Approve Action */}
+                  {item.status !== "selected" && (
                     <button
-                      className="btn btn-dark w-100 mb-2 action-btn d-flex align-items-center gap-2 justify-content-center"
+                      className="btn btn-dark w-100 action-btn d-flex align-items-center gap-2 justify-content-center"
                       onClick={handleApprove}
                     >
                       <IoMdCheckmarkCircleOutline size={20} />
-                      Approve & Add to Battle
+                      {item.status === "rejected" ? "Approve & Select" : "Approve & Add to Battle"}
                     </button>
+                  )}
 
+                  {/* Add to Battle (Only when already selected) */}
+                  {item.status === "selected" && (
+                    <button
+                      className="btn btn-dark w-100 action-btn d-flex align-items-center gap-2 justify-content-center"
+                      onClick={openBattleModal}
+                    >
+                      <IoMdCheckmarkCircleOutline size={20} />
+                      Add to Battle
+                    </button>
+                  )}
+
+                  {/* Reject Action */}
+                  {item.status !== "rejected" && (
                     <button
                       className="btn btn-danger w-100 action-btn d-flex align-items-center gap-2 justify-content-center"
                       onClick={() => updateStatus("rejected")}
@@ -165,19 +189,19 @@ export default function ContentDetail() {
                       <FaRegCircleCheck size={15} />
                       Reject Submission
                     </button>
-                  </>
-                )}
+                  )}
 
-                {/* SELECTED */}
-                {item.status === "selected" && (
-                  <button
-                    className="btn btn-dark w-100 action-btn d-flex align-items-center gap-2 justify-content-center"
-                    onClick={openBattleModal}
-                  >
-                    <IoMdCheckmarkCircleOutline size={20} />
-                    Add to Battle
-                  </button>
-                )}
+                  {/* Move to Pending Action */}
+                  {item.status !== "pending" && (
+                    <button
+                      className="btn btn-outline-secondary w-100 action-btn d-flex align-items-center gap-2 justify-content-center"
+                      onClick={() => updateStatus("pending")}
+                    >
+                      <MdHistory size={20} />
+                      Move to Pending
+                    </button>
+                  )}
+                </div>
               </div>
 
             </div>

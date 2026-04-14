@@ -72,10 +72,16 @@ const SideBar = () => {
     {
       href: "/admin/dashboard/categories",
       icon: "/images/layer-icon.png",
-      text: "Filter Management",
+      text: "Category Management",
       related: [
         "/admin/dashboard/categories"
       ],
+    },
+    {
+      href: "/admin/dashboard/categoryrequest",
+      icon: "/images/report-data.png",
+      text: "Category Proposals",
+      related: ["/admin/dashboard/categoryrequest"],
     },
     {
       href: "/admin/dashboard/disputes",
@@ -93,7 +99,14 @@ const SideBar = () => {
         "/admin/dashboard/pushnotification"
       ],
     },
-
+    {
+      href: "/admin/dashboard/discount",
+      icon: "/images/layer-icon.png",
+      text: "Discount Management",
+      related: [
+        "/admin/dashboard/discount"
+      ],
+    },
   ];
   // useEffect(() => {
   //   setActiveTab(pathname);
@@ -113,6 +126,7 @@ const SideBar = () => {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
   return (
     <div className="sidebar_container">
       <div className="sidebar_header">

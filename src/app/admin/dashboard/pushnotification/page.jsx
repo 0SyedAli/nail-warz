@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Cookies from "js-cookie";
 import CreateNotificationCard from "@/components/pushNotification/CreateNotificationCard";
 import NotificationHistory from "@/components/pushNotification/NotificationHistory";
@@ -9,18 +9,58 @@ import { showErrorToast, showSuccessToast } from "@/lib/toast";
 export default function PushNotificationPage() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [recipientType, setRecipientType] = useState(""); // active, inactive, or empty (all)
+  const [scheduledAt, setScheduledAt] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fetchingHistory, setFetchingHistory] = useState(false);
   const [history, setHistory] = useState([]);
+
+  // 🔔 FETCH HISTORY
+  const fetchHistory = useCallback(async () => {
+    try {
+      setFetchingHistory(true);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/notificationHistory`,
+        {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        }
+      );
+      const json = await res.json();
+      if (res.ok) {
+        setHistory(json.data || []);
+      }
+    } catch (err) {
+      console.error("History fetch error:", err);
+    } finally {
+      setFetchingHistory(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchHistory();
+  }, [fetchHistory]);
 
   // 🔔 SEND NOTIFICATION
   const handleSend = async () => {
     if (!title || !body) {
-      alert("Title and message are required");
+      showErrorToast("Title and body are required");
       return;
     }
 
     try {
       setLoading(true);
+
+      const payload = {
+        title,
+        body,
+        data: {
+          type: "admin broadcast",
+        },
+        recipientType: recipientType || undefined,
+        scheduledAt: scheduledAt ? new Date(scheduledAt).toISOString() : undefined,
+      };
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/sendNotification`,
@@ -30,28 +70,22 @@ export default function PushNotificationPage() {
             Authorization: `Bearer ${Cookies.get("token")}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ title, body }),
+          body: JSON.stringify(payload),
         }
       );
 
       const json = await res.json();
 
-      if (!res.ok) throw new Error(json.message || "Failed");
-
-      // prepend to history
-      setHistory(prev => [
-        {
-          title,
-          body,
-          sentAt: new Date().toISOString(),
-          delivered: "All Users",
-        },
-        ...prev,
-      ]);
+      if (!res.ok) throw new Error(json.message || "Failed to send notification");
 
       setTitle("");
       setBody("");
-      showSuccessToast("Notification sent successfully ✅");
+      setRecipientType("");
+      setScheduledAt("");
+      showSuccessToast("Notification broadcast initiated! ✅");
+      
+      // Refresh history
+      fetchHistory();
 
     } catch (err) {
       showErrorToast(err.message);
@@ -68,27 +102,35 @@ export default function PushNotificationPage() {
         <div className="mb-4">
           <h4 className="fw-bold">Push Notification</h4>
           <p className="text-muted">
-            Send Notifications To Users And Manage Messaging
+            Send targeted notifications to users and manage your broadcast history.
           </p>
         </div>
 
         <div className="row g-4">
 
           {/* LEFT – CREATE */}
-          <div className="col-lg-6">
+          <div className="col-lg-5">
             <CreateNotificationCard
               title={title}
               body={body}
+              recipientType={recipientType}
+              scheduledAt={scheduledAt}
               setTitle={setTitle}
               setBody={setBody}
+              setRecipientType={setRecipientType}
+              setScheduledAt={setScheduledAt}
               loading={loading}
               onSend={handleSend}
             />
           </div>
 
           {/* RIGHT – HISTORY */}
-          <div className="col-lg-6">
-            <NotificationHistory history={history} />
+          <div className="col-lg-7">
+            <NotificationHistory 
+              history={history} 
+              loading={fetchingHistory} 
+              onRefresh={fetchHistory}
+            />
           </div>
 
         </div>

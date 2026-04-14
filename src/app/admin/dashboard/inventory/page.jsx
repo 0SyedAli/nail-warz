@@ -59,15 +59,18 @@ export default function SuperAdminInventory() {
     };
 
     // 🔁 Fetch Products
-    const fetchProducts = async (status = null, filter = null, showAll = false) => {
+    const fetchProducts = async (status = null, filter = null, showAll = true) => {
         setLoading(true);
         try {
             let url = `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/product`;
 
             const params = new URLSearchParams();
+
+            // Always include showAll
+            params.append("showAll", true);
+
             if (status) params.append("status", status);
             if (filter) params.append("smartFilter", filter);
-            if (showAll) params.append("showAll", showAll);
 
             const queryString = params.toString();
             if (queryString) {
@@ -162,9 +165,9 @@ export default function SuperAdminInventory() {
                                 Add Product
                             </button>
                         </div>
-                        <div className="d-flex flex-wrap gap-2 my-2 justify-content-center">
+                        <div className="d-flex flex-wrap gap-2 my-2 justify-content-start">
                             <button
-                                className={`btn btn-sm ${showAll === true && smartStatus === null && smartFilter === null ? "btn-dark" : "btn-outline-dark"}`}
+                                className={`btn btn-sm ${showAll === true && smartStatus === true && smartFilter === true ? "btn-dark" : "btn-outline-dark"}`}
                                 onClick={() => handleSmartShowAll(true)}
                             >
                                 Show All
@@ -212,6 +215,7 @@ export default function SuperAdminInventory() {
                                         <th>Category</th>
                                         <th>Price</th>
                                         <th>Stock</th>
+                                        {smartFilter === "bestSeller" && <th>Total Sold</th>}
                                         <th>Status</th>
                                         <th>Is Active</th>
                                         <th>Actions</th>
@@ -227,7 +231,8 @@ export default function SuperAdminInventory() {
                                                 <td><Skeleton height="20px" width="100px" /></td>
                                                 <td><Skeleton height="20px" width="50px" /></td>
                                                 <td><Skeleton height="20px" width="40px" /></td>
-                                                <td><Skeleton height="20px" width="70px" /></td>
+                                                <td><Skeleton height="20px" width="40px" /></td>
+                                                {smartFilter === "bestSeller" && <td><Skeleton height="20px" width="70px" /></td>}
                                                 <td><Skeleton height="20px" width="70px" /></td>
                                                 <td>
                                                     <div className="d-flex gap-2">
@@ -245,6 +250,7 @@ export default function SuperAdminInventory() {
                                                 <td>{p.category?.join(", ") || "-"}</td>
                                                 <td>${p.price}</td>
                                                 <td>{p.stock}</td>
+                                                {smartFilter === "bestSeller" && <td>{p.totalSold}</td>}
                                                 <td>
                                                     <StatusBadge status={p.status} />
                                                 </td>

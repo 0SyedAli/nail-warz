@@ -169,7 +169,8 @@ export default function SuperAdminOrders() {
                 <thead className="table-light">
                   <tr>
                     <th>Order Number</th>
-                    <th>Customer</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
                     <th>Products</th>
                     <th>Total</th>
                     <th>Date</th>
@@ -182,25 +183,27 @@ export default function SuperAdminOrders() {
                   {loading ? (
                     Array.from({ length: 7 }).map((_, index) => (
                       <tr key={index}>
-                        <td><Skeleton height="20px" width="120px" /></td>
+                        <td><Skeleton height="20px" width="155px" /></td>
                         <td><Skeleton height="20px" width="100px" /></td>
                         <td><Skeleton height="20px" width="70px" /></td>
                         <td><Skeleton height="20px" width="60px" /></td>
                         <td><Skeleton height="20px" width="90px" /></td>
                         <td><Skeleton height="20px" width="70px" /></td>
                         <td><Skeleton height="30px" width="60px" /></td>
+                        <td><Skeleton height="30px" width="60px" /></td>
                       </tr>
                     ))
                   ) : (
                     currentOrders.map(order => (
                       <tr key={order._id}>
-                        <td className="fw-semibold">{order.orderNumber}</td>
-                        <td>{order.customer?.username || "-"}</td>
-                        <td>{order.products?.length || 0} items</td>
-                        <td>${order.total.toFixed(2)}</td>
-                        <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                        <td className="fw-semibold">{order?.orderNumber}</td>
+                        <td>{order?.customer?.firstName || "-"}</td>
+                        <td>{order?.customer?.lastName || "-"}</td>
+                        <td>{order?.products?.length || 0} items</td>
+                        <td>${order?.total?.toFixed(2)}</td>
+                        <td>{new Date(order?.createdAt).toLocaleDateString()}</td>
                         <td>
-                          <OrderStatusBadge status={order.status} />
+                          <OrderStatusBadge status={order?.status} />
                         </td>
                         <td>
                           <button
@@ -268,7 +271,7 @@ const OrderStatusBadge = ({ status }) => {
     pending: "bg-secondary2 text-dark",
     processing: "bg-info text-dark",
     shipped: "bg-primary text-white",
-    completed: "bg-dark text-white",
+    completed: "bg-success text-white",
     cancelled: "bg-danger text-white",
   };
 

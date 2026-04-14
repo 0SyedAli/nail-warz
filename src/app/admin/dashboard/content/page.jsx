@@ -167,7 +167,11 @@ export default function ContentManagement() {
             </div>
           )}
         </div>
-
+        {items.length === 0 && (
+          <div className="text-center py-5">
+            <p className="text-muted">No content found</p>
+          </div>
+        )}
       </div>
     </div>
   );

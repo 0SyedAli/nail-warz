@@ -25,7 +25,7 @@ export default function Services() {
   const [salonId, setSalonId] = useState("");
   const [error, setError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
 
   const router = useRouter();
 
@@ -179,6 +179,7 @@ export default function Services() {
                     <th>Service</th>
                     <th>Price</th>
                     <th>Category</th>
+                    <th>Sub Category</th>
                     <th>Technician</th>
                     <th>Actions</th>
                   </tr>
@@ -226,6 +227,7 @@ export default function Services() {
                         </td>
                         <td>${Number(s.price).toFixed(2)}</td>
                         <td>{category}</td>
+                        <td>{s.subCategory}</td>
                         <td>{technicianDisplay}</td>
                         <td style={{ width: "310px" }}>
                           <div className="d-flex gap-2">

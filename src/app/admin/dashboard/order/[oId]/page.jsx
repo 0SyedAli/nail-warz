@@ -80,60 +80,34 @@ export default function OrderDetailsPage() {
                 <div className="card mb-4">
                     <div className="card-body d-flex justify-content-between align-items-start">
                         <div className="d-flex flex-column gap-2">
-                            <h5 className="fw-bold mb-1">{order.orderNumber}</h5>
+                            <h5 className="fw-bold mb-1">{order?.orderNumber}</h5>
                             <p className="text-muted">
-                                Placed on {new Date(order.createdAt).toLocaleDateString()}
+                                Placed on {new Date(order?.createdAt).toLocaleDateString()}
                             </p>
-                            {!(order.status?.toLowerCase() === "completed" || order.status?.toLowerCase() === "cancelled") ? (
-                                <div className="d-flex align-items-center gap-2 mt-2 pt-1 border-top border-light">
-                                    <div className="small text-muted mb-0 me-1 fw-bold text-uppercase">Update Status:</div>
-                                    <select
-                                        className="form-select form-select-sm border shadow-sm"
-                                        style={{ width: "200px", borderRadius: "8px" }}
-                                        value={order.status?.toLowerCase()}
-                                        disabled={updating}
-                                        onChange={(e) => updateStatus(e.target.value)}
-                                    >
-                                        <option value="" >Select Next Status</option>
+                            <div className="d-flex align-items-center gap-2 mt-2 pt-1 border-top border-light">
+                                <div className="small text-muted mb-0 me-1 fw-bold text-uppercase">Update Status:</div>
 
-                                        {order.status?.toLowerCase() === "pending" && (
-                                            <>
-                                                <option value="processing">Processing</option>
-                                                <option value="shipped">Shipped</option>
-                                                <option value="completed">Completed</option>
-                                                <option value="cancelled">Cancelled</option>
-                                            </>
-                                        )}
+                                <select
+                                    className="form-select form-select-sm border shadow-sm"
+                                    style={{ width: "200px", borderRadius: "8px" }}
+                                    value={order?.status?.toLowerCase() || ""}
+                                    disabled={updating}
+                                    onChange={(e) => updateStatus(e.target.value)}
+                                >
+                                    <option value="">Select Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="processing">Processing</option>
+                                    <option value="shipped">Shipped</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
 
-                                        {order.status?.toLowerCase() === "processing" && (
-                                            <>
-                                                <option value="shipped">Shipped</option>
-                                                <option value="completed">Completed</option>
-                                                <option value="cancelled">Cancelled</option>
-                                            </>
-                                        )}
-
-                                        {order.status?.toLowerCase() === "shipped" && (
-                                            <>
-                                                <option value="completed">Completed</option>
-                                            </>
-                                        )}
-                                    </select>
-                                    {updating && <small className="text-muted ms-1">Updating…</small>}
-                                </div>
-                            ) : (order.status?.toLowerCase() === "cancelled") ? (
-                                <div className="mt-2 p-2 border-2 border-danger rounded-2 d-flex align-items-center justify-content-center">
-                                    <small className="text-danger fw-bold text-uppercase">Order Cancelled</small>
-                                </div>
-                            ) : (
-                                <div className="mt-2 p-2 border-2 border-success rounded-2 d-flex align-items-center justify-content-center">
-                                    <small className="text-success fw-bold text-uppercase">Order Completed</small>
-                                </div>
-                            )}
+                                {updating && <small className="text-muted ms-1">Updating…</small>}
+                            </div>
                         </div>
 
                         <div className="d-flex align-items-center gap-3">
-                            <OrderStatusBadge status={order.status} />
+                            <OrderStatusBadge status={order?.status} />
 
                         </div>
                     </div>
@@ -147,7 +121,7 @@ export default function OrderDetailsPage() {
                             <div className="card-body">
                                 <h6 className="fw-bold mb-4">Order Items</h6>
 
-                                {order.products.map((p) => (
+                                {order?.products?.map((p) => (
                                     <div
                                         key={p._id}
                                         className="d-flex justify-content-between align-items-center mb-3"
@@ -161,40 +135,65 @@ export default function OrderDetailsPage() {
                                                 }
                                                 width={60}
                                                 height={60}
+                                                style={{ width: "60px", height: "60px" }}
                                                 alt={p.name}
                                                 className="rounded"
                                             />
                                             <div>
                                                 <div className="fw-semibold">{p.name}</div>
-                                                <small className="text-muted">Qty: {p.qty}</small>
+                                                <small className="text-muted">Qty: {p.qty} </small>
+                                                <br />
+                                                <small className="text-muted">SKU: {p?.sku}</small>
                                             </div>
                                         </div>
                                         <div className="fw-semibold">
-                                            ${(p.price * p.qty).toFixed(2)}
+                                            ${(p.price).toFixed(2)}
                                         </div>
                                     </div>
                                 ))}
-
                                 <hr />
-
+                                {/* <div className="d-flex justify-content-between">
+                                    <span className="text-muted">SKU</span>
+                                    <span className="text-muted">{order?.products?.map((p) => p.sku).join(", ")}</span>
+                                </div>
+                                <hr /> */}
                                 <div className="d-flex justify-content-between">
                                     <span className="text-muted">Subtotal</span>
-                                    <span className="text-muted">${order.total.toFixed(2)}</span>
+                                    <span className="text-muted">${order?.subTotal?.toFixed(2)}</span>
                                 </div>
                                 <hr />
+                                {/* <div className="d-flex justify-content-between">
+                                    <span className="text-muted">Discount Code</span>
+                                    <span className="text-muted">{order?.discountCode?.code}</span>
+                                </div>
                                 <div className="d-flex justify-content-between">
-                                    <span className="text-muted">Discount Price</span>
-                                    <span className="text-muted">${order.discountAmount.toFixed(2)}</span>
+                                    <span className="text-muted">Discount Type</span>
+                                    <span className="text-muted text-capitalize">{order?.discountCode?.type}</span>
+                                </div> */}
+                                <div className="d-flex justify-content-between text-danger">
+                                    <span className="">
+                                        Discount (
+                                        {order?.discountCode?.code} -{" "}
+                                        {order?.discountCode?.type === "fixed"
+                                            ? `$${order?.discountCode?.value}`
+                                            : order?.discountCode?.type === "percentage"
+                                                ? `${order?.discountCode?.value}%`
+                                                : order?.discountCode?.value}
+                                        )
+                                    </span>
+                                    <span className="">
+                                        -${order?.discountAmount ? order?.discountAmount.toFixed(2) : "0.00"}
+                                    </span>
                                 </div>
                                 <hr />
                                 <div className="d-flex justify-content-between">
                                     <span className="text-muted">Shipping Price</span>
-                                    <span className="text-muted">${order.shippingCharges.toFixed(2)}</span>
+                                    <span className="text-muted">+${order?.shippingCharges?.toFixed(2)}</span>
                                 </div>
                                 <hr />
                                 <div className="d-flex justify-content-between fw-bold mt-2">
                                     <span>Total</span>
-                                    <span>${order.total.toFixed(2)}</span>
+                                    <span>${order?.payment?.amount?.toFixed(2)}</span>
                                 </div>
                             </div>
                         </div>
@@ -208,14 +207,16 @@ export default function OrderDetailsPage() {
                             <div className="card-body">
                                 <h6 className="fw-bold mb-2">Customer Information</h6>
 
-                                <small className="mb-0 text-muted">Name</small>
-                                <p className="mb-1">{order.customer.username}</p>
-                                <small className="mb-0 text-muted">Email</small>
-                                <p className="mb-1">{order.customer.email}</p>
-                                <small className="mb-0 text-muted">Phone</small>
-                                <p className="mb-0">{order.customer.phone}</p>
-                                <small className="mb-0 text-muted">Device Type</small>
-                                <p className="mb-0 text-capitalize">{order.customer.deviceType}</p>
+                                <small className="mb-0 text-muted">First Name:</small>
+                                <p className="mb-1">{order?.customer?.firstName || "N/A"}</p>
+                                <small className="mb-0 text-muted">Last Name:</small>
+                                <p className="mb-1">{order?.customer?.lastName || "N/A"}</p>
+                                <small className="mb-0 text-muted">Email:</small>
+                                <p className="mb-1">{order?.customer?.email || "N/A"}</p>
+                                <small className="mb-0 text-muted">Phone:</small>
+                                <p className="mb-0">{order?.customer?.phone || "N/A"}</p>
+                                <small className="mb-0 text-muted">Device Type:</small>
+                                <p className="mb-0 text-capitalize">{order?.customer?.deviceType || "N/A"}</p>
                             </div>
                         </div>
 
@@ -239,10 +240,10 @@ export default function OrderDetailsPage() {
                                     </div>
                                     <div>
                                         <p className="mb-0">
-                                            {order.payment.paymentMethod.toUpperCase()}
+                                            {order?.payment?.paymentMethod?.toUpperCase()}
                                         </p>
                                         <small className="text-muted">
-                                            {order.payment.status === "succeeded" ? "Payment received" : "Payment pending"}
+                                            {order?.payment?.status === "succeeded" ? "Payment received" : "Payment pending"}
                                         </small>
                                     </div>
                                 </div>
@@ -251,11 +252,11 @@ export default function OrderDetailsPage() {
                         </div>
 
                         {/* NOTES */}
-                        {order.notes && (
+                        {order?.notes && (
                             <div className="card">
                                 <div className="card-body">
                                     <h6 className="fw-bold mb-2">Order Notes</h6>
-                                    <small className="mb-0 text-muted">{order.notes}</small>
+                                    <p className="mb-0 text-muted">{order?.notes}</p>
                                 </div>
                             </div>
                         )}

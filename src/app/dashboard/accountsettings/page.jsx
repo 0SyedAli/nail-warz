@@ -61,7 +61,7 @@ const EditProfile = () => {
             city: "",
             state: "",
             zipCode: "",
-            streetAddress: "",
+            street: "",
             description: "",
             bussinessPhoneNumber: "",
             bussinessWebsite: "",
@@ -170,7 +170,7 @@ const EditProfile = () => {
                         locationName: profileData.city || "",
                         state: profileData.state || "",
                         zipCode: profileData.zipCode || "",
-                        streetAddress: profileData.streetAddress || "",
+                        street: profileData.street || "",
                         description: profileData.description || "",
                         bussinessPhoneNumber: profileData.bussinessPhoneNumber || "",
                         bussinessWebsite: profileData.bussinessWebsite || "",
@@ -241,7 +241,9 @@ const EditProfile = () => {
             // if (data.locationName !== existingData.locationName) {
             //     formData.append("locationName", data.locationName);
             // }
-
+            if (data.street !== existingData.street) {
+                formData.append("street", data.street);
+            }
             if (data.city !== existingData.city) {
                 formData.append("city", data.city);
             }
@@ -556,11 +558,11 @@ const EditProfile = () => {
                                     <label>Street Address</label>
                                     <input
                                         type="text"
-                                        {...register("streetAddress")}
-                                        className={`form-control ${errors.streetAddress ? "is-invalid" : ""}`}
+                                        {...register("street")}
+                                        className={`form-control ${errors.street ? "is-invalid" : ""}`}
                                     />
-                                    {errors.state && (
-                                        <div className="invalid-feedback">{errors.state.message}</div>
+                                    {errors.street && (
+                                        <div className="invalid-feedback">{errors.street.message}</div>
                                     )}
                                 </div>
                             </div>

@@ -14,72 +14,85 @@ export default function UserDataModal({ isOpen, onClose, user }) {
                     <button className="btn-close" onClick={onClose}></button>
                 </div>
                 {/* HEADER */}
-                <div className="d-flex justify-content-between align-items-start mb-4">
+                {/* <div className="d-flex justify-content-between align-items-start mb-4">
                     <div className="d-flex align-items-center gap-3">
 
-                        {/* Avatar */}
-                        <div
-                            style={{
-                                width: "60px",
-                                height: "60px",
-                                borderRadius: "50%",
-                                background: "#f1f3f5",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                fontWeight: 600,
-                                fontSize: "20px",
-                                color: "#333"
-                            }}
-                        >
-
-                            {user?.image ? (
-                                <Image
-                                    src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${user.image}`}
-                                    width={60}
-                                    height={60}
-                                    alt="User"
-                                    style={{
-                                        width: "100%",
-                                        height: "100%",
-                                        borderRadius: "50%",
-                                        objectFit: "cover"
-                                    }}
-                                />
-                            ) : (
-                                user?.username?.charAt(0) || "U"
-                            )}
-                        </div>
-
-                        <div>
-                            <h5 className="mb-1">{user.username || "Unnamed User"}</h5>
-                            <div className="text-muted small">{user.email}</div>
-
-                            <span
-                                style={{
-                                    padding: "6px 12px",
-                                    borderRadius: "20px",
-                                    fontSize: "12px",
-                                    fontWeight: 600,
-                                    backgroundColor: user?.isActive ? "#e6f4ea" : "#f1f3f5",
-                                    color: user?.isActive ? "#1e7e34" : "#6c757d"
-                                }}
-                            >
-                                {user?.isActive ? "Active" : "Inactive"}
-                            </span>
-                        </div>
+                       
                     </div>
 
-                </div>
+                </div> */}
+
 
                 {/* ACCOUNT INFO */}
                 <SectionTitle title="Account Information" />
+                <div className="d-flex align-items-center justify-content-between mb-3  ">
+                    <div
+                        style={{
+                            width: "100px",
+                            height: "100px",
+                            borderRadius: "10px",
+                            background: "#f1f3f5",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: 600,
+                            fontSize: "20px",
+                            color: "#333",
+                        }}
+                    >
+
+                        {user?.image ? (
+                            <Image
+                                src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${user.image}`}
+                                width={60}
+                                height={60}
+                                alt="User"
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    borderRadius: "10px",
+                                    objectFit: "cover"
+                                }}
+                            />
+                        ) : (
+                            user?.username?.charAt(0) || "U"
+                        )}
+                    </div>
+                    <div className="">Status:
+                        <span
+                            style={{
+                                padding: "6px 12px",
+                                borderRadius: "20px",
+                                fontSize: "12px",
+                                fontWeight: 600,
+                                marginLeft: "5px",
+                                backgroundColor: user?.isActive ? "#e6f4ea" : "#f1f3f5",
+                                color: user?.isActive ? "#1e7e34" : "#6c757d"
+                            }}
+                        >
+                            {user?.isActive ? "Active" : "Inactive"}
+                        </span>
+                    </div>
+                </div>
 
                 <div className="row g-3 mb-4">
+                    <Info label="First Name" value={user?.firstName || "-"} />
+                    <Info label="Last Name" value={user?.lastName || "-"} />
+                    <Info label="Email" value={user?.email || "-"} />
                     <Info label="Phone Number" value={user?.phone || "-"} />
                     <Info label="Device Type" value={user.deviceType || "-"} />
                     {/* <Info label="Stripe ID" value={user.stripeCustomerId || "-"} /> */}
-                    <Info label="Joined" value={new Date(user.createdAt).toLocaleString()} />
+                    <Info label="Joined" value={new Date(user.createdAt).toLocaleDateString()} />
+                    <Info
+                        label="Last Active"
+                        value={
+                            user.daysSinceLastActive === 0
+                                ? "Today"
+                                : user.daysSinceLastActive
+                                    ? `${user.daysSinceLastActive} days ago`
+                                    : "-"
+                        }
+                    />
                 </div>
 
                 {/* FINANCIAL */}
@@ -94,9 +107,9 @@ export default function UserDataModal({ isOpen, onClose, user }) {
                 <SectionTitle title="Activity Summary" />
 
                 <div className="row g-3 mb-4">
-                    <Info label="Total Orders" value={user.purchaseCount ?? 0} />
+                    {/* <Info label="Total Orders" value={user.purchaseCount ?? 0} /> */}
                     <Info label="Total Appointment" value={user.appointmentCount ?? 0} />
-                    <Info label="Last Appointment" value={user.lastAppointmentDate ? new Date(user.lastAppointmentDate).toLocaleString() : "-"} />
+                    <Info label="Last Appointment" value={user.lastAppointmentDate ? new Date(user.lastAppointmentDate).toLocaleDateString() : "-"} />
                 </div>
 
                 {/* FAVOURITES */}

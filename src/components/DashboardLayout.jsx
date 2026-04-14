@@ -26,6 +26,7 @@ export default function Dashboard({ children }) {
     categories: { title: "Manage Vendor Catagories" },
     disputes: { title: "Disputes" },
     disputeDetails: { title: "Dispute Details" },
+    categoryrequest: { title: "Category Requests" },
   };
 
   useEffect(() => {

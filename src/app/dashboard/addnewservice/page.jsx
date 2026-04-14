@@ -37,7 +37,9 @@ export default function AddNewService() {
   const [technicianList, setTechnicianList] = useState([]);
   const [salonId, setSalonId] = useState(null);   // null = not checked yet
   const [isReady, setIsReady] = useState(false);
-  const [categoryList, setCategoryList] = useState("");
+  const [categoryList, setCategoryList] = useState([]);
+  const [subCategoryList, setSubCategoryList] = useState([]);
+
   /* -------- Check cookie / auth -------- */
   useEffect(() => {
     const cookie = Cookies.get("user");
@@ -77,17 +79,29 @@ export default function AddNewService() {
   }, [salonId]);
 
   useEffect(() => {
-     if (!salonId) return;       
+    if (!salonId) return;
     (async () => {
       try {
-        const res = await api.get(`/getSalonCategory?salonId=${salonId}`);
+        const res = await api.get(`/getAdminById?salonId=${salonId}`);
         if (res?.data?.success) {
-          setCategoryList(res?.data?.data || []);
+          const profileData = res.data.data;
+
+          // Combine categoryId (standard) and salonCategoryId (requested)
+          const standardCats = (profileData.categoryId || []).map(cat => ({
+            ...cat,
+            model: "category"
+          }));
+          const salonCats = (profileData.salonCategoryId || []).map(cat => ({
+            ...cat,
+            model: "SalonCategory"
+          }));
+
+          setCategoryList([...standardCats, ...salonCats]);
         } else {
-          showErrorToast("Failed to fetch technicians");
+          showErrorToast("Failed to fetch categories");
         }
       } catch {
-        showErrorToast("Failed to fetch technicians");
+        showErrorToast("Failed to fetch categories");
       }
     })();
   }, [salonId]);
@@ -102,8 +116,32 @@ export default function AddNewService() {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: { technicians: [], category: "", images: [] },
+    defaultValues: { technicians: [], category: "", subCategory: "", images: [], categoryModel: "" },
   });
+
+  const selectedCategoryId = watch("category");
+
+  /* -------- Handle Subcategories when Category changes -------- */
+  useEffect(() => {
+    if (selectedCategoryId) {
+      const selectedCat = categoryList.find(c => String(c._id) === String(selectedCategoryId));
+      if (selectedCat) {
+        setSubCategoryList(selectedCat.subCategories || []);
+        setValue("categoryModel", selectedCat.model);
+        // Reset subcategory if it's not in the new list
+        const currentSub = watch("subCategory");
+        if (!selectedCat.subCategories?.includes(currentSub)) {
+          setValue("subCategory", "");
+        }
+      } else {
+        setSubCategoryList([]);
+        setValue("categoryModel", "");
+      }
+    } else {
+      setSubCategoryList([]);
+      setValue("categoryModel", "");
+    }
+  }, [selectedCategoryId, categoryList, setValue, watch]);
 
   /* -------- Image previews -------- */
   const images = watch("images");
@@ -117,9 +155,7 @@ export default function AddNewService() {
   /* -------- Chip helpers (unchanged except for nullish guards) -------- */
   const addChip = (field, value) => {
     if (!value) return;
-    const arr = watch(field) ?? [];
-    if (arr.includes(value)) return;
-    setValue(field, [...arr, value], { shouldValidate: true });
+    setValue(field, [value], { shouldValidate: true });
   };
   const removeChip = (field, idx) => {
     const arr = [...(watch(field) ?? [])];
@@ -137,6 +173,8 @@ export default function AddNewService() {
       fd.append("description", data.description);
       fd.append("technicianId", JSON.stringify(data.technicians));
       fd.append("categoryId", data.category);
+      fd.append("subCategory", data.subCategory);
+      fd.append("categoryModel", data.categoryModel);
       data.images.forEach((file) => fd.append("images", file));
 
       const res = await fetch(
@@ -153,6 +191,8 @@ export default function AddNewService() {
       setValue("description", "");
       setValue("technicians", []);
       setValue("category", "");
+      setValue("subCategory", "");
+      setValue("categoryModel", "");
       setValue("images", []);
       setPreviews([]);
     } catch (e) {
@@ -287,39 +327,70 @@ export default function AddNewService() {
                 </span>
               ))}
             </div>
-            <label className="mt-0">Assign Service Category</label>
-            <select
-              className="form-select input_field2 mt-1"
-              {...register("category")}
-            >
-              <option value="">-- choose --</option>
-              {categoryList && categoryList.map((cat) => (
-                <option key={cat?._id} value={cat?._id}>
-                  {cat?.categoryName}
-                </option>
-              ))}
-            </select>
-            {errors.category && <p className="text-danger">{errors.category.message}</p>}
 
-            {/* Selected category pill */}
-            <div className="d-flex flex-wrap my-2 gap-2">
-              {watch("category") && (
-                <span
-                  className="tags_category"
-                  onClick={() => setValue("category", "", { shouldValidate: true })}
+            <div className="row gx-3">
+              <div className="col-md-6">
+                <label className="mt-0">Select Category</label>
+                <select
+                  className="form-select input_field2 mt-1"
+                  {...register("category")}
                 >
-                  {
-                    // match against _id, then show categoryName
-                    categoryList?.find(c => String(c._id) === String(watch("category")))?.categoryName
-                    || "Unknown"
-                  }
-                  <RxCross2 />
-                </span>
-              )}
+                  <option value="">-- choose --</option>
+                  {categoryList && categoryList.map((cat) => (
+                    <option key={cat?._id} value={cat?._id}>
+                      {cat?.categoryName}
+                    </option>
+                  ))}
+                </select>
+                {/* Selected category pill */}
+                <div className="d-flex flex-wrap my-2 gap-2">
+                  {watch("category") && (
+                    <span
+                      className="tags_category"
+                      onClick={() => {
+                        setValue("category", "", { shouldValidate: true });
+                        setValue("subCategory", "");
+                        setValue("categoryModel", "");
+                      }}
+                    >
+                      {categoryList?.find(c => String(c._id) === String(watch("category")))?.categoryName || "Unknown"}
+                      <RxCross2 />
+                    </span>
+                  )}
+                </div>
+                {errors.category && <p className="text-danger">{errors.category.message}</p>}
+              </div>
+
+              <div className="col-md-6">
+                <label className="mt-0">Select Sub Category</label>
+                <select
+                  className="form-select input_field2 mt-1"
+                  {...register("subCategory")}
+                  disabled={!selectedCategoryId || subCategoryList.length === 0}
+                >
+                  <option value="">-- choose --</option>
+                  {subCategoryList.map((sub, i) => (
+                    <option key={i} value={sub}>
+                      {sub}
+                    </option>
+                  ))}
+                </select>
+                {/* Selected subcategory pill */}
+                <div className="d-flex flex-wrap my-2 gap-2">
+                  {watch("subCategory") && (
+                    <span
+                      className="tags_category"
+                      onClick={() => setValue("subCategory", "")}
+                    >
+                      {watch("subCategory")}
+                      <RxCross2 />
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
 
             {/* image upload */}
-
             <div className="d-flex align-items-center justify-content-between gap-5">
               <AuthBtn title="Back" type="button" location_btn={"back_btn"} onClick={() => router.back()} />
               <AuthBtn title="Create Service" type="submit" disabled={isSubmitting} />

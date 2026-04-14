@@ -29,6 +29,37 @@ export default function SuperAdminDashboard() {
   const [weeklyData, setWeeklyData] = useState(null);
   const [topVendors, setTopVendors] = useState([]);
   const [weeklyBookingData, setWeeklyBookingData] = useState(null);
+  const [filterType, setFilterType] = useState('all');
+  const [selectedMonth, setSelectedMonth] = useState('Jan');
+  const [selectedYear, setSelectedYear] = useState('2026');
+
+  const loadTopVendors = async () => {
+    const token = Cookies.get('token');
+    if (!token) return;
+
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/topVendorsBySales`,
+        {
+          params: {
+            filterType,
+            months: filterType === 'monthly' ? selectedMonth : undefined,
+            year: filterType === 'monthly' ? selectedYear : undefined,
+          },
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (response.data?.success) {
+        setTopVendors(response.data.vendors || []);
+      }
+    } catch (err) {
+      console.error("Failed to fetch top vendors:", err);
+    }
+  };
+
+  useEffect(() => {
+    loadTopVendors();
+  }, [filterType, selectedMonth, selectedYear]);
 
   useEffect(() => {
     const token = Cookies.get('token')
@@ -52,20 +83,15 @@ export default function SuperAdminDashboard() {
         headers: { Authorization: `Bearer ${token}` },
       }
     )
-    const fetchTopVendors = axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/topVendorsBySales`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    )
+
     const fetchWeeklyBookings = axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/weeklyBookingStats`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-    Promise.all([fetchDashboard, fetchWeeklyStats, fetchTopVendors, fetchWeeklyBookings])
-      .then(([dashboardRes, weeklyRes, vendorsRes, bookingRes]) => {
+    Promise.all([fetchDashboard, fetchWeeklyStats, fetchWeeklyBookings])
+      .then(([dashboardRes, weeklyRes, bookingRes]) => {
 
         // Dashboard Data
         if (dashboardRes.data?.success && dashboardRes.data?.stats) {
@@ -75,9 +101,6 @@ export default function SuperAdminDashboard() {
         // Weekly Data
         if (weeklyRes.data?.success) {
           setWeeklyData(weeklyRes.data)
-        }
-        if (vendorsRes.data?.success) {
-          setTopVendors(vendorsRes.data.vendors || [])
         }
         if (bookingRes.data?.success) {
           setWeeklyBookingData(bookingRes.data);
@@ -417,7 +440,44 @@ export default function SuperAdminDashboard() {
             <div className="col-lg-6">
               <div className="card dashboard-card h-100">
                 <div className="card-body">
-                  <h6 className="fw-semibold mb-3">Top Performing Vendors</h6>
+                  <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <h6 className="fw-semibold mb-0">Top Performing Vendors</h6>
+                    <div className="d-flex gap-2">
+                      <select 
+                        className="form-select form-select-sm border-0 bg-light shadow-none" 
+                        style={{ width: "auto", cursor: "pointer" }}
+                        value={filterType}
+                        onChange={(e) => setFilterType(e.target.value)}
+                      >
+                        <option value="all">All Time</option>
+                        <option value="monthly">Monthly</option>
+                      </select>
+                      {filterType === 'monthly' && (
+                        <>
+                          <select 
+                            className="form-select form-select-sm border-0 bg-light shadow-none" 
+                            style={{ width: "auto", cursor: "pointer" }}
+                            value={selectedMonth}
+                            onChange={(e) => setSelectedMonth(e.target.value)}
+                          >
+                            {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map(m => (
+                              <option key={m} value={m}>{m}</option>
+                            ))}
+                          </select>
+                          <select 
+                            className="form-select form-select-sm border-0 bg-light shadow-none" 
+                            style={{ width: "auto", cursor: "pointer" }}
+                            value={selectedYear}
+                            onChange={(e) => setSelectedYear(e.target.value)}
+                          >
+                            {['2024', '2025', '2026', '2027'].map(y => (
+                              <option key={y} value={y}>{y}</option>
+                            ))}
+                          </select>
+                        </>
+                      )}
+                    </div>
+                  </div>
 
                   {topVendors.length === 0 && (
                     <p className="text-muted small">No vendor data available</p>
@@ -430,6 +490,7 @@ export default function SuperAdminDashboard() {
                       location={vendor.locationName || vendor.city || "Unknown"}
                       amount={`$${(vendor.totalSales ?? 0).toLocaleString()}`}
                       vendorId={vendor._id}
+                      image={vendor.profileImage ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${vendor.profileImage}` : null}
                     />
                   ))}
 

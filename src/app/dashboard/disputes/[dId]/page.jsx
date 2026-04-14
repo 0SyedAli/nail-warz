@@ -138,92 +138,72 @@ export default function DisputeDetails() {
 
     if (!dispute) return <p className="m-5 text-center">Dispute not found</p>;
 
+    const vendorResponded = dispute.responses?.some(r => r.respondent === "Vendor");
+    const firstResponse = dispute.responses?.[0];
+
     return (
-        <div className="page  min-vh-100">
+        <div className="page min-vh-100 bg-light-subtle">
             <div className="dashboard_panel_inner pt-4 container-fluid">
-                <button
-                    className="btn btn-link text-dark p-0 mb-4 d-flex align-items-center gap-2 text-decoration-none "
-                    onClick={() => router.back()}
-                >
-                    <BsArrowLeft /> Back to Disputes
-                </button>
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <button
+                        className="btn btn-link text-dark p-0 d-flex align-items-center gap-2 text-decoration-none fw-semibold"
+                        onClick={() => router.back()}
+                    >
+                        <BsArrowLeft /> Back to Disputes
+                    </button>
+                    <div className={`badge py-2 px-4 rounded-pill shadow-sm ${dispute.status === 'Refunded' ? 'bg-success' : 'bg-warning text-dark'}`} style={{ fontSize: '0.9rem' }}>
+                        {dispute.status.replace('_', ' ')}
+                    </div>
+                </div>
 
                 <div className="row g-4">
-                    {/* LEFT COLUMN: INFO & HISTORY */}
+                    {/* LEFT COLUMN: PRIMARY INFO */}
                     <div className="col-lg-8">
-                        {/* MAIN INFO CARD */}
-                        <div className="card shadow-sm border-0 mb-4 rounded-4 overflow-hidden">
-                            <div className="card-header bg-white py-3 border-bottom-0">
-                                <h5 className="mb-0 fw-bold">Dispute Information</h5>
-                            </div>
-                            <div className="card-body">
-                                <div className="row mb-4">
-                                    <div className="col-md-6">
-                                        <label className="text-muted small text-uppercase fw-bold mb-2">User</label>
-                                        <div className="d-flex align-items-center gap-3 p-3 bg-light rounded-3">
-                                            <div className="avatar2 rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center" style={{ width: 48, height: 48 }}>
-                                                {dispute.userId?.username?.charAt(0)}
-                                            </div>
-                                            <div>
-                                                <div className="fw-bold">{dispute.userId?.username}</div>
-                                                <div className="small text-muted">{dispute.userId?.email}</div>
-                                                <div className="small text-muted">{dispute.userId?.phone}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="col-md-6">
-                                        <label className="text-muted small text-uppercase fw-bold mb-2">Vendor</label>
-                                        <div className="d-flex align-items-center gap-3 p-3 bg-light rounded-3">
-                                            <div className="avatar2 rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center overflow-hidden" style={{ width: 48, height: 48 }}>
-                                                {dispute.vendorId?.image?.[0] ? (
-                                                    <Image src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${dispute.vendorId.image[0]}`} width={48} height={48} alt="vendor" className="object-fit-cover  w-100 h-100" />
-                                                ) : (
-                                                    dispute.vendorId?.salonName?.charAt(0)
-                                                )}
-                                            </div>
-                                            <div>
-                                                <div className="fw-bold">{dispute.vendorId?.salonName}</div>
-                                                <div className="small text-muted">{dispute.vendorId?.email}</div>
-                                                <div className="small text-muted">{dispute.vendorId?.bussinessAddress}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                        {/* DISPUTE REQUEST BOX */}
+                        <div className="card shadow-sm border-0 rounded-4 mb-4" style={{ borderRadius: '24px' }}>
+                            <div className="card-body p-4">
+                                <h4 className="fw-bold mb-4 d-flex align-items-center gap-2">
+                                    <span className="bg-primary bg-opacity-10 p-2 rounded-3 text-primary"><BsX size={24} /></span>
+                                    Dispute Request Details
+                                </h4>
 
-                                <div className="mb-4">
-                                    <label className="text-muted small text-uppercase fw-bold mb-2">Reason</label>
-                                    <div className="p-3 bg-light rounded-3 fw-medium">
-                                        {dispute.reason}
+                                <div className="row g-4 mb-4">
+                                    <div className="col-md-6">
+                                        <div className="p-3 bg-light rounded-4 h-100 border border-secondary border-opacity-10">
+                                            <label className="text-muted small text-uppercase fw-bold mb-1 d-block">Raised By</label>
+                                            <p className="fw-bold mb-0 text-dark fs-5">{dispute.raisedBy}</p>
+                                        </div>
+                                    </div>
+                                    <div className="col-md-6">
+                                        <div className="p-3 bg-light rounded-4 h-100 border border-secondary border-opacity-10">
+                                            <label className="text-muted small text-uppercase fw-bold mb-1 d-block">Reason</label>
+                                            <p className="fw-bold mb-0 text-dark fs-5">{dispute.reason}</p>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div className="mb-4">
                                     <label className="text-muted small text-uppercase fw-bold mb-2">Description</label>
-                                    <div className="p-3 bg-light rounded-3 fw-medium">
-                                        {dispute.description || "No description provided."}
+                                    <div className="p-3 bg-light rounded-4 border border-secondary border-opacity-10" style={{ minHeight: '80px' }}>
+                                        {dispute.description || "No additional description provided."}
                                     </div>
                                 </div>
 
                                 {dispute.attachments?.length > 0 && (
-                                    <div className="mb-4">
-                                        <label className="text-muted small text-uppercase fw-bold mb-2">Initial Attachments</label>
-                                        <div className="d-flex flex-wrap gap-2">
+                                    <div>
+                                        <label className="text-muted small text-uppercase fw-bold mb-2">Attachments</label>
+                                        <div className="d-flex flex-wrap gap-3">
                                             {dispute.attachments.map((file, idx) => {
                                                 const isImage = file?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
                                                 const fileUrl = file ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${file}` : null;
-
                                                 return (
-                                                    <div key={idx} className="attachment-item border rounded-3 p-1 position-relative" style={{ width: 100, height: 100 }}>
+                                                    <div key={idx} className="attachment-box shadow-sm rounded-4 overflow-hidden position-relative" style={{ width: 120, height: 120 }}>
                                                         {isImage && file ? (
-                                                            <AttachmentWithFallback url={fileUrl} fallbackText="IMG" />
-                                                        ) : !isImage && file ? (
-                                                            <a href={fileUrl} target="_blank" rel="noreferrer" className="btn btn-light d-flex align-items-center justify-content-center w-100 h-100 overflow-hidden">
-                                                                <div className="text-center small p-2">View Video</div>
-                                                            </a>
+                                                            <AttachmentWithFallback url={fileUrl} fallbackText="IMAGE" size={120} />
                                                         ) : (
-                                                            <div className="w-100 h-100 bg-light d-flex align-items-center justify-content-center text-muted fw-bold rounded-2">
-                                                                {isImage ? "IMG" : "VID"}
-                                                            </div>
+                                                            <a href={fileUrl} target="_blank" rel="noreferrer" className="w-100 h-100 bg-dark d-flex align-items-center justify-content-center text-white text-decoration-none">
+                                                                <small className="fw-bold">VIEW VIDEO</small>
+                                                            </a>
                                                         )}
                                                     </div>
                                                 );
@@ -234,157 +214,180 @@ export default function DisputeDetails() {
                             </div>
                         </div>
 
-                        {/* RESPONSE HISTORY */}
-                        <div className="card shadow-sm border-0 rounded-4 overflow-hidden mb-4">
-                            <div className="card-header bg-white py-3 border-bottom-0">
-                                <h5 className="mb-0 fw-bold">Response History</h5>
+                        {/* FIRST RESPONSE BOX */}
+                        {firstResponse && (
+                            <div className="card shadow-sm border-0 rounded-4 mb-4" style={{ borderRadius: '24px', borderLeft: '6px solid var(--bs-primary)' }}>
+                                <div className="card-body p-4">
+                                    <h5 className="fw-bold mb-4 d-flex align-items-center gap-2">
+                                        <BsSend className="text-primary" />
+                                        Initial Response
+                                    </h5>
+                                    
+                                    <div className="d-flex align-items-center justify-content-between mb-3">
+                                        <div className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">
+                                            Respondent: {firstResponse.respondent}
+                                        </div>
+                                        <small className="text-muted">{new Date(firstResponse.createdAt).toLocaleString()}</small>
+                                    </div>
+
+                                    <div className="p-3 bg-light rounded-4 border border-secondary border-opacity-10 mb-3">
+                                        {firstResponse.message}
+                                    </div>
+
+                                    {firstResponse.attachments?.length > 0 && (
+                                        <div className="d-flex flex-wrap gap-2">
+                                            {firstResponse.attachments.map((file, i) => (
+                                                <div key={i} className="rounded-3 overflow-hidden shadow-sm" style={{ width: 60, height: 60 }}>
+                                                    <AttachmentWithFallback url={file ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${file}` : null} fallbackText="RES" size={60} />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                            <div className="card-body bg-light-subtle">
-                                {/* <div className="chat-container" style={{ maxHeight: "450px", overflowY: "auto", paddingRight: "20px" }}> */}
-                                <div
-                                    ref={messagesContainerRef}
-                                    className="chat-container"
-                                    style={{ maxHeight: "450px", overflowY: "auto", paddingRight: "20px" }}
-                                >
-                                    {dispute.responses?.length > 0 ? dispute.responses.map((res, idx) => (
-                                        <div key={idx} className={`d-flex flex-column mb-4 ${res.respondent === 'User' || res.respondent === 'Admin' ? 'align-items-end' : 'align-items-start'}`}>
-                                            <div className="small text-muted mb-1 px-2">{res.respondent} • {new Date(res.createdAt).toLocaleString()}</div>
-                                            <div className={`p-3 border rounded-3  ${res.respondent === 'User' || res.respondent === 'Admin' ? 'bg-light text-dark' : 'bg-white'}`} style={{ maxWidth: '85%' }}>
-                                                <div className="fw-medium">{res.message}</div>
-                                                {res.attachments?.length > 0 && (
-                                                    <div className="mt-2 pt-2 border-top border-opacity-10 d-flex flex-wrap gap-1">
-                                                        {res.attachments.map((file, i) => {
-                                                            const fileUrl = file ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${file}` : null;
-                                                            return (
-                                                                <div key={i} style={{ width: 50, height: 50 }}>
-                                                                    <AttachmentWithFallback url={fileUrl} fallbackText="IMG" size={50} />
-                                                                </div>
-                                                            );
-                                                        })}
+                        )}
+
+                        {/* RESPONSE FORM - ONLY SHOW IF VENDOR HASN'T RESPONDED */}
+                        {!vendorResponded && dispute.status !== "Refunded" && dispute.status !== "Completed" && (
+                            <div className="card shadow-sm border-0 rounded-4" style={{ borderRadius: '24px' }}>
+                                <div className="card-header bg-white pt-4 border-0">
+                                    <h5 className="fw-bold mb-0">Submit Your Response</h5>
+                                    <p className="text-muted small">You can only send one response to this dispute.</p>
+                                </div>
+                                <div className="card-body p-4">
+                                    <form onSubmit={handleSubmitResponse}>
+                                        <div className="mb-4">
+                                            <textarea
+                                                className="form-control border-0 bg-light p-4 rounded-4 shadow-inner"
+                                                placeholder="Detail your perspective on this situation..."
+                                                rows="5"
+                                                value={message}
+                                                onChange={(e) => setMessage(e.target.value)}
+                                            ></textarea>
+                                        </div>
+
+                                        <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-4">
+                                            <div className="d-flex flex-column gap-2">
+                                                <div className="position-relative">
+                                                    <input
+                                                        type="file"
+                                                        multiple
+                                                        accept="image/*"
+                                                        className="form-control opacity-0 position-absolute top-0 start-0 w-100 h-100"
+                                                        style={{ cursor: 'pointer' }}
+                                                        onChange={handleFileUpload}
+                                                        disabled={images.length >= 3}
+                                                    />
+                                                    <button type="button" className={`btn btn-outline-dark rounded-pill px-4 ${images.length >= 3 ? 'disabled' : ''}`}>
+                                                        {images.length >= 3 ? "Max Images Reached" : "Attach Images (Max 3)"}
+                                                    </button>
+                                                </div>
+
+                                                {images.length > 0 && (
+                                                    <div className="d-flex gap-2 mt-2">
+                                                        {images.map((img, idx) => (
+                                                            <div key={idx} className="position-relative">
+                                                                <Image src={URL.createObjectURL(img)} width={50} height={50} className="rounded border shadow-sm object-fit-cover" alt="preview" />
+                                                                <button type="button" className="btn btn-danger btn-sm rounded-circle position-absolute translate-middle p-0" style={{ top: 0, right: -15, width: 20, height: 20 }} onClick={() => removeImage(idx)}><BsX size={14} /></button>
+                                                            </div>
+                                                        ))}
                                                     </div>
                                                 )}
                                             </div>
+
+                                            <button
+                                                type="submit"
+                                                className="btn btn-primary btn-lg rounded-pill px-5 shadow-sm d-flex align-items-center gap-2"
+                                                disabled={submitting}
+                                            >
+                                                {submitting ? "Sending..." : <>Send Final Response <BsSend /></>}
+                                            </button>
                                         </div>
-                                    )) : (
-                                        <div className="text-center py-5 text-muted">No responses yet.</div>
-                                    )}
-                                    {/* <div ref={chatEndRef} /> */}
+                                    </form>
+                                </div>
+                            </div>
+                        )}
+
+                        {vendorResponded && (
+                            <div className="alert alert-info rounded-4 border-0 p-4 shadow-sm" style={{ borderLeft: '6px solid var(--bs-info)' }}>
+                                <div className="d-flex align-items-center gap-3 text-info fw-bold fs-5">
+                                    <BsSend /> Response Submitted
+                                </div>
+                                <p className="mb-0 mt-2 text-dark opacity-75">You have already provided your response to this dispute. Further updates will be handled by the administrator.</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* RIGHT COLUMN: APPOINTMENT & PARTIES */}
+                    <div className="col-lg-4">
+                        <div className="card shadow-sm border-0 rounded-4 overflow-hidden mb-4" style={{ borderRadius: '24px' }}>
+                            <div className="card-header bg-dark py-3 border-0">
+                                <h6 className="mb-0 text-white fw-bold">Involved Parties</h6>
+                            </div>
+                            <div className="card-body p-4">
+                                <div className="mb-4">
+                                    <label className="text-muted small text-uppercase fw-bold mb-2">Customer</label>
+                                    <div className="d-flex align-items-center gap-3">
+                                        <div className="avatar2 rounded-circle bg-primary bg-opacity-10 text-primary fw-bold d-flex align-items-center justify-content-center" style={{ width: 44, height: 44 }}>
+                                            {dispute.userId?.username?.charAt(0)}
+                                        </div>
+                                        <div>
+                                            <div className="fw-bold">{dispute.userId?.username}</div>
+                                            <div className="small text-muted">{dispute.userId?.email}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="mb-0">
+                                    <label className="text-muted small text-uppercase fw-bold mb-2">Vendor / Salon</label>
+                                    <div className="d-flex align-items-center gap-3">
+                                        <div className="avatar2 rounded-circle bg-light d-flex align-items-center justify-content-center overflow-hidden" style={{ width: 44, height: 44 }}>
+                                            {dispute.vendorId?.image?.[0] ? (
+                                                <Image src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${dispute.vendorId.image[0]}`} width={44} height={44} alt="vendor" className="object-fit-cover w-100 h-100" />
+                                            ) : (
+                                                <span className="text-muted">{dispute.vendorId?.salonName?.charAt(0)}</span>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <div className="fw-bold">{dispute.vendorId?.salonName}</div>
+                                            <div className="small text-muted">{dispute.vendorId?.bussinessAddress}</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* RESPONSE FORM */}
-                        <div className="card shadow-sm border-0 rounded-4 overflow-hidden mb-5">
-                            <div className="card-body p-4">
-                                <form onSubmit={handleSubmitResponse}>
-                                    <div className="mb-3">
-                                        <textarea
-                                            className="form-control border-0 bg-light p-3"
-                                            placeholder="Write your response here..."
-                                            rows="4"
-                                            value={message}
-                                            onChange={(e) => setMessage(e.target.value)}
-                                            style={{ borderRadius: '15px' }}
-                                        ></textarea>
-                                    </div>
-                                    <div className="d-flex justify-content-between align-items-center">
-                                        <div className="d-flex flex-column gap-3">
-                                            <div className="d-flex align-items-center gap-2 position-relative">
-                                                <input
-                                                    type="file"
-                                                    multiple
-                                                    accept="image/*"
-                                                    className="form-control form-control-sm opacity-0 position-absolute top-0 start-0 w-100 h-100"
-                                                    style={{ cursor: 'pointer' }}
-                                                    onChange={handleFileUpload}
-                                                    disabled={images.length >= 3}
-                                                />
-                                                <label className={`btn ${images.length >= 3 ? 'btn-secondary' : 'btn-outline-secondary'} px-4 py-2 rounded-pill d-flex align-items-center gap-2 shadow-sm mb-0`}>
-                                                    {images.length >= 3 ? "Limit Reached" : "Upload Images"}
-                                                </label>
-                                            </div>
-
-                                            {images.length > 0 && (
-                                                <div className="d-flex flex-wrap gap-3">
-                                                    {images.map((img, idx) => (
-                                                        <div key={idx} className="position-relative">
-                                                            <div className="preview-container rounded-3 overflow-hidden border shadow-sm" style={{ width: 60, height: 60 }}>
-                                                                <Image
-                                                                    src={URL.createObjectURL(img)}
-                                                                    alt="preview"
-                                                                    width={60}
-                                                                    height={60}
-                                                                    className="object-fit-cover w-100 h-100"
-                                                                />
-                                                            </div>
-                                                            <button
-                                                                type="button"
-                                                                className="btn btn-danger btn-sm rounded-circle position-absolute top-0 start-100 translate-middle p-0 d-flex align-items-center justify-content-center border border-white"
-                                                                style={{ width: 22, height: 22 }}
-                                                                onClick={() => removeImage(idx)}
-                                                            >
-                                                                <BsX size={18} />
-                                                            </button>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                        <button
-                                            type="submit"
-                                            className="btn btn-primary px-4 py-2 rounded-pill d-flex align-items-center gap-2 shadow-sm"
-                                            disabled={submitting || dispute.status === 'Completed' || dispute.status === 'Refunded'}
-                                        >
-                                            {submitting ? "Sending..." : <>Send Response <BsSend /></>}
-                                        </button>
-                                    </div>
-                                </form>
+                        <div className="card shadow-sm border-0 rounded-4 overflow-hidden position-sticky" style={{ top: '2rem', borderRadius: '24px' }}>
+                            <div className="card-header bg-success py-3 border-0">
+                                <h6 className="mb-0 text-white fw-bold">Appointment Context</h6>
                             </div>
-                        </div>
-                    </div>
-
-                    {/* RIGHT COLUMN: APPOINTMENT INFO */}
-                    <div className="col-lg-4">
-                        <div className="card shadow-sm border-0 rounded-4 overflow-hidden position-sticky" style={{ top: '2rem' }}>
-                            <div className="card-header bg-dark text-white py-3 border-0">
-                                <h5 className="mb-0 fw-bold">Appointment Context</h5>
-                            </div>
-                            <div className="card-body">
+                            <div className="card-body p-4 text-center">
                                 {dispute.appointmentId ? (
                                     <>
-                                        <div className="mb-4">
-                                            <label className="text-muted small text-uppercase fw-bold mb-1">Service</label>
-                                            <h6 className="fw-bold text-primary mb-0">{dispute.appointmentId.serviceId?.serviceName}</h6>
-                                        </div>
-                                        <div className="row mb-4">
+                                        <h5 className="fw-bold text-primary mb-1">{dispute.appointmentId.serviceId?.serviceName}</h5>
+                                        <div className="text-muted small mb-4">Service Details</div>
+                                        
+                                        <div className="row g-2 mb-4">
                                             <div className="col-6">
-                                                <label className="text-muted small text-uppercase fw-bold mb-1">Date</label>
-                                                <div className="fw-semibold">{dispute.appointmentId.date}</div>
+                                                <div className="p-3 bg-light rounded-4">
+                                                    <label className="text-muted small text-uppercase fw-bold mb-1 d-block">Date</label>
+                                                    <span className="fw-bold">{dispute.appointmentId.date}</span>
+                                                </div>
                                             </div>
                                             <div className="col-6">
-                                                <label className="text-muted small text-uppercase fw-bold mb-1">Time</label>
-                                                <div className="fw-semibold">{dispute.appointmentId.time}</div>
-                                            </div>
-                                        </div>
-                                        <div className="row mb-4">
-                                            <div className="col-6">
-                                                <label className="text-muted small text-uppercase fw-bold mb-1">Price</label>
-                                                <div className="fw-bold text-success fs-5">${dispute.appointmentId.totalAmount}</div>
-                                            </div>
-                                            <div className="col-6">
-                                                <label className="text-muted small text-uppercase fw-bold mb-1">Status</label>
-                                                <div><span className="badge bg-light text-dark border">{dispute.appointmentId.status}</span></div>
+                                                <div className="p-3 bg-light rounded-4">
+                                                    <label className="text-muted small text-uppercase fw-bold mb-1 d-block">Time</label>
+                                                    <span className="fw-bold">{dispute.appointmentId.time}</span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <hr />
-                                        <div className="mb-0 text-center">
-                                            <div className={`badge py-2 px-3 fs-6 rounded-pill ${dispute.status === 'Refunded' ? 'bg-success' : 'bg-warning text-dark'}`}>
-                                                Status: {dispute.status}
-                                            </div>
+
+                                        <div className="bg-success bg-opacity-10 p-4 rounded-4 mb-0">
+                                            <label className="text-success small text-uppercase fw-bold mb-1 d-block">Total Paid</label>
+                                            <h2 className="fw-black text-success mb-0">${dispute.appointmentId.totalAmount}</h2>
                                         </div>
                                     </>
                                 ) : (
-                                    <p className="text-muted text-center py-4">No appointment linked</p>
+                                    <div className="py-5 text-muted">No appointment linked.</div>
                                 )}
                             </div>
                         </div>

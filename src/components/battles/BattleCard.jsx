@@ -4,8 +4,11 @@ import ViewResultModal from "../Modal/ViewResultModal";
 import { BsPersonFillAdd } from "react-icons/bs";
 import { IoPersonAddSharp } from "react-icons/io5";
 import { MdPersonAdd } from "react-icons/md";
+import { useRouter } from "next/navigation";
+import { BsEye } from "react-icons/bs";
 
 export default function BattleCard({ title, battles, onEdit, emptyMessage = "No battles available." }) {
+  const router = useRouter();
   const [resultOpen, setResultOpen] = useState(false);
   const [selectedBattleId, setSelectedBattleId] = useState(null);
   const [modalMode, setModalMode] = useState("result"); // "result" | "participants"
@@ -85,14 +88,43 @@ export default function BattleCard({ title, battles, onEdit, emptyMessage = "No 
                     >
                       View Participants
                     </button>
+                    <button
+                      className="btn btn-outline-dark btn-sm d-flex align-items-center gap-1"
+                      onClick={() => router.push(`/admin/dashboard/battles/${b._id}`)}
+                    >
+                      <BsEye /> Detail
+                    </button>
+                  </div>
+                </div>
+              )}
+              {(b.status === "active") && (
+                <div className="d-flex align-items-center justify-content-between">
+                  <div className="d-flex gap-2">
+                    <button
+                      className="btn btn-outline-dark btn-sm"
+                      onClick={() => {
+                        if (!b.participants || b.participants.length === 0) return;
+                        setSelectedBattleId(b._id);
+                        setModalMode("result");
+                        setResultOpen(true);
+                      }}
+                    >
+                      View Result
+                    </button>
+                    <button
+                      className="btn btn-outline-dark btn-sm d-flex align-items-center gap-1"
+                      onClick={() => router.push(`/admin/dashboard/battles/${b._id}`)}
+                    >
+                      <BsEye /> Detail
+                    </button>
                   </div>
                   {/* <span className="add-user">
                     <MdPersonAdd />
                   </span> */}
                 </div>
               )}
-              {(b.status === "active") && (
-                <div className="d-flex align-items-center justify-content-between">
+              {(b.status === "completed") && (
+                <div className="d-flex gap-2">
                   <button
                     className="btn btn-outline-dark btn-sm"
                     onClick={() => {
@@ -104,23 +136,13 @@ export default function BattleCard({ title, battles, onEdit, emptyMessage = "No 
                   >
                     View Result
                   </button>
-                  <span className="add-user">
-                    <MdPersonAdd />
-                  </span>
+                  <button
+                    className="btn btn-outline-dark btn-sm d-flex align-items-center gap-1"
+                    onClick={() => router.push(`/admin/dashboard/battles/${b._id}`)}
+                  >
+                    <BsEye /> Detail
+                  </button>
                 </div>
-              )}
-              {(b.status === "completed") && (
-                <button
-                  className="btn btn-outline-dark btn-sm"
-                  onClick={() => {
-                    if (!b.participants || b.participants.length === 0) return;
-                    setSelectedBattleId(b._id);
-                    setModalMode("result");
-                    setResultOpen(true);
-                  }}
-                >
-                  View Result
-                </button>
               )}
 
 

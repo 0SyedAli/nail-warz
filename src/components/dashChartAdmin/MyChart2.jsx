@@ -128,6 +128,7 @@ export default function Dashboard() {
                                 })}
                             </select> */}
                             <div className="d-flex align-items-center gap-2">
+                                <h4>Monthly Revenue</h4>
 
                                 {/* Month Dropdown */}
                                 <select
@@ -181,7 +182,7 @@ export default function Dashboard() {
         <div className="row gy-4 gx-0 w-100">
             <div className="col-12">
                 <div className="chart-card">
-                    <div className="overview-header d-flex align-items-center justify-content-end gap-2 mb-4 flex-wrap">
+                    <div className="overview-header d-flex align-items-center justify-content-between gap-2 mb-4 flex-wrap">
                         {/* <div className="d-flex align-items-center gap-4 flex-wrap">
                             <div className="d-flex align-items-center gap-2 flex-wrap" style={{
                                 border: "1px solid #ccc",
@@ -219,6 +220,7 @@ export default function Dashboard() {
                                 )
                             })}
                         </select> */}
+                        <h5 className="fw-semibold mb-1">Monthly Revenue Chart</h5>
                         <div className="d-flex align-items-center gap-2">
                             <select
                                 className="form-select date-selector-input"

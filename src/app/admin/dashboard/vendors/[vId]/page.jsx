@@ -3,10 +3,12 @@
 import { useEffect, useState, useMemo } from "react";
 import Cookies from "js-cookie";
 import { useRouter, useParams } from "next/navigation";
-import { FaPhoneAlt, FaUser } from "react-icons/fa";
+import { FaPhoneAlt, FaUser, FaRegCalendarAlt, FaCalendarCheck, FaCalendarTimes, FaWallet, FaChartLine } from "react-icons/fa";
 import { IoIosMail } from "react-icons/io";
 import { GiWorld } from "react-icons/gi";
 import { IoLocationSharp } from "react-icons/io5";
+import { MdOutlineAccessTime, MdAttachMoney } from "react-icons/md";
+import { HiTrendingUp } from "react-icons/hi";
 
 export default function VendorDetail() {
     const { vId } = useParams();
@@ -172,37 +174,53 @@ export default function VendorDetail() {
                     ← Back to Vendors
                 </button>
                 {/* STATS */}
-                <div className="vendor-stats">
+                <div className="vendor-stats" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
                     <StatBox
                         title="Daily Revenue"
-                        value={`$${revenueStats?.dailyRevenue ?? 0}`}
+                        value={`$${revenueStats?.dailyRevenue.toFixed(2) ?? 0}`}
                         color="green"
+                        icon={<HiTrendingUp size={22} className="text-success opacity-50" />}
                     />
                     <StatBox
                         title="Weekly Revenue"
-                        value={`$${revenueStats?.weeklyRevenue ?? 0}`}
+                        value={`$${revenueStats?.weeklyRevenue.toFixed(2) ?? 0}`}
                         color="green"
+                        icon={<FaChartLine size={20} className="text-success opacity-50" />}
                     />
                     <StatBox
                         title="Monthly Revenue"
-                        value={`$${revenueStats?.monthlyRevenue ?? 0}`}
+                        value={`$${revenueStats?.monthlyRevenue.toFixed(2) ?? 0}`}
                         color="green"
+                        icon={<MdAttachMoney size={24} className="text-success opacity-50" />}
                     />
                     <StatBox
                         title="Vendor Share (85%)"
-                        value={`$${vendorShare}`}
+                        value={`$${vendorShare.toFixed(2)}`}
                         color="purple"
+                        icon={<FaWallet size={20} className="text-purple opacity-50" style={{ color: "#7b2cbf" }} />}
+                    />
+                    <StatBox
+                        title="Total Bookings"
+                        value={vendor.totalBooking ?? 0}
+                        color="blue"
+                        icon={<FaCalendarCheck size={20} className="text-primary opacity-50" />}
+                    />
+                    <StatBox
+                        title="Cancelled Bookings"
+                        value={vendor.cancelCount ?? 0}
+                        color="red"
+                        icon={<FaCalendarTimes size={20} className="text-danger opacity-50" />}
                     />
                 </div>
                 {/* HEADER */}
-                <div className="vendor-grid">
+                <div className="vendor-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))" }}>
                     <div className="card-box">
                         <h6>Bussiness Info</h6>
-                        {vendor.salonName && <h5 className="d-flex align-items-center gap-2"><span><FaUser size={14} /></span>{vendor.salonName}</h5>}
-                        {vendor.bussinessEmail && <p className="d-flex align-items-center gap-2"><span><IoIosMail size={17} /></span>{vendor.bussinessEmail}</p>}
-                        {vendor.bussinessPhoneNumber && <p className="d-flex align-items-center gap-2"><span><FaPhoneAlt size={17} /></span>{vendor.bussinessPhoneNumber}</p>}
-                        {vendor.bussinessWebsite && <p className="d-flex align-items-center gap-2"><span><GiWorld size={17} /></span>{vendor.bussinessWebsite}</p>}
-                        {vendor.locationName && <p className="d-flex align-items-center gap-2"><span><IoLocationSharp size={17} /></span>{vendor.locationName}</p>}
+                        {vendor.salonName && <h5 className="d-flex align-items-center gap-2 mb-2"><span><FaUser size={14} /></span>{vendor.salonName}</h5>}
+                        {vendor.bussinessEmail && <p className="d-flex align-items-center gap-2 mb-2"><span><IoIosMail size={17} /></span>{vendor.bussinessEmail}</p>}
+                        {vendor.bussinessPhoneNumber && <p className="d-flex align-items-center gap-2 mb-2"><span><FaPhoneAlt size={17} /></span>{vendor.bussinessPhoneNumber}</p>}
+                        {vendor.bussinessWebsite && <a href={`https://${vendor.bussinessWebsite}`} target="_blank" className="d-flex align-items-center gap-2 text-decoration-none mb-2"><span><GiWorld size={17} /></span>{vendor.bussinessWebsite}</a>}
+                        {vendor.locationName && <p className="d-flex align-items-center gap-2 mb-2"><span><IoLocationSharp size={17} /></span>{vendor.locationName}</p>}
                     </div>
                     <div className="card-box">
                         <h6>Owner Info</h6>
@@ -210,6 +228,21 @@ export default function VendorDetail() {
                         {vendor.email && <p className="d-flex align-items-center gap-2"><span><IoIosMail size={17} /></span>{vendor.email}</p>}
                         {vendor.city && <p className="d-flex align-items-center gap-2"><span><IoLocationSharp size={17} /></span>{vendor.city}</p>}
                     </div>
+                    {vendor.workingDays && vendor.workingDays.length > 0 && (
+                        <div className="card-box">
+                            <h6 className="d-flex align-items-center gap-2"><span><MdOutlineAccessTime size={18} /></span>Working Hours</h6>
+                            <div className="mt-2">
+                                {vendor.workingDays.map((wd, i) => (
+                                    <div key={i} className="d-flex justify-content-between align-items-center mb-1 py-1 border-bottom border-light">
+                                        <span style={{ fontSize: "14px", fontWeight: 500, color: wd.isActive ? "#333" : "#999" }}>{wd.day}</span>
+                                        <span style={{ fontSize: "13px", color: wd.isActive ? "#0aa84f" : "#dc3545" }}>
+                                            {wd.isActive ? `${wd.startTime} - ${wd.endTime}` : "Closed"}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
                 {/* <div className="vendor-header">
                     <div className="d-flex align-items-center gap-4">
@@ -243,7 +276,7 @@ export default function VendorDetail() {
                         <h6>Process Payout</h6>
 
                         <div className="label">Remaining Balance</div>
-                        <div className="amount purple">${availableBalance}</div>
+                        <div className="amount purple">${availableBalance.toFixed(2)}</div>
 
                         <input
                             className="input"
@@ -275,29 +308,29 @@ export default function VendorDetail() {
 
                         <div className="summary-row">
                             <span>Total Revenue</span>
-                            <span>${revenueSummary?.totalRevenue}</span>
+                            <span>${revenueSummary?.totalRevenue.toFixed(2)}</span>
                         </div>
                         <div className="summary-row purple">
                             <span>Total Paid Out</span>
-                            <span>${revenueSummary?.totalPaidAmount}</span>
+                            <span>${revenueSummary?.totalPaidAmount.toFixed(2)}</span>
                         </div>
                         <div className="summary-row purple">
                             <span>Remaining Revenue</span>
-                            <span>${revenueSummary?.remainingRevenue}</span>
+                            <span>${revenueSummary?.remainingRevenue.toFixed(2)}</span>
                         </div>
 
                         <div className="summary-row red">
                             <span>Platform Fee (15%)</span>
-                            <span>${revenueSummary?.platformFee?.amount}</span>
+                            <span>${revenueSummary?.platformFee?.amount.toFixed(2)}</span>
                         </div>
 
                         <div className="summary-row green">
                             <span>Vendor Share (85%)</span>
-                            <span>${revenueSummary?.vendorShare?.amount}</span>
+                            <span>${revenueSummary?.vendorShare?.amount.toFixed(2)}</span>
                         </div>
                         <div className="summary-row">
                             <span><strong>Remaining Balance</strong></span>
-                            <span>${revenueSummary?.totalPayoutPending}</span>
+                            <span>${revenueSummary?.totalPayoutPending.toFixed(2)}</span>
                         </div>
                     </div>
                 </div>
@@ -447,10 +480,13 @@ export default function VendorDetail() {
 }
 
 /* ===================== COMPONENT ===================== */
-const StatBox = ({ title, value, color }) => (
-    <div className="stat-box">
-        <p>{title}</p>
-        <h5 className={color}>{value}</h5>
+const StatBox = ({ title, value, color, icon }) => (
+    <div className="stat-box d-flex justify-content-between align-items-start">
+        <div>
+            <p>{title}</p>
+            <h5 className={color}>{value}</h5>
+        </div>
+        {icon && <div>{icon}</div>}
     </div>
 );
 

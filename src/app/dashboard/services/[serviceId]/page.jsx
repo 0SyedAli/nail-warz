@@ -10,6 +10,7 @@ import Image from "next/image";
 import { showErrorToast, showSuccessToast } from "src/lib/toast";
 import api from "@/lib/axios";
 import Cookies from "js-cookie";
+import BallsLoading from "@/components/Spinner/BallsLoading";
 
 const MAX_IMAGES = 3;
 
@@ -30,6 +31,8 @@ export default function EditService() {
     defaultValues: {
       technicians: [],
       category: "",
+      subCategory: "",
+      categoryModel: "",
       images: [],
       serviceName: "",
       servicePrice: "",
@@ -39,11 +42,13 @@ export default function EditService() {
 
   const [technicianList, setTechnicianList] = useState([]);
   const [salonId, setSalonId] = useState(null);
-  const [isReady, setIsReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [categoryList, setCategoryList] = useState([]);
+  const [subCategoryList, setSubCategoryList] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
   const [initialValues, setInitialValues] = useState(null);
   const IMG_BASE = process.env.NEXT_PUBLIC_IMAGE_URL;
+
   /* -------- Check cookie / auth -------- */
   useEffect(() => {
     const cookie = Cookies.get("user");
@@ -56,7 +61,6 @@ export default function EditService() {
       const user = JSON.parse(cookie);
       if (user?._id) {
         setSalonId(user._id);
-        setIsReady(true);
       } else {
         router.replace("/auth/login");
       }
@@ -68,18 +72,33 @@ export default function EditService() {
   /* -------- Fetch service data -------- */
   useEffect(() => {
     if (!serviceId || !salonId) return;
-
+    setIsLoading(true);
     const fetchServiceData = async () => {
       try {
-        const [serviceRes, techniciansRes, categoriesRes] = await Promise.all([
+        const [serviceRes, techniciansRes, adminRes] = await Promise.all([
           api.get(`/getServiceById?id=${serviceId}`),
           api.get(`/getAllTechniciansBySalonId?salonId=${salonId}`),
-          api.get(`/getSalonCategory?salonId=${salonId}`)
+          api.get(`/getAdminById?salonId=${salonId}`)
         ]);
+
+        let combinedCats = [];
+        if (adminRes?.data?.success) {
+          const profileData = adminRes.data.data;
+          const standardCats = (profileData.categoryId || []).map(cat => ({ ...cat, model: "category" }));
+          const salonCats = (profileData.salonCategoryId || []).map(cat => ({ ...cat, model: "SalonCategory" }));
+          combinedCats = [...standardCats, ...salonCats];
+          setCategoryList(combinedCats);
+        }
 
         if (serviceRes.data.success) {
           const serviceData = serviceRes.data.data;
           setExistingImages(serviceData.images || []);
+
+          // Find the category to get subcategories
+          const selectedCat = combinedCats.find(c => String(c._id) === String(serviceData.categoryId?._id || serviceData.categoryId));
+          if (selectedCat) {
+            setSubCategoryList(selectedCat.subCategories || []);
+          }
 
           // Store initial values for comparison
           const initialData = {
@@ -87,10 +106,12 @@ export default function EditService() {
             servicePrice: serviceData.price,
             description: serviceData.description,
             technicians: Array.isArray(serviceData.technicianId)
-              ? serviceData.technicianId
+              ? serviceData.technicianId.map(t => typeof t === 'string' ? t : t._id)
               : [],
-            category: serviceData.categoryId,
-            images: serviceData.images.map(img => ({
+            category: serviceData.categoryId?._id || serviceData.categoryId,
+            subCategory: serviceData.subCategory || "",
+            categoryModel: serviceData.categoryModel || (selectedCat?.model || ""),
+            images: (serviceData.images || []).map(img => ({
               name: img,
               preview: `${process.env.NEXT_PUBLIC_IMAGE_URL}/${img}`
             }))
@@ -104,16 +125,38 @@ export default function EditService() {
           setTechnicianList(techniciansRes.data.data || []);
         }
 
-        if (categoriesRes?.data?.success) {
-          setCategoryList(categoriesRes?.data?.data || []);
-        }
+        setIsLoading(false);
       } catch (error) {
+        console.error(error);
         showErrorToast("Failed to fetch service data");
+        setIsLoading(false);
       }
     };
 
     fetchServiceData();
   }, [serviceId, salonId, reset]);
+
+  const selectedCategoryId = watch("category");
+
+  /* -------- Handle Subcategories when Category changes -------- */
+  useEffect(() => {
+    if (selectedCategoryId && categoryList.length > 0) {
+      const selectedCat = categoryList.find(c => String(c._id) === String(selectedCategoryId));
+      if (selectedCat) {
+        setSubCategoryList(selectedCat.subCategories || []);
+        setValue("categoryModel", selectedCat.model);
+
+        // Only reset subcategory if we're not in initial load and it's not in the new list
+        const currentSub = watch("subCategory");
+        if (currentSub && !selectedCat.subCategories?.includes(currentSub)) {
+          setValue("subCategory", "");
+        }
+      } else {
+        setSubCategoryList([]);
+        setValue("categoryModel", "");
+      }
+    }
+  }, [selectedCategoryId, categoryList, setValue, watch]);
 
   /* -------- Image previews -------- */
   const images = watch("images");
@@ -138,9 +181,7 @@ export default function EditService() {
   /* -------- Chip helpers -------- */
   const addChip = (field, value) => {
     if (!value) return;
-    const arr = watch(field) ?? [];
-    if (arr.includes(value)) return;
-    setValue(field, [...arr, value], { shouldValidate: true });
+    setValue(field, [value], { shouldValidate: true });
   };
 
   const removeChip = (field, idx) => {
@@ -176,17 +217,18 @@ export default function EditService() {
         fd.append("categoryId", data.category);
       }
 
+      if (data.subCategory !== initialValues.subCategory) {
+        fd.append("subCategory", data.subCategory);
+      }
+
+      if (data.categoryModel !== initialValues.categoryModel) {
+        fd.append("categoryModel", data.categoryModel);
+      }
+
       // Handle images - only send new ones
-      const newImages = data.images
-        .filter(img => img instanceof File);
+      const newImages = data.images.filter((img) => img instanceof File);
 
       newImages.forEach((file) => fd.append("images", file));
-
-      // Add names of existing images to keep
-      // const existingImageNames = data.images
-      //   .filter(img => img.name && !(img instanceof File))
-      //   .map(img => img.name);
-      // fd.append("existingImages", JSON.stringify(existingImageNames));
 
       const res = await api.post("/updateService", fd, {
         headers: {
@@ -205,15 +247,19 @@ export default function EditService() {
     }
   };
 
-  /* -------- Don't render form until auth check complete -------- */
-  if (!isReady || !initialValues) return null;
-
   /* -------- Handle image removal -------- */
   const removeImage = (index) => {
     const currentImages = [...watch("images")];
     currentImages.splice(index, 1);
     setValue("images", currentImages, { shouldValidate: true });
   };
+
+  if (isLoading)
+    return (
+      <div className="page h-50 d-flex align-items-center">
+        <BallsLoading borderWidth="mx-auto" />
+      </div>
+    );
 
   return (
     <div className="page">
@@ -264,30 +310,67 @@ export default function EditService() {
             })}
           </div>
 
-          <label className="mt-0">Assign Category</label>
-          <select
-            className="form-select input_field2 mt-1"
-            {...register("category")}
-          >
-            <option value="">-- choose --</option>
-            {categoryList.map((cat) => (
-              <option key={cat?._id} value={cat?._id}>
-                {cat?.categoryName}
-              </option>
-            ))}
-          </select>
-
-          {/* Selected category pill */}
-          <div className="d-flex flex-wrap my-2 gap-2">
-            {watch("category") && (
-              <span
-                className="tags_category"
-                onClick={() => setValue("category", "", { shouldValidate: true })}
+          <div className="row gx-3">
+            <div className="col-md-6">
+              <label className="mt-0">Select Category</label>
+              <select
+                className="form-select input_field2 mt-1"
+                {...register("category")}
               >
-                {categoryList?.find(c => String(c._id) === String(watch("category")))?.categoryName || "Unknown"}
-                <RxCross2 />
-              </span>
-            )}
+                <option value="">-- choose --</option>
+                {categoryList.map((cat) => (
+                  <option key={cat?._id} value={cat?._id}>
+                    {cat?.categoryName}
+                  </option>
+                ))}
+              </select>
+
+              {/* Selected category pill */}
+              <div className="d-flex flex-wrap my-2 gap-2">
+                {watch("category") && (
+                  <span
+                    className="tags_category"
+                    onClick={() => {
+                      setValue("category", "", { shouldValidate: true });
+                      setValue("subCategory", "");
+                      setValue("categoryModel", "");
+                    }}
+                  >
+                    {categoryList?.find(c => String(c._id) === String(watch("category")))?.categoryName || "Unknown"}
+                    <RxCross2 />
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="col-md-6">
+              <label className="mt-0">Select Sub Category</label>
+              <select
+                className="form-select input_field2 mt-1"
+                {...register("subCategory")}
+                disabled={!selectedCategoryId || subCategoryList.length === 0}
+              >
+                <option value="">-- choose --</option>
+                {subCategoryList.map((sub, i) => (
+                  <option key={i} value={sub}>
+                    {sub}
+                  </option>
+                ))}
+              </select>
+
+              {/* Selected subcategory pill */}
+              <div className="d-flex flex-wrap my-2 gap-2">
+                {watch("subCategory") && (
+                  <span
+                    className="tags_category"
+                    onClick={() => setValue("subCategory", "")}
+                  >
+                    {watch("subCategory")}
+                    <RxCross2 />
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* image upload */}
@@ -304,10 +387,9 @@ export default function EditService() {
                   accept="image/*"
                   multiple
                   onChange={(e) => {
-                    const currentImages = field.value || [];
                     const newFiles = Array.from(e.target.files || [])
-                      .slice(0, MAX_IMAGES - currentImages.length);
-                    field.onChange([...currentImages, ...newFiles]);
+                      .slice(0, MAX_IMAGES);
+                    field.onChange([...newFiles]);
                     e.target.value = "";
                   }}
                 />

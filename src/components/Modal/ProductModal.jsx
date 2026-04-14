@@ -483,7 +483,17 @@ export default function ProductModal({ isOpen, onClose, product, onSuccess }) {
                     </div>
                     <div>
                         <label>Unit Type</label>
-                        <input name="unitType" value={form.unitType} onChange={handleChange} />
+                        {/* <input name="unitType" value={form.unitType} onChange={handleChange} /> */}
+                        <select
+                            name="unitType"
+                            value={form.unitType}
+                            onChange={handleChange}
+                            className="form-select"
+                        >
+                            <option value="">Select Unit</option>
+                            <option value="piece">Piece</option>
+                            <option value="pack">Pack</option>
+                        </select>
                     </div>
 
                 </div>

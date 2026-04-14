@@ -15,18 +15,20 @@ export default function Dashboard({ children }) {
     users: { title: "Application Users Management" },
     usersDetails: { title: "Application User Details" },
     vendors: { title: "Vendors Management" },
-    vendorsDetails: { title: "Vendor Details" }, // ✅ ADD THIS
+    vendorsDetails: { title: "Vendor Details" },
     inventory: { title: "Inventory Management" },
     order: { title: "Order Management" },
-    orderDetails: { title: "Order Details" }, // ✅ ADD THIS
+    orderDetails: { title: "Order Details" },
     battles: { title: "Battles Management" },
-    battlesDetails: { title: "Battles Details" }, // ✅ ADD THIS
+    battlesDetails: { title: "Battles Details" },
     content: { title: "Participant Requests" },
-    contentDetails: { title: "Participant Details" }, // ✅ ADD THIS
-    categories: { title: "Filter Management" }, // ✅ ADD THIS
+    contentDetails: { title: "Participant Details" },
+    categories: { title: "Category Management" },
+    categoryrequest: { title: "Category Request" },
     pushnotification: { title: "Push Notification" },
-    disputes: { title: "Disputes Management" }, // ✅ ADD THIS
-    disputesDetails: { title: "Dispute Details" }, // ✅ ADD THIS
+    disputes: { title: "Disputes Management" },
+    disputesDetails: { title: "Dispute Details" },
+    discount: { title: "Discount Management" },
   };
   useEffect(() => {
     const parts = pathname.split("/").filter(Boolean);

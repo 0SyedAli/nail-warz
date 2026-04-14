@@ -28,6 +28,7 @@ const schema = Yup.object({
     .min(6, "Min 6 characters")
     .matches(/^[+\d][\d\s\-()]+$/, "Invalid phone number format")
     .required("Phone number is required"),
+  street: Yup.string().required("Street is required"),
   city: Yup.string().required("City is required"),
   state: Yup.string().required("State is required"),
   zipCode: Yup.string()
@@ -108,6 +109,7 @@ export default function BussinessProfile() {
       endTime: "",
       images: [],
       categories: [],
+      street: "",
       city: "",
       state: "",
       zipCode: "",
@@ -291,6 +293,7 @@ export default function BussinessProfile() {
       formData.append("salonName", data.salonName);
       formData.append("phoneNumber", data.phoneNumber.replace(/\D/g, ""));
       formData.append("description", data.description);
+      formData.append("street", data.street);
       formData.append("city", data.city);
       formData.append("state", data.state);
       formData.append("zipCode", data.zipCode);
@@ -371,6 +374,10 @@ export default function BussinessProfile() {
           <label>Salon Name</label>
           <InputField {...register("salonName")} />
           {errors.salonName && <p className="text-danger">{errors.salonName.message}</p>}
+
+          <label>Street</label>
+          <InputField {...register("street")} />
+          {errors.street && <p className="text-danger">{errors.street.message}</p>}
 
           {/* CITY AUTOCOMPLETE */}
           {console.log(isLoaded)}

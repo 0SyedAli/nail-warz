@@ -199,7 +199,7 @@ export default function SuperAdminVendors() {
                                         <th>City</th>
                                         <th>Join Date</th>
                                         <th>Total Revenue</th>
-                                        <th>Total Ratting</th>
+                                        <th>Average Ratting</th>
                                         <th>Cancel Count</th>
                                         <th>Payouts Pending</th>
                                         <th>Status</th>
@@ -216,9 +216,9 @@ export default function SuperAdminVendors() {
                                             <td>{new Date(v.createdAt).toLocaleDateString()}</td>
 
                                             <td className="fw-bold">${v.totalRevenue || 0}</td>
-                                            <td className="fw-bold">{v.totalReviews || 0}</td>
-                                            <td className="fw-bold">{v.cancelledByCount || 0}</td>
-                                            <td className="fw-bold">${v.totalPayoutPending || 0}</td>
+                                            <td className="fw-bold">{v.avgRating.toFixed(2) || 0}</td>
+                                            <td className="fw-bold">{v.salonCancellationCount || 0}</td>
+                                            <td className="fw-bold">${v.revenueSummary.totalPayoutPending.toFixed(2) || 0}</td>
                                             <td>
 
                                                 <span
