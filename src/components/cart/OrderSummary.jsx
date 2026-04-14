@@ -109,11 +109,11 @@ export default function OrderSummary() {
           </div>
         </div>
 
-        {isFree && (
-          <div className="text-success fw-semibold mt-2">
-            Orders over $50.00 ship free
-          </div>
-        )}
+        {/* {isFree && ( */}
+        <div className="text-success fw-semibold mt-2">
+          Orders over $50.00 ship free
+        </div>
+        {/* )} */}
       </div>
 
       <hr />
