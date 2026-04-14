@@ -27,12 +27,7 @@ export default function AddToCart() {
 
     const handleCheckout = (e) => {
         e.preventDefault();
-        const token = Cookies.get("token");
-        if (!token) {
-            dispatch(openLoginModal());
-        } else {
-            router.push("/checkout");
-        }
+        router.push("/checkout");
     };
     return (
         <>

@@ -119,8 +119,6 @@ import Cookies from "js-cookie";
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { showSuccessToast } from "@/lib/toast";
-import { closeLoginModal } from "@/redux/slice/uiSlice";
-import LoginModal from "../Modal/LoginModal";
 import { clearCart } from "@/redux/slice/cartSlice";
 
 export default function Header() {
@@ -138,52 +136,10 @@ export default function Header() {
 
   // hide cart on these routes
   const hideCart = pathname === "/cart" || pathname === "/checkout";
-  // Read cookies on mount (and after logout)
+  // Guest-only flow: token logic removed
   useEffect(() => {
-    const t = Cookies.get("token") || null;
-
-    let u = null;
-    const userStr = Cookies.get("user");
-    if (userStr) {
-      try {
-        u = JSON.parse(userStr);
-      } catch (e) {
-        u = null;
-      }
-    }
-
-    setToken(t);
-    setUser(u);
+    // Logic for auth checking removed as per request for guest-only flow
   }, []);
-
-  const isLoggedIn = useMemo(() => Boolean(token), [token]);
-
-  const displayName = user?.name || user?.full_name || user?.username || "User";
-
-  // Support both absolute avatar URLs and relative paths
-  // const avatarSrc = useMemo(() => {
-  //   const a = user?.avatar || user?.profile_image || user?.image || "";
-  //   if (!a) return "/images/default-avatar.png"; // add this file or change path
-  //   if (a.startsWith("http://") || a.startsWith("https://")) return a;
-  //   return a.startsWith("/") ? a : `/${a}`;
-  // }, [user]);
-
-  const handleLogout = () => {
-    // remove whatever cookies you set on login
-    Cookies.remove("token");
-    Cookies.remove("user");
-
-    // if you also store refresh token etc, remove them too:
-    Cookies.remove("refresh_token");
-
-    setToken(null);
-    setUser(null);
-    dispatch(clearCart());
-
-    showSuccessToast("Logout successfully")
-    router.push("/");
-    router.refresh();
-  };
 
   return (
     <>
@@ -280,10 +236,6 @@ export default function Header() {
           </span>
         </Link>
       )}
-      <LoginModal
-        show={isLoginModalOpen}
-        onClose={() => dispatch(closeLoginModal())}
-      />
     </>
   );
 }
