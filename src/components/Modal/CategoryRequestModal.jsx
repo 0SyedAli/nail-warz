@@ -1,6 +1,5 @@
 "use client";
 
-import Modal from "./layout";
 import "./modal.css";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
@@ -84,7 +83,11 @@ function CategoryRequestModal({ isOpen, onClose, onSuccess }) {
       setIsLoading(false);
       return;
     }
-
+    if (!subCategories.length) {
+      setError("Please enter at least one subcategory");
+      setIsLoading(false);
+      return;
+    }
     try {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_API_URL}/categoryRequest`,
