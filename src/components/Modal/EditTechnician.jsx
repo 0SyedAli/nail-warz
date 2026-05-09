@@ -9,6 +9,7 @@ import Image from "next/image";
 import InputField from "@/components/Form/InputField";
 import { AuthBtn } from "@/components/AuthBtn/AuthBtn";
 import BallsLoading from "../Spinner/BallsLoading";
+import { showErrorToast } from "@/lib/toast";
 
 /* ---------- Days ---------- */
 
@@ -92,7 +93,7 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
 
         setLoading(false);
       } catch (err) {
-        alert(err.message);
+        showErrorToast(err.message);
         onClose();
       }
     };
@@ -171,7 +172,7 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
 
       onClose();
     } catch (err) {
-      alert(err.message ?? "Something went wrong");
+      showErrorToast(err.message ?? "Something went wrong");
     }
   };
 

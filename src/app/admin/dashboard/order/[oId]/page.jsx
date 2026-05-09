@@ -5,6 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import Image from "next/image";
 import api from "@/lib/axios";
+import { Edit2, X } from "lucide-react";
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 export default function OrderDetailsPage() {
     const { oId } = useParams();
@@ -14,6 +16,10 @@ export default function OrderDetailsPage() {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
     const [error, setError] = useState(null);
+    const [trackingId, setTrackingId] = useState("");
+    const [description, setDescription] = useState("");
+    const [trackingUpdating, setTrackingUpdating] = useState(false);
+    const [isEditingTracking, setIsEditingTracking] = useState(false);
 
     // 🔐 Auth Guard
     useEffect(() => {
@@ -42,6 +48,14 @@ export default function OrderDetailsPage() {
         if (oId) fetchOrder();
     }, [oId]);
 
+    // 🔄 Sync tracking details when order is fetched
+    useEffect(() => {
+        if (order) {
+            setTrackingId(order.trackingId || "");
+            setDescription(order.description || "");
+        }
+    }, [order]);
+
     // ✅ Update Status
     const updateStatus = async (newStatus) => {
         setUpdating(true);
@@ -57,9 +71,36 @@ export default function OrderDetailsPage() {
             );
             fetchOrder();
         } catch (e) {
-            alert("Failed to update order");
+            showErrorToast("Failed to update order");
         } finally {
             setUpdating(false);
+        }
+    };
+
+    // 📦 Update Tracking Details
+    const handleUpdateTracking = async () => {
+        if (!trackingId) {
+            showErrorToast("Please enter a tracking ID");
+            return;
+        }
+        setTrackingUpdating(true);
+        try {
+            await api.patch(
+                `/order/updateTracking/${oId}`,
+                { trackingId, description },
+                {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get("token")}`,
+                    },
+                }
+            );
+            showSuccessToast("Tracking details updated successfully!");
+            setIsEditingTracking(false);
+            fetchOrder();
+        } catch (e) {
+            showErrorToast("Failed to update tracking details");
+        } finally {
+            setTrackingUpdating(false);
         }
     };
 
@@ -99,6 +140,7 @@ export default function OrderDetailsPage() {
                                     <option value="processing">Processing</option>
                                     <option value="shipped">Shipped</option>
                                     <option value="completed">Completed</option>
+                                    <option value="refunded">Refunded</option>
                                     <option value="cancelled">Cancelled</option>
                                 </select>
 
@@ -248,6 +290,69 @@ export default function OrderDetailsPage() {
                                     </div>
                                 </div>
 
+                            </div>
+                        </div>
+
+                        {/* COURIER DETAILS */}
+                        <div className="card mb-3">
+                            <div className="card-body">
+                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 className="fw-bold mb-0">Courier Details</h6>
+                                    {order?.trackingId && (
+                                        <button
+                                            className="btn btn-link p-0 text-dark"
+                                            onClick={() => setIsEditingTracking(!isEditingTracking)}
+                                        >
+                                            {isEditingTracking ? <X size={16} /> : <Edit2 size={16} />}
+                                        </button>
+                                    )}
+                                </div>
+
+                                {(order?.trackingId && !isEditingTracking) ? (
+                                    <>
+                                        <div className="mb-2">
+                                            <small className="text-muted d-block">Tracking ID</small>
+                                            <p className="mb-2 fw-semibold">{order.trackingId}</p>
+                                        </div>
+                                        <div className="mb-0">
+                                            <small className="text-muted d-block">Description</small>
+                                            <p className="mb-0">{order.description || "N/A"}</p>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="mb-3">
+                                            <label className="small text-muted mb-1">Tracking ID</label>
+                                            <input
+                                                type="text"
+                                                className="form-control form-control-sm"
+                                                style={{ borderRadius: "6px" }}
+                                                value={trackingId}
+                                                onChange={(e) => setTrackingId(e.target.value)}
+                                                placeholder="Enter tracking ID"
+                                            />
+                                        </div>
+                                        <div className="mb-3">
+                                            <label className="small text-muted mb-1">Description</label>
+                                            <textarea
+                                                className="form-control form-control-sm"
+                                                style={{ borderRadius: "6px" }}
+                                                rows="2"
+                                                value={description}
+                                                onChange={(e) => setDescription(e.target.value)}
+                                                placeholder="Enter courier name or notes"
+                                            ></textarea>
+                                        </div>
+                                        <button
+                                            className="btn btn-dark btn-sm w-100"
+                                            style={{ borderRadius: "6px" }}
+                                            onClick={handleUpdateTracking}
+                                            disabled={trackingUpdating}
+                                        >
+                                            {trackingUpdating ? "Saving..." : (order?.trackingId ? "Save Changes" : "Submit Details")}
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         </div>
 

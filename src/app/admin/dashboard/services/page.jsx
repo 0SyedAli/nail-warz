@@ -162,10 +162,23 @@ export default function Services() {
                         ? `${IMG_BASE}/${s.images[0]}`
                         : fallbackImg;
 
-                    const technician =
-                      s.technicianId?.[0]?.fullName ||
-                      s.technicianId?.[0]?.email ||
-                      "—";
+                    const technicians = s.technicianId || [];
+
+                    let technicianDisplay = "—";
+
+                    if (technicians.length === 1) {
+                      technicianDisplay =
+                        technicians[0]?.fullName ||
+                        technicians[0]?.email ||
+                        "—";
+                    } else if (technicians.length > 1) {
+                      const firstName =
+                        technicians[0]?.fullName ||
+                        technicians[0]?.email ||
+                        "";
+
+                      technicianDisplay = `${firstName}, ...`;
+                    }
                     const category = s.categoryId?.categoryName || "—";
 
                     return (
@@ -181,7 +194,7 @@ export default function Services() {
                         </td>
                         <td>${Number(s.price).toFixed(2)}</td>
                         <td>{category}</td>
-                        <td>{technician}</td>
+                        <td>{technicianDisplay}</td>
                         <td style={{ width: "310px" }}>
                           <div className="d-flex gap-2">
                             <AuthBtn

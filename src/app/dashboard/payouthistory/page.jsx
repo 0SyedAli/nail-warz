@@ -24,6 +24,10 @@ export default function PayoutHistory() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+
   /* 🔐 Auth */
   useEffect(() => {
     const token = Cookies.get("token");
@@ -50,14 +54,20 @@ export default function PayoutHistory() {
       setError(null);
 
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor/${vendorId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${Cookies.get("token")}`,
-            },
-          }
-        );
+        let url = `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor/${vendorId}`;
+        const params = new URLSearchParams();
+        if (startDate) params.append("startDate", startDate);
+        if (endDate) params.append("endDate", endDate);
+        if (params.toString()) {
+          url += `?${params.toString()}`;
+        }
+
+        const res = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        });
+
 
         const json = await res.json();
 
@@ -86,6 +96,55 @@ export default function PayoutHistory() {
 
     fetchPayoutHistory();
   }, [vendorId]);
+
+
+  const handleFetch = (sDate = startDate, eDate = endDate) => {
+    if (!vendorId) return;
+
+    const fetchPayoutHistory = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        let url = `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor/${vendorId}`;
+        const params = new URLSearchParams();
+        if (sDate) params.append("startDate", sDate);
+        if (eDate) params.append("endDate", eDate);
+        if (params.toString()) {
+          url += `?${params.toString()}`;
+        }
+
+        const res = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        });
+
+        const json = await res.json();
+
+        if (!json.success) {
+          setPayouts([]);
+          setFilteredPayouts([]);
+          setSummary(null);
+          setError(json.message || "Something went wrong");
+          return;
+        }
+
+        const history = json.revenueSummary?.payoutHistory || [];
+        setPayouts(history);
+        setFilteredPayouts(history);
+        setSummary(json.revenueSummary);
+        setVendor(json.vendor);
+      } catch (err) {
+        setError("Server error. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPayoutHistory();
+  };
+
 
   /* 🔍 Search */
   useEffect(() => {
@@ -124,7 +183,51 @@ export default function PayoutHistory() {
     <div className="page">
       <div className="dashboard_panel_inner pt-4">
 
+        {/* ===== DATE FILTERS ===== */}
+        <div className="mb-4 d-flex gap-3 justify-content-end align-items-center">
+          <div className="d-flex align-items-center gap-2">
+            <label className="form-label fw-bold text-nowrap mb-0">Start Date</label>
+            <input
+              type="date"
+              className="form-control"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </div>
+          <div className="d-flex align-items-center gap-2">
+            <label className="form-label fw-bold text-nowrap mb-0">End Date</label>
+            <input
+              type="date"
+              className="form-control"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </div>
+          <button
+            className="btn btn-danger"
+            onClick={handleFetch}
+            disabled={!startDate || !endDate}
+          >
+            Fetch
+          </button>
+          {(startDate || endDate) && (
+            <button
+              className="btn btn-outline-secondary"
+              onClick={() => {
+                setStartDate("");
+                setEndDate("");
+                handleFetch("", "");
+              }}
+            >
+              Clear
+            </button>
+
+          )}
+        </div>
+
+
         {/* ===== SUMMARY ===== */}
+
         {summary && (
           <div className="row g-4 justify-content-between">
 

@@ -3,6 +3,9 @@ import Image from "next/image";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { requestForToken, onMessageListener } from "@/lib/firebase";
+import { toast } from "react-toastify";
+
 
 const TopBar = ({ header }) => {
   const router = useRouter();
@@ -54,13 +57,50 @@ const TopBar = ({ header }) => {
         setSalonName(json.data.salonName || "");
         setLocation(json.data.location?.locationName || json.data.locationName || "");
         setImage(json.data.image?.[0] || "");
-      } catch {
+
+        // FCM Token logic
+        if (!json.data.FCMToken) {
+          const fcmToken = await requestForToken();
+          if (fcmToken) {
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/updateAdminProfile`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+              body: JSON.stringify({
+                id: salonId,
+                FCMToken: fcmToken,
+              }),
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Error in TopBar fetchData:", err);
         router.push("/auth/login");
       }
     };
 
     fetchData();
   }, [salonId, token]); // <-- will run only when both available
+
+
+  // Handle foreground notifications
+  useEffect(() => {
+    onMessageListener()
+      .then((payload) => {
+        if (payload?.notification) {
+          toast.info(
+            <div>
+              <strong>{payload.notification.title}</strong>
+              <p>{payload.notification.body}</p>
+            </div>,
+            { position: "top-right" }
+          );
+        }
+      })
+      .catch((err) => console.log("failed: ", err));
+  }, []);
 
 
   return (

@@ -168,7 +168,7 @@ const AddTechnician = () => {
       showSuccessToast(result?.message || "Technician Created Successful")
       router.push(`/dashboard/technicians`);
     } catch (err) {
-      alert(err.message ?? "Something went wrong");
+      // alert(err.message ?? "Something went wrong");
       showErrorToast(err.message || "Something went wrong")
     }
   };

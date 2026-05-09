@@ -181,7 +181,9 @@ export default function EditService() {
   /* -------- Chip helpers -------- */
   const addChip = (field, value) => {
     if (!value) return;
-    setValue(field, [value], { shouldValidate: true });
+    const arr = watch(field) ?? [];
+    if (arr.includes(value)) return;
+    setValue(field, [...arr, value], { shouldValidate: true });
   };
 
   const removeChip = (field, idx) => {

@@ -77,7 +77,7 @@ export default function AddNewService() {
   }, [salonId]);
 
   useEffect(() => {
-     if (!salonId) return;       
+    if (!salonId) return;
     (async () => {
       try {
         const res = await api.get(`/getSalonCategory?salonId=${salonId}`);

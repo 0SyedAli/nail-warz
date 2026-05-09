@@ -3,6 +3,12 @@
 import Image from "next/image";
 
 export default function AppCTASection() {
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
   return (
     <section className="py-5 text-center position-relative cta_bg" >
       <div className="container">
@@ -10,11 +16,12 @@ export default function AppCTASection() {
           <Image
             src="/images/logo.png"
             alt="NAIL WARZ"
+            onClick={scrollToTop}
             width={196}
             height={178}
             priority
             className="img-fluid"
-            style={{ height: '178px', objectFit: "contain" }}
+            style={{ height: '178px', objectFit: "contain", cursor: "pointer" }}
           />
         </div>
         <h3 className="text-white mb-2 fw-medium">Join the Nail Warz Community</h3>

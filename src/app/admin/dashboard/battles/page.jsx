@@ -7,6 +7,9 @@ import { useDisclosure } from "@chakra-ui/react";
 import BattleModal from "@/components/Modal/BattleModal";
 import BattleCard from "@/components/battles/BattleCard";
 import BattleStats from "@/components/battles/BattleStats";
+import api from "@/lib/axios";
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
+import SelectWinnerModal from "@/components/Modal/SelectWinnerModal";
 
 export default function BattleManagementPage() {
     const router = useRouter();
@@ -15,6 +18,11 @@ export default function BattleManagementPage() {
     const [battles, setBattles] = useState([]);
     const [editBattle, setEditBattle] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [updating, setUpdating] = useState(false);
+
+    // Winner Modal State
+    const [winnerModalOpen, setWinnerModalOpen] = useState(false);
+    const [selectedBattle, setSelectedBattle] = useState(null);
 
     // 🔐 AUTH
     useEffect(() => {
@@ -39,6 +47,41 @@ export default function BattleManagementPage() {
     useEffect(() => {
         fetchBattles();
     }, []);
+
+    const handleUpdateStatus = async (battle, status) => {
+        if (!battle || !status) return;
+
+        // If completed, check for winner logic
+        if (status === "completed") {
+            setSelectedBattle(battle);
+            setWinnerModalOpen(true);
+            return;
+        }
+
+        try {
+            setUpdating(true);
+            const payload = {
+                battleId: battle._id,
+                status: status,
+            };
+
+            const res = await api.post("/updateBattleStatus", payload, {
+                headers: { Authorization: `Bearer ${Cookies.get("token")}` },
+            });
+
+            if (res.data.success) {
+                showSuccessToast(`Battle status updated to ${status}`);
+                fetchBattles(); // Refresh
+            } else {
+                showErrorToast(res.data.message || "Failed to update status");
+            }
+        } catch (err) {
+            console.error(err);
+            showErrorToast(err.response?.data?.message || "Failed to update battle status");
+        } finally {
+            setUpdating(false);
+        }
+    };
 
     const active = battles.filter(b => b.status === "active");
     const upcoming = battles.filter(b => b.status === "upcoming");
@@ -115,6 +158,7 @@ export default function BattleManagementPage() {
                             setEditBattle(b);
                             onOpen();
                         }}
+                        onUpdateStatus={handleUpdateStatus}
                         emptyMessage="No active battles available at the moment."
                     />
 
@@ -126,6 +170,7 @@ export default function BattleManagementPage() {
                             setEditBattle(b);
                             onOpen();
                         }}
+                        onUpdateStatus={handleUpdateStatus}
                         emptyMessage="No upcoming battles scheduled."
                     />
 
@@ -133,6 +178,7 @@ export default function BattleManagementPage() {
                     <BattleCard
                         title="Completed Battles"
                         battles={completed}
+                        onUpdateStatus={handleUpdateStatus}
                         emptyMessage="No completed battles yet."
                     />
 
@@ -145,6 +191,14 @@ export default function BattleManagementPage() {
                 isOpen={isOpen}
                 onClose={onClose}
                 battle={editBattle}
+                onSuccess={fetchBattles}
+            />
+
+            <SelectWinnerModal
+                isOpen={winnerModalOpen}
+                onClose={() => setWinnerModalOpen(false)}
+                participants={selectedBattle?.participants || []}
+                battleId={selectedBattle?._id}
                 onSuccess={fetchBattles}
             />
         </div>

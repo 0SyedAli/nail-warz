@@ -3,9 +3,10 @@
 import { useState, useEffect, use } from "react"
 import "bootstrap/dist/css/bootstrap.min.css"
 import { FaCheck, FaChevronLeft, FaChevronRight } from "react-icons/fa"
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 export default function ManageAvailabilityPage({ params }) {
-    const { tId } = use(params);
+  const { tId } = use(params);
 
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [currentStartDate, setCurrentStartDate] = useState(new Date())
@@ -89,22 +90,22 @@ export default function ManageAvailabilityPage({ params }) {
           const timeSlots =
             result.data.technician.workingDays.length > 0
               ? generateTimeSlots(
-                  result.data.technician.workingDays[0].startTime,
-                  result.data.technician.workingDays[0].endTime,
-                )
+                result.data.technician.workingDays[0].startTime,
+                result.data.technician.workingDays[0].endTime,
+              )
               : [
-                  "08:00 AM",
-                  "09:00 AM",
-                  "10:00 AM",
-                  "11:00 AM",
-                  "12:00 PM",
-                  "01:00 PM",
-                  "02:00 PM",
-                  "03:00 PM",
-                  "04:00 PM",
-                  "05:00 PM",
-                  "06:00 PM",
-                ]
+                "08:00 AM",
+                "09:00 AM",
+                "10:00 AM",
+                "11:00 AM",
+                "12:00 PM",
+                "01:00 PM",
+                "02:00 PM",
+                "03:00 PM",
+                "04:00 PM",
+                "05:00 PM",
+                "06:00 PM",
+              ]
 
           const existingAvailability = {}
           if (result.data.technician.notAvailable) {
@@ -157,18 +158,18 @@ export default function ManageAvailabilityPage({ params }) {
     technicianData && technicianData.workingDays.length > 0
       ? generateTimeSlots(technicianData.workingDays[0].startTime, technicianData.workingDays[0].endTime)
       : [
-          "08:00 AM",
-          "09:00 AM",
-          "10:00 AM",
-          "11:00 AM",
-          "12:00 PM",
-          "01:00 PM",
-          "02:00 PM",
-          "03:00 PM",
-          "04:00 PM",
-          "05:00 PM",
-          "06:00 PM",
-        ]
+        "08:00 AM",
+        "09:00 AM",
+        "10:00 AM",
+        "11:00 AM",
+        "12:00 PM",
+        "01:00 PM",
+        "02:00 PM",
+        "03:00 PM",
+        "04:00 PM",
+        "05:00 PM",
+        "06:00 PM",
+      ]
 
   const getDayLabels = () => {
     const labels = []
@@ -259,7 +260,7 @@ export default function ManageAvailabilityPage({ params }) {
 
   const handleSlotClick = (dayIndex, timeSlot) => {
     if (!isDayActive(dayIndex)) {
-      alert("This day is not available for booking")
+      showErrorToast("This day is not available for booking")
       return
     }
 
@@ -304,9 +305,9 @@ export default function ManageAvailabilityPage({ params }) {
         setSelectedRange((prev) => ({ ...prev, end: { dayIndex, timeSlot } }))
         setAvailability((prev) => ({ ...prev, [slotKey]: true }))
       } else if (dayIndex !== selectedRange.start.dayIndex) {
-        alert("Please select end time on the same day and after the start time")
+        showErrorToast("Please select end time on the same day and after the start time")
       } else {
-        alert("End time must be after start time")
+        showErrorToast("End time must be after start time")
       }
     } else {
       setSelectedRange({ start: { dayIndex, timeSlot }, end: null })
@@ -359,7 +360,7 @@ export default function ManageAvailabilityPage({ params }) {
         const result = await updateTechnicianAvailability(notAvailableSlots)
 
         if (result.success || result.message === "success") {
-          alert("Availability updated successfully!")
+          showSuccessToast("Availability updated successfully!")
           setTechnicianData((prev) => ({
             ...prev,
             notAvailable: [...(prev.notAvailable || []), newSlot],
@@ -367,14 +368,14 @@ export default function ManageAvailabilityPage({ params }) {
           setSelectedRange({ start: null, end: null })
           setAvailability({})
         } else {
-          alert(`Error: ${result.message || "Failed to update availability"}`)
+          showErrorToast(`Error: ${result.message || "Failed to update availability"}`)
         }
       } catch (error) {
         console.error("API Error:", error)
-        alert("Error updating availability. Please try again.")
+        showErrorToast("Error updating availability. Please try again.")
       }
     } else {
-      alert("Please select both start and end time")
+      showErrorToast("Please select both start and end time")
     }
   }
 
@@ -502,7 +503,7 @@ export default function ManageAvailabilityPage({ params }) {
 
           <div className="card shadow-sm">
             <div className="card-body p-4">
-              <div className="d-flex align-items-center justify-content-between mb-4" style={{width:"fitContent"}}>
+              <div className="d-flex align-items-center justify-content-between mb-4" style={{ width: "fitContent" }}>
                 <button className="btn btn-outline-danger btn-sm" onClick={() => navigateMonth("prev")}>
                   <FaChevronLeft />
                 </button>
@@ -629,12 +630,12 @@ export default function ManageAvailabilityPage({ params }) {
                     try {
                       const result = await updateWorkingDays(workingDays)
                       if (result.success || result.message === "success") {
-                        alert("Working days updated successfully!")
+                        showSuccessToast("Working days updated successfully!")
                       } else {
-                        alert(`Error: ${result.message || "Failed to update working days"}`)
+                        showErrorToast(`Error: ${result.message || "Failed to update working days"}`)
                       }
                     } catch (error) {
-                      alert("Error updating working days")
+                      showErrorToast("Error updating working days")
                     }
                   }}
                 >

@@ -171,7 +171,7 @@ export default function SuperAdminUsers() {
                     <div className="row flex-wrap g-3 mb-4">
                         <StatCard title="Total Users" value={stats.totalUser} />
                         <StatCard title="Active Users" value={stats.activeUser} />
-                        <StatCard title="Total Orders" value={stats.totalOrders} />
+                        <StatCard title="Total Bookings" value={stats.totalOrders} />
                         <StatCard title="Total Revenue" value={`$${stats.totalRevenue}`} />
                         <StatCard title="Total Wallet Balance" value={`$${stats.totalWalletBalance}`} />
                     </div>

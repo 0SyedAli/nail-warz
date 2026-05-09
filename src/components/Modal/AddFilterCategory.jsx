@@ -78,6 +78,7 @@ function AddCategory({ isOpen, onClose, btntitle, onSuccess, initialData = null 
           `${process.env.NEXT_PUBLIC_API_URL}/updateCategory`,
           {
             categoryId: initialData._id,
+            categoryName: categoryName.trim(),
             description: description.trim(),
             isArchive,
             subCategories,
@@ -140,7 +141,7 @@ function AddCategory({ isOpen, onClose, btntitle, onSuccess, initialData = null 
               placeholder="Enter category name"
               value={categoryName}
               onChange={(e) => setCategoryName(e.target.value)}
-              disabled={isEdit} // Following user provided schema for updateCategory
+            // disabled={isEdit} // Following user provided schema for updateCategory
             />
           </div>
 

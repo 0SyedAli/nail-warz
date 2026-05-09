@@ -16,18 +16,23 @@ import {
   VStack,
   Icon,
   useDisclosure,
-  Container,
   SimpleGrid,
   Stat,
   StatLabel,
   StatNumber,
-  Avatar,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
   IconButton,
   Tooltip,
 } from "@chakra-ui/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FaPlus, FaTrash, FaInfoCircle, FaHourglassHalf, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { FaPlus, FaTrash, FaInfoCircle, FaHourglassHalf, FaCheckCircle, FaTimesCircle, FaEye } from "react-icons/fa";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -41,6 +46,8 @@ const CategoryRequestPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isViewOpen, onOpen: onViewOpen, onClose: onViewClose } = useDisclosure();
+  const [selectedRequest, setSelectedRequest] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -105,6 +112,11 @@ const CategoryRequestPage = () => {
       deleteRequest(requestToDelete);
       setRequestToDelete(null);
     }
+  };
+
+  const handleOpenViewModal = (req) => {
+    setSelectedRequest(req);
+    onViewOpen();
   };
 
   const getStatusInfo = (status) => {
@@ -283,18 +295,30 @@ const CategoryRequestPage = () => {
                           })}
                         </Td>
                         <Td textAlign="right">
-                          <Tooltip label="Remove Request" hasArrow>
-                            <IconButton
-                              icon={<FaTrash />}
-                              colorScheme="red"
-                              variant="ghost"
-                              size="sm"
-                              data-bs-toggle="modal"
-                              data-bs-target="#areyousure2"
-                              onClick={() => setRequestToDelete(req._id)}
-                              aria-label="Delete Request"
-                            />
-                          </Tooltip>
+                          <HStack justify="flex-end" spacing={2}>
+                            <Tooltip label="View Details" hasArrow>
+                              <IconButton
+                                icon={<FaEye />}
+                                colorScheme="blue"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleOpenViewModal(req)}
+                                aria-label="View Details"
+                              />
+                            </Tooltip>
+                            <Tooltip label="Remove Request" hasArrow>
+                              <IconButton
+                                icon={<FaTrash />}
+                                colorScheme="red"
+                                variant="ghost"
+                                size="sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#areyousure2"
+                                onClick={() => setRequestToDelete(req._id)}
+                                aria-label="Delete Request"
+                              />
+                            </Tooltip>
+                          </HStack>
                         </Td>
                       </Tr>
                     );
@@ -317,6 +341,134 @@ const CategoryRequestPage = () => {
         title="Remove Request"
         message="Are you sure you want to remove this category request? This action cannot be undone."
       />
+
+      {/* View Detail Modal */}
+      <Modal isOpen={isViewOpen} onClose={onViewClose} size="xl" scrollBehavior="inside">
+        <ModalOverlay backdropFilter="blur(4px)" />
+        <ModalContent borderRadius="2xl" overflow="hidden" className="category-reject-modal2">
+          <ModalHeader bg="gray.50" borderBottom="1px solid" borderColor="gray.100" py={6}>
+            <Flex justify="space-between" align="center">
+              <VStack align="flex-start" spacing={1}>
+                <Heading size="md" fontWeight="800">Request Details</Heading>
+                <Text fontSize="sm" color="gray.500" fontWeight="400" sx={{ mb: 0 }}>Review your category proposal submission</Text>
+              </VStack>
+              <Badge
+                colorScheme={selectedRequest ? getStatusInfo(selectedRequest.status).colorScheme : "gray"}
+                variant="solid"
+                px={4}
+                py={1.5}
+                borderRadius="full"
+                fontSize="xs"
+                mr={8}
+              >
+                {selectedRequest ? getStatusInfo(selectedRequest.status).label : "Unknown"}
+              </Badge>
+            </Flex>
+          </ModalHeader>
+          <ModalCloseButton mt={2} bg="lightgray" />
+          <ModalBody p={8}>
+            {selectedRequest && (
+              <VStack spacing={6} align="stretch">
+                {/* Category Information */}
+                <Box>
+                  <Heading size="xs" textTransform="uppercase" letterSpacing="wider" color="gray.400" mb={4}>
+                    Proposed Category Information
+                  </Heading>
+                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+                    <VStack align="flex-start" spacing={1} sx={{ border: "1px solid #ccc", borderRadius: "10px", p: 3 }}>
+                      <Text fontSize="xs" fontWeight="700" color="gray.500" sx={{ mb: 0 }}>CATEGORY NAME</Text>
+                      <Text fontWeight="600" fontSize="lg" sx={{ mb: 0 }}>{selectedRequest.categoryName}</Text>
+                    </VStack>
+                    <VStack align="flex-start" spacing={1} sx={{ border: "1px solid #ccc", borderRadius: "10px", p: 3 }}>
+                      <Text fontSize="xs" fontWeight="700" color="gray.500" sx={{ mb: 0 }}>REQUEST REASON</Text>
+                      <Text fontWeight="500" sx={{ mb: 0 }}>{selectedRequest.reason}</Text>
+                    </VStack>
+                  </SimpleGrid>
+
+                  <VStack align="flex-start" spacing={2} mt={3} sx={{ border: "1px solid #ccc", borderRadius: "10px", p: 3 }}>
+                    <Text fontSize="xs" fontWeight="700" color="gray.500" sx={{ mb: 0 }}>SUBCATEGORIES</Text>
+                    <HStack spacing={2} flexWrap="wrap">
+                      {selectedRequest.subCategories?.map((sub, i) => (
+                        <Badge key={i} variant="subtle" colorScheme="blue" px={3} py={1} borderRadius="md" textTransform="none">
+                          {sub}
+                        </Badge>
+                      ))}
+                      {(!selectedRequest.subCategories || selectedRequest.subCategories.length === 0) && (
+                        <Text color="gray.400" fontStyle="italic">No subcategories provided</Text>
+                      )}
+                    </HStack>
+                  </VStack>
+
+                  {selectedRequest.description && (
+                    <VStack align="flex-start" spacing={2} mt={3} sx={{ border: "1px solid #ccc", borderRadius: "10px", p: 3 }}>
+                      <Text fontSize="xs" fontWeight="700" color="gray.500" sx={{ mb: 0 }}>DESCRIPTION</Text>
+                      <Text fontSize="sm" color="gray.700" lineHeight="tall" sx={{ mb: 0 }}>{selectedRequest.description}</Text>
+                    </VStack>
+                  )}
+                </Box>
+
+                {/* Submission Info */}
+                <Box>
+                  <Heading size="xs" textTransform="uppercase" letterSpacing="wider" color="gray.400" mb={4}>
+                    Submission History
+                  </Heading>
+                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                    <VStack align="flex-start" spacing={1} sx={{ border: "1px solid #ccc", borderRadius: "10px", p: 3 }}>
+                      <Text fontSize="xs" fontWeight="700" color="gray.500" sx={{ mb: 0 }}>SUBMITTED ON</Text>
+                      <Text fontWeight="500" sx={{ mb: 0 }}>
+                        {new Date(selectedRequest.createdAt).toLocaleDateString(undefined, {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric"
+                        })}
+                      </Text>
+                    </VStack>
+                    <VStack align="flex-start" spacing={1} sx={{ border: "1px solid #ccc", borderRadius: "10px", p: 3 }}>
+                      <Text fontSize="xs" fontWeight="700" color="gray.500" sx={{ mb: 0 }}>LAST UPDATED</Text>
+                      <Text fontWeight="500" sx={{ mb: 0 }}>
+                        {new Date(selectedRequest.updatedAt).toLocaleDateString(undefined, {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric"
+                        })}
+                      </Text>
+                    </VStack>
+                  </SimpleGrid>
+                </Box>
+
+                {/* Status/Feedback Section */}
+                {selectedRequest.status?.toLowerCase() === "rejected" && (
+                  <Box p={5} bg="red.50" borderRadius="xl" border="1px solid" borderColor="red.100">
+                    <HStack spacing={3} mb={2}>
+                      <Text fontWeight="800" color="red.700" fontSize="sm" textTransform="uppercase" sx={{ mb: 0 }}>Decline Reason</Text>
+                    </HStack>
+                    <Text color="red.600" fontSize="sm" fontWeight="500" sx={{ mb: 0 }}>
+                      {selectedRequest.rejectionReason || "No feedback provided by the administrator."}
+                    </Text>
+                  </Box>
+                )}
+
+                {selectedRequest.status?.toLowerCase() === "approved" && (
+                  <Box p={5} bg="green.50" borderRadius="xl" border="1px solid" borderColor="green.100">
+                    <HStack spacing={3} mb={2}>
+                      <Icon as={FaCheckCircle} color="green.500" />
+                      <Text fontWeight="800" color="green.700" fontSize="sm" textTransform="uppercase" sx={{ mb: 0 }}>Administrator Note</Text>
+                    </HStack>
+                    <Text color="green.600" fontSize="sm" fontWeight="500" sx={{ mb: 0 }}>
+                      Your category has been approved and is now available for your salon.
+                    </Text>
+                  </Box>
+                )}
+              </VStack>
+            )}
+          </ModalBody>
+          <ModalFooter bg="gray.50" borderTop="1px solid" borderColor="gray.100" py={4}>
+            <Button bg="#000" color="#fff" _hover={{ bg: "gray.800" }} onClick={onViewClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };

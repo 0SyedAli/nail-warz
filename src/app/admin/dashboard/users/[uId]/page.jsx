@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import Cookies from "js-cookie";
 import { useRouter, useParams } from "next/navigation";
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 export default function VendorDetail() {
     const { uId } = useParams();
@@ -83,7 +84,7 @@ export default function VendorDetail() {
 
             router.push("/admin/dashboard/vendors");
         } catch (err) {
-            alert(err.message || "Failed to delete vendor");
+            showErrorToast(err.message || "Failed to delete vendor");
         }
     };
 
@@ -92,12 +93,12 @@ export default function VendorDetail() {
         const payoutAmount = Number(amount);
 
         if (!payoutAmount || payoutAmount <= 0) {
-            alert("Enter a valid payout amount");
+            showErrorToast("Enter a valid payout amount");
             return;
         }
 
         if (payoutAmount > availableBalance) {
-            alert("Amount exceeds available balance");
+            showErrorToast("Amount exceeds available balance");
             return;
         }
 
@@ -128,9 +129,9 @@ export default function VendorDetail() {
             setAmount("");
             setRemarks("");
 
-            alert("Payout processed successfully");
+            showSuccessToast("Payout processed successfully");
         } catch (err) {
-            alert(err.message || "Payout error");
+            showErrorToast(err.message || "Payout error");
         } finally {
             setPaying(false);
         }

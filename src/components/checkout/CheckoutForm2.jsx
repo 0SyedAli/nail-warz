@@ -221,6 +221,7 @@
 // }
 
 // CheckoutForm.jsx
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useState } from "react";
 
@@ -242,9 +243,9 @@ export default function CheckoutForm() {
     });
 
     if (error) {
-      alert(error.message);
+      showErrorToast(error.message);
     } else if (paymentIntent.status === "succeeded") {
-      alert("Payment successful 🎉");
+      showSuccessToast("Payment successful 🎉");
 
       // 👉 NEXT STEP:
       // call createOrder API with paymentIntent.id

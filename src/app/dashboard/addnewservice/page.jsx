@@ -155,7 +155,9 @@ export default function AddNewService() {
   /* -------- Chip helpers (unchanged except for nullish guards) -------- */
   const addChip = (field, value) => {
     if (!value) return;
-    setValue(field, [value], { shouldValidate: true });
+    const arr = watch(field) ?? [];
+    if (arr.includes(value)) return;
+    setValue(field, [...arr, value], { shouldValidate: true });
   };
   const removeChip = (field, idx) => {
     const arr = [...(watch(field) ?? [])];

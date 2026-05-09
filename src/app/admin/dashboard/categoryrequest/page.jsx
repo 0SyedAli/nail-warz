@@ -15,16 +15,23 @@ import {
   HStack,
   VStack,
   Icon,
-  Container,
   SimpleGrid,
   Stat,
   StatLabel,
   StatNumber,
-  Avatar,
   IconButton,
   Tooltip,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  Textarea,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { FaPlus, FaCheck, FaTimes, FaInfoCircle, FaHourglassHalf, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { FaPlus, FaCheck, FaTimes, FaInfoCircle, FaHourglassHalf, FaCheckCircle, FaTimesCircle, FaEye } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -37,6 +44,11 @@ const AdminCategoryRequestPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [updatingId, setUpdatingId] = useState(null);
+  const { isOpen: isRejectOpen, onOpen: onRejectOpen, onClose: onRejectClose } = useDisclosure();
+  const { isOpen: isViewOpen, onOpen: onViewOpen, onClose: onViewClose } = useDisclosure();
+  const [rejectingId, setRejectingId] = useState(null);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [selectedRequest, setSelectedRequest] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -66,12 +78,17 @@ const AdminCategoryRequestPage = () => {
     }
   };
 
-  const updateStatus = async (id, newStatus) => {
+  const updateStatus = async (id, newStatus, reason = "") => {
     try {
       setUpdatingId(id);
+      const payload = { status: newStatus };
+      if (newStatus === "Rejected" && reason) {
+        payload.rejectionReason = reason;
+      }
+
       const response = await axios.patch(
         `${process.env.NEXT_PUBLIC_API_URL}/categoryRequest/${id}`,
-        { status: newStatus }
+        payload
       );
 
       if (response?.data?.success) {
@@ -88,6 +105,26 @@ const AdminCategoryRequestPage = () => {
     } finally {
       setUpdatingId(null);
     }
+  };
+
+  const handleOpenRejectModal = (id) => {
+    setRejectingId(id);
+    setRejectionReason("");
+    onRejectOpen();
+  };
+
+  const handleOpenViewModal = (req) => {
+    setSelectedRequest(req);
+    onViewOpen();
+  };
+
+  const handleConfirmReject = () => {
+    if (!rejectionReason.trim()) {
+      toast.warning("Please provide a reason for rejection.");
+      return;
+    }
+    updateStatus(rejectingId, "Rejected", rejectionReason);
+    onRejectClose();
   };
 
   const getStatusInfo = (status) => {
@@ -110,7 +147,7 @@ const AdminCategoryRequestPage = () => {
   };
 
   return (
-    <Box py={8}>
+    <Box py={8} >
       <Box className="category-request-page">
         {/* Header Section */}
         <Flex direction={{ base: "column", md: "row" }} justify="space-between" align={{ base: "flex-start", md: "center" }} mb={10}>
@@ -125,19 +162,19 @@ const AdminCategoryRequestPage = () => {
           <Box bg="white" p={6} borderRadius="md" boxShadow="sm" border="1px solid #ccc" borderColor="gray.100 transition='all 0.3s' _hover={{ transform: 'translateY(-5px)', boxShadow: 'md' }}">
             <Stat>
               <StatLabel color="gray.500" fontWeight="600" fontSize="18px">Incoming Proposals</StatLabel>
-              <StatNumber fontSize="3xl" fontWeight="800">{stats.total}</StatNumber>
+              <StatNumber fontSize="3xl" fontWeight="800" >{stats.total}</StatNumber>
             </Stat>
           </Box>
           <Box bg="white" p={6} borderRadius="md" boxShadow="sm" border="1px solid #ccc" borderColor="gray.100 transition='all 0.3s' _hover={{ transform: 'translateY(-5px)', boxShadow: 'md' }}">
-            <Stat>
+            <Stat >
               <StatLabel color="gray.500" fontWeight="600" fontSize="18px">Pending Review</StatLabel>
-              <StatNumber fontSize="3xl" fontWeight="800" color="yellow.500">{stats.pending}</StatNumber>
+              <StatNumber fontSize="3xl" fontWeight="800" color="yellow.500" >{stats.pending}</StatNumber>
             </Stat>
           </Box>
           <Box bg="white" p={6} borderRadius="md" boxShadow="sm" border="1px solid #ccc" borderColor="gray.100 transition='all 0.3s' _hover={{ transform: 'translateY(-5px)', boxShadow: 'md' }}">
-            <Stat>
+            <Stat >
               <StatLabel color="gray.500" fontWeight="600" fontSize="18px">Approved This Month</StatLabel>
-              <StatNumber fontSize="3xl" fontWeight="800" color="green.500">{stats.approved}</StatNumber>
+              <StatNumber fontSize="3xl" fontWeight="800" color="green.500" >{stats.approved}</StatNumber>
             </Stat>
           </Box>
         </SimpleGrid>
@@ -263,6 +300,16 @@ const AdminCategoryRequestPage = () => {
                         </Td>
                         <Td textAlign="right">
                           <HStack justify="flex-end" spacing={2}>
+                            <Tooltip label="View Details" hasArrow>
+                              <IconButton
+                                icon={<FaEye />}
+                                colorScheme="blue"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleOpenViewModal(req)}
+                                aria-label="View"
+                              />
+                            </Tooltip>
                             {isPending ? (
                               <>
                                 <Tooltip label="Approve Proposal" hasArrow>
@@ -280,7 +327,7 @@ const AdminCategoryRequestPage = () => {
                                     icon={<FaTimes />}
                                     colorScheme="red"
                                     size="sm"
-                                    onClick={() => updateStatus(req._id, "Rejected")}
+                                    onClick={() => handleOpenRejectModal(req._id)}
                                     isLoading={updatingId === req._id}
                                     aria-label="Reject"
                                   />
@@ -303,6 +350,220 @@ const AdminCategoryRequestPage = () => {
           )}
         </Box>
       </Box>
+
+      {/* Rejection Modal */}
+      <Modal isOpen={isRejectOpen} onClose={onRejectClose} isCentered>
+        <ModalOverlay backdropFilter="blur(4px)" />
+        <ModalContent borderRadius="xl" p={6} className="category-reject-modal">
+          <ModalHeader fontWeight="800" px={0}>Reject Proposal</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <VStack align="flex-start" spacing={4}>
+              <Text color="gray.600">
+                Please provide a reason for rejecting this category proposal. This will be sent to the vendor.
+              </Text>
+              <Textarea
+                placeholder="Enter rejection reason here..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                rows={5}
+                borderRadius="lg"
+                focusBorderColor="red.500"
+                resize="none"
+              />
+            </VStack>
+          </ModalBody>
+          <ModalFooter>
+            <HStack spacing={3}>
+              <Button variant="ghost" onClick={onRejectClose}>Cancel</Button>
+              <Button
+                colorScheme="red"
+                onClick={handleConfirmReject}
+                isLoading={updatingId === rejectingId}
+              >
+                Confirm Rejection
+              </Button>
+            </HStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* View Detail Modal */}
+      <Modal isOpen={isViewOpen} onClose={onViewClose} size="xl" scrollBehavior="inside">
+        <ModalOverlay backdropFilter="blur(4px)" />
+        <ModalContent borderRadius="2xl" overflow="hidden" className="category-reject-modal2">
+          <ModalHeader bg="gray.50" borderBottom="1px solid" borderColor="gray.100" py={6}>
+            <Flex justify="space-between" align="center">
+              <VStack align="flex-start" spacing={1}>
+                <Heading size="md" fontWeight="800">Proposal Details</Heading>
+                <Text fontSize="sm" color="gray.500" fontWeight="400" sx={{ mb: 0 }}>Review complete submission information</Text>
+              </VStack>
+              <Badge
+                colorScheme={selectedRequest ? getStatusInfo(selectedRequest.status).colorScheme : "gray"}
+                variant="solid"
+                px={4}
+                py={1.5}
+                borderRadius="full"
+                fontSize="xs"
+                mr={8}
+              >
+                {selectedRequest?.status || "Unknown"}
+              </Badge>
+            </Flex>
+          </ModalHeader>
+          <ModalCloseButton mt={2} bg="lightgray" />
+          <ModalBody p={8}>
+            {selectedRequest && (
+              <VStack spacing={8} align="stretch">
+                {/* Proposal Info Section */}
+                <Box>
+                  <Heading size="xs" textTransform="uppercase" letterSpacing="wider" color="gray.400" mb={4}>
+                    Category Information
+                  </Heading>
+                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6} >
+                    <VStack align="flex-start" spacing={1} sx={{ border: "1px solid #ccc", borderRadius: "10px", p: 3 }}>
+                      <Text fontSize="xs" fontWeight="700" color="gray.500" sx={{ mb: 0 }}>REQUESTED CATEGORY</Text>
+                      <Text fontWeight="600" fontSize="lg" sx={{ mb: 0 }}>{selectedRequest.categoryName}</Text>
+                    </VStack>
+                    <VStack align="flex-start" spacing={1} sx={{ border: "1px solid #ccc", borderRadius: "10px", p: 3 }}>
+                      <Text fontSize="xs" fontWeight="700" color="gray.500" sx={{ mb: 0 }}>REQUEST REASON</Text>
+                      <Text fontWeight="500" sx={{ mb: 0 }}>{selectedRequest.reason}</Text>
+                    </VStack>
+                  </SimpleGrid>
+
+                  <VStack align="flex-start" spacing={2} mt={3} sx={{ border: "1px solid #ccc", borderRadius: "10px", p: 3 }}>
+                    <Text fontSize="xs" fontWeight="700" color="gray.500" sx={{ mb: 0 }}>SUBCATEGORIES</Text>
+                    <HStack spacing={2} flexWrap="wrap">
+                      {selectedRequest.subCategories?.map((sub, i) => (
+                        <Badge key={i} variant="subtle" colorScheme="blue" px={3} py={1} borderRadius="md" textTransform="none">
+                          {sub}
+                        </Badge>
+                      ))}
+                      {(!selectedRequest.subCategories || selectedRequest.subCategories.length === 0) && (
+                        <Text color="gray.400" fontStyle="italic">No subcategories provided</Text>
+                      )}
+                    </HStack>
+                  </VStack>
+
+                  {selectedRequest.description && (
+                    <VStack align="flex-start" spacing={2} mt={3} sx={{ border: "1px solid #ccc", borderRadius: "10px", p: 3 }}>
+                      <Text fontSize="xs" fontWeight="700" color="gray.500" sx={{ mb: 0 }}>DESCRIPTION</Text>
+                      <Text fontSize="sm" color="gray.700" lineHeight="tall" sx={{ mb: 0 }}>{selectedRequest.description}</Text>
+                    </VStack>
+                  )}
+                </Box>
+
+                <Box height="1px" bg="gray.100" />
+
+                {/* Vendor Info Section */}
+                <Box>
+                  <Heading size="xs" textTransform="uppercase" letterSpacing="wider" color="gray.400" mb={4}>
+                    Vendor Information
+                  </Heading>
+                  <Flex align="center" mb={6}>
+                    <Box mr={4}>
+                      {selectedRequest.vendorId?.image?.[0] ? (
+                        <Image
+                          width={60}
+                          height={60}
+                          style={{ width: "60px", height: "60px", borderRadius: "16px", objectFit: "cover" }}
+                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${selectedRequest.vendorId.image[0]}`}
+                          alt={selectedRequest.vendorId?.salonName || "Vendor"}
+                        />
+                      ) : (
+                        <Box
+                          w="60px"
+                          h="60px"
+                          borderRadius="16px"
+                          bg="blue.500"
+                          color="white"
+                          display="flex"
+                          alignItems="center"
+                          justifyContent="center"
+                          fontSize="2xl"
+                          fontWeight="bold"
+                        >
+                          {(selectedRequest.vendorId?.salonName || selectedRequest.vendorId?.name || "?").charAt(0).toUpperCase()}
+                        </Box>
+                      )}
+                    </Box>
+                    <VStack align="flex-start" spacing={0}>
+                      <Text fontWeight="800" fontSize="xl" sx={{ mb: 0 }}>{selectedRequest.vendorId?.salonName || "Salon Name Not Provided"}</Text>
+                      <Text color="gray.500" fontWeight="500" sx={{ mb: 0 }}>Owner: {selectedRequest.vendorId?.name || "N/A"}</Text>
+                    </VStack>
+                  </Flex>
+
+                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+                    <VStack align="flex-start" spacing={1} sx={{ border: "1px solid #ccc", borderRadius: "10px", p: 3 }}>
+                      <Text fontSize="xs" fontWeight="700" color="gray.500" sx={{ mb: 0 }}>EMAIL ADDRESS</Text>
+                      <Text fontWeight="500" sx={{ mb: 0 }}>{selectedRequest.vendorId?.bussinessEmail || selectedRequest.vendorId?.email || "N/A"}</Text>
+                    </VStack>
+                    <VStack align="flex-start" spacing={1} sx={{ border: "1px solid #ccc", borderRadius: "10px", p: 3 }}>
+                      <Text fontSize="xs" fontWeight="700" color="gray.500" sx={{ mb: 0 }}>PHONE NUMBER</Text>
+                      <Text fontWeight="500" sx={{ mb: 0 }}>{selectedRequest.vendorId?.bussinessPhoneNumber || selectedRequest.vendorId?.phoneNumber || "N/A"}</Text>
+                    </VStack>
+                    <VStack align="flex-start" spacing={1} gridColumn={{ md: "span 2" }} sx={{ border: "1px solid #ccc", borderRadius: "10px", p: 3 }}>
+                      <Text fontSize="xs" fontWeight="700" color="gray.500" sx={{ mb: 0 }}>BUSINESS ADDRESS</Text>
+                      <Text fontWeight="500" sx={{ mb: 0 }}>{selectedRequest.vendorId?.bussinessAddress || selectedRequest.vendorId?.locationName || "N/A"}</Text>
+                      {selectedRequest.vendorId?.city && (
+                        <Text fontSize="sm" color="gray.500" sx={{ mb: 0 }}>
+                          {selectedRequest.vendorId.city}, {selectedRequest.vendorId.state} {selectedRequest.vendorId.zipCode}
+                        </Text>
+                      )}
+                    </VStack>
+                  </SimpleGrid>
+                </Box>
+
+                {/* Status/Rejection Section if applicable */}
+                {selectedRequest.status?.toLowerCase() === "rejected" && (
+                  <>
+                    <Box height="1px" bg="gray.100" />
+                    <Box p={5} bg="red.50" borderRadius="xl" border="1px solid" borderColor="red.100">
+                      <HStack spacing={3} mb={2}>
+                        {/* <Icon as={FaTimesCircle} color="red.500" /> */}
+                        <Text fontWeight="800" color="red.700" fontSize="sm" textTransform="uppercase" sx={{ mb: 0 }}>Rejection Details</Text>
+                      </HStack>
+                      <Text color="red.600" fontSize="sm" fontWeight="500" sx={{ mb: 0 }}>
+                        {selectedRequest.rejectionReason || "No rejection reason provided."}
+                      </Text>
+                    </Box>
+                  </>
+                )}
+              </VStack>
+            )}
+          </ModalBody>
+          <ModalFooter bg="gray.50" borderTop="1px solid" borderColor="gray.100" py={4}>
+            <HStack spacing={3} w="100%" justify="flex-end">
+              <Button bg="#000" color="#fff" onClick={onViewClose}>Close</Button>
+              {selectedRequest?.status?.toLowerCase() === "pending" && (
+                <>
+                  <Button
+                    colorScheme="red"
+                    variant="outline"
+                    leftIcon={<FaTimes />}
+                    onClick={() => {
+                      onViewClose();
+                      handleOpenRejectModal(selectedRequest._id);
+                    }}
+                  >
+                    Reject
+                  </Button>
+                  <Button
+                    colorScheme="green"
+                    leftIcon={<FaCheck />}
+                    onClick={() => {
+                      updateStatus(selectedRequest._id, "Approved");
+                      onViewClose();
+                    }}
+                  >
+                    Approve Proposal
+                  </Button>
+                </>
+              )}
+            </HStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };

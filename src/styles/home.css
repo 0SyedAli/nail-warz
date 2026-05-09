@@ -26,7 +26,7 @@
   width: 100%;
 }
 
-.header-home .btn-header {
+.btn-home-header {
   color: #FFF;
   background-color: #C11111;
   border-radius: 30px;
@@ -37,7 +37,7 @@
 
 }
 
-.header-home .btn-header:hover {
+.btn-home-header:hover {
   background-color: transparent;
   border: 1px solid #C11111;
   color: #000;
@@ -1127,7 +1127,7 @@
     font-size: 15px !important;
   }
 
-  .header-home .btn-header {
+  .btn-home-header {
     font-size: 13px;
     padding: 5px 10px;
   }

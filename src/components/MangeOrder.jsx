@@ -109,7 +109,11 @@ export default function ManageAppointments() {
     const calculateStats = (data) => {
         const stats = data.reduce(
             (acc, appt) => {
-                acc.all++;
+                // acc.all++;
+                // Only count appointments that are not "pending" for the "All" count
+                if (appt.status.toLowerCase() !== "pending") {
+                    acc.all++;
+                }
 
                 switch (appt.status.toLowerCase()) {
                     case "accepted":

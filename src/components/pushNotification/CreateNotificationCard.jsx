@@ -69,7 +69,9 @@ const CreateNotificationCard = ({
                     >
                         <option value="">All Users</option>
                         <option value="active">Active Users</option>
+                        <option value="active_vendor">Active Vendors</option>
                         <option value="inactive">Inactive Users</option>
+                        <option value="inactive_vendor">Inactive Vendors</option>
                     </select>
                 </div>
                 <div className="col-md-6">

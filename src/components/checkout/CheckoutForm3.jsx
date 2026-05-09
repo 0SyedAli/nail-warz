@@ -1,4 +1,5 @@
 "use client"
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useState } from "react";
 export default function CheckoutForm3() {
@@ -14,9 +15,9 @@ export default function CheckoutForm3() {
       redirect: "if_required",
     });
     if (error) {
-      alert(error.message);
+      showErrorToast(error.message);
     } else if (paymentIntent.status === "succeeded") {
-      alert("Payment successful :tada:");
+      showSuccessToast("Payment successful :tada:");
       // :point_right: NOW CALL CREATE ORDER API
       // createOrder(paymentIntent.id)
     }

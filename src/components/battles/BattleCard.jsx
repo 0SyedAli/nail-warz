@@ -7,7 +7,7 @@ import { MdPersonAdd } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import { BsEye } from "react-icons/bs";
 
-export default function BattleCard({ title, battles, onEdit, emptyMessage = "No battles available." }) {
+export default function BattleCard({ title, battles, onEdit, onUpdateStatus, emptyMessage = "No battles available." }) {
   const router = useRouter();
   const [resultOpen, setResultOpen] = useState(false);
   const [selectedBattleId, setSelectedBattleId] = useState(null);
@@ -43,25 +43,6 @@ export default function BattleCard({ title, battles, onEdit, emptyMessage = "No 
                 ⭐ {b.totalVotes} votes
               </div>
 
-              {/* {!completed ? (
-              <div className="d-flex gap-2">
-                <button
-                  className="btn btn-dark btn-sm"
-                  onClick={() => onEdit(b)}
-                >
-                  Edit
-                </button>
-                <button
-                  className="btn btn-outline-secondary btn-sm"
-                >
-                  Manage
-                </button>
-              </div>
-            ) : (
-              <p className="small text-success">
-                Winner: {b.winner?.name || "N/A"}
-              </p>
-            )} */}
               {b.status === "completed" && (
                 <p className="small text-success mt-2">
                   Winner: {b.winner?.name || "N/A"}
@@ -69,8 +50,8 @@ export default function BattleCard({ title, battles, onEdit, emptyMessage = "No 
               )}
               {/* ===== ACTIONS ===== */}
               {b.status === "upcoming" && (
-                <div className="d-flex align-items-center justify-content-between">
-                  <div className="d-flex gap-2">
+                <div className="d-flex align-items-center justify-content-between mt-3">
+                  <div className="d-flex gap-2 flex-wrap">
                     <button
                       className="btn btn-dark btn-sm"
                       onClick={() => onEdit(b)}
@@ -86,7 +67,7 @@ export default function BattleCard({ title, battles, onEdit, emptyMessage = "No 
                         setResultOpen(true);
                       }}
                     >
-                      View Participants
+                      Participants
                     </button>
                     <button
                       className="btn btn-outline-dark btn-sm d-flex align-items-center gap-1"
@@ -94,12 +75,18 @@ export default function BattleCard({ title, battles, onEdit, emptyMessage = "No 
                     >
                       <BsEye /> Detail
                     </button>
+                    <button
+                      className="btn btn-success btn-sm text-white"
+                      onClick={() => onUpdateStatus(b, "active")}
+                    >
+                      Activate
+                    </button>
                   </div>
                 </div>
               )}
               {(b.status === "active") && (
-                <div className="d-flex align-items-center justify-content-between">
-                  <div className="d-flex gap-2">
+                <div className="d-flex align-items-center justify-content-between mt-3">
+                  <div className="d-flex gap-2 flex-wrap">
                     <button
                       className="btn btn-outline-dark btn-sm"
                       onClick={() => {
@@ -117,14 +104,17 @@ export default function BattleCard({ title, battles, onEdit, emptyMessage = "No 
                     >
                       <BsEye /> Detail
                     </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => onUpdateStatus(b, "completed")}
+                    >
+                      Complete
+                    </button>
                   </div>
-                  {/* <span className="add-user">
-                    <MdPersonAdd />
-                  </span> */}
                 </div>
               )}
               {(b.status === "completed") && (
-                <div className="d-flex gap-2">
+                <div className="d-flex gap-2 mt-3">
                   <button
                     className="btn btn-outline-dark btn-sm"
                     onClick={() => {

@@ -1323,6 +1323,15 @@ table.table.caption-top th {
   box-shadow: unset !important;
 }
 
+
+
+.category-reject-modal,
+.category-reject-modal2 {
+  background-color: #FFF !important;
+}
+
+
+
 .modal_container_body {
   border: 1px solid #ccc;
   border-radius: 10px;
@@ -1333,6 +1342,10 @@ table.table.caption-top th {
 
 .chakra-modal__body {
   padding: 0 !important;
+}
+
+.category-reject-modal2 .chakra-modal__body {
+  padding: 20px !important;
 }
 
 .appoint_detail_container {
@@ -2813,10 +2826,10 @@ div#googleSignInDiv iframe {
 }
 
 /* MAIN CALENDAR WRAPPER */
-.rbc-calendar {
-  /* background: transparent !important; */
-  /* color: #fff !important; */
-}
+/* .rbc-calendar {
+  background: transparent !important;
+  color: #fff !important;
+} */
 
 /* WEEK HEADER (Mon, Tue...) */
 /* .rbc-header {
@@ -4414,9 +4427,9 @@ span.prod_stock_status {
   border-bottom: 0;
 }
 
-.checkout-summary .subtotal span {
-  /* text-decoration: underline; */
-}
+/* .checkout-summary .subtotal span {
+  text-decoration: underline;
+} */
 
 .subtotal {
   padding: 20px 0;
@@ -5010,6 +5023,21 @@ span.prod_stock_status {
   .sidebar_container ul {
     padding: 0 0 0 20px;
   }
+
+  .reward-names.rn1 {
+    top: 270px;
+    left: 15px;
+  }
+
+  .reward-names.rn2 {
+    top: 225px;
+    left: 170px;
+  }
+
+  .reward-names.rn3 {
+    top: 275px;
+    left: 315px;
+  }
 }
 
 @media only screen and (max-width: 1080px) {
@@ -5253,6 +5281,27 @@ span.prod_stock_status {
     padding: 0;
     border-left: 0;
   }
+
+  .final-podium {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .reward-names.rn1 {
+    top: 315px;
+    left: 116px;
+  }
+
+  .reward-names.rn2 {
+    top: 265px;
+    left: 290px;
+  }
+
+  .reward-names.rn3 {
+    top: 330px;
+    left: 455px;
+  }
 }
 
 @media only screen and (max-width: 768px) {
@@ -5398,10 +5447,24 @@ span.prod_stock_status {
     top: 29px;
     width: 300px;
   }
+
+  .reward-names.rn1 {
+    top: 305px;
+    left: 16px;
+  }
+
+  .reward-names.rn2 {
+    top: 255px;
+    left: 195px;
+  }
+
+  .reward-names.rn3 {
+    top: 320px;
+    left: 375px;
+  }
 }
 
 @media only screen and (max-width: 576px) {
-
 
   .topbar_container h1 {
     font-size: 20px;

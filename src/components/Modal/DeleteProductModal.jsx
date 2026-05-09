@@ -3,6 +3,7 @@
 import api from "@/lib/axios";
 import Cookies from "js-cookie";
 import Modal from "./layout";
+import { showErrorToast } from "@/lib/toast";
 
 export default function DeleteProductModal({ isOpen, onClose, productId, onSuccess }) {
 
@@ -17,7 +18,7 @@ export default function DeleteProductModal({ isOpen, onClose, productId, onSucce
             onClose();
         } catch (err) {
             console.error("Delete failed", err);
-            alert("Failed to delete product");
+            showErrorToast("Failed to delete product");
         }
     };
 

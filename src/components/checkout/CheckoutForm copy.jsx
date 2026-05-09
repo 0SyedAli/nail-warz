@@ -98,6 +98,7 @@ import { useStripe, useElements, CardElement } from "@stripe/react-stripe-js";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { clearCart } from "@/redux/slice/cartSlice";
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 export default function CheckoutForm() {
   const stripe = useStripe();
@@ -128,7 +129,7 @@ export default function CheckoutForm() {
     });
 
     if (error) {
-      alert(error.message);
+      showErrorToast(error.message);
       return;
     }
 
@@ -161,7 +162,7 @@ export default function CheckoutForm() {
     await axios.post("/api/order", body);
 
     dispatch(clearCart());
-    alert("Order placed successfully 🎉");
+    showSuccessToast("Order placed successfully 🎉");
   };
 
   return (

@@ -5,6 +5,7 @@ import api from "@/lib/axios";
 import Cookies from "js-cookie";
 import Modal from "./layout";
 import MultiImageUpload from "../MultiImageUpload";
+import { showErrorToast } from "@/lib/toast";
 
 export default function ProductModal({ isOpen, onClose, product, onSuccess }) {
     const isEdit = Boolean(product);
@@ -113,7 +114,7 @@ export default function ProductModal({ isOpen, onClose, product, onSuccess }) {
             onClose();
         } catch (err) {
             console.error("Save failed", err);
-            alert("Failed to save product");
+            showErrorToast("Failed to save product");
         } finally {
             setLoading(false);
         }

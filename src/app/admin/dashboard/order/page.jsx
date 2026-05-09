@@ -98,12 +98,13 @@ export default function SuperAdminOrders() {
 
         {/* ===== STATS ===== */}
         {stats && (
-          <div className="row g-3 mb-4">
+          <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3 mb-4">
             <StatCard title="Total Orders" value={stats.totalOrders} />
             <StatCard title="Pending" value={stats.pendingOrders || 0} valueClass="text-warning" />
             {/* <StatCard title="Processing" value={stats.processingOrders || 0} valueClass="text-info" />
             <StatCard title="Shipped" value={stats.shippedOrders || 0} valueClass="text-primary" /> */}
             <StatCard title="Completed" value={stats.completedOrders || 0} valueClass="text-success" />
+            <StatCard title="Refunded" value={stats?.refundedOrders || 0} valueClass="text-secondary" />
             <StatCard title="Total Revenue" value={`$${stats.totalRevenue.toFixed(2)}`} valueClass="text-primary2" />
           </div>
         )}
@@ -156,6 +157,12 @@ export default function SuperAdminOrders() {
                   onClick={() => handleStatusFilter("completed")}
                 >
                   Completed
+                </button>
+                <button
+                  className={`btn btn-sm ${statusFilter === "refunded" ? "btn-dark" : "btn-outline-dark"}`}
+                  onClick={() => handleStatusFilter("refunded")}
+                >
+                  Refunded
                 </button>
               </div>
             </div>
@@ -256,7 +263,7 @@ export default function SuperAdminOrders() {
 /* ===== COMPONENTS ===== */
 
 const StatCard = ({ title, value, valueClass = "" }) => (
-  <div className="col-md-3">
+  <div className="col">
     <div className="card h-100">
       <div className="card-body">
         <p className="text-muted mb-1">{title}</p>
@@ -272,6 +279,7 @@ const OrderStatusBadge = ({ status }) => {
     processing: "bg-info text-dark",
     shipped: "bg-primary text-white",
     completed: "bg-success text-white",
+    refunded: "bg-secondary text-white",
     cancelled: "bg-danger text-white",
   };
 

@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 import Modal from "./layout";
 import Image from "next/image";
 import { MdDeleteForever } from "react-icons/md";
+import { showErrorToast } from "@/lib/toast";
 
 export default function ViewResultModal({
     isOpen,
@@ -56,7 +57,7 @@ export default function ViewResultModal({
             fetchBattle(); // refresh list
         } catch (err) {
             console.error(err);
-            alert("Failed to remove participant");
+            showErrorToast("Failed to remove participant");
         }
     };
     function Avatar({ src, alt }) {

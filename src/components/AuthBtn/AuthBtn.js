@@ -13,7 +13,7 @@ export const AuthBtn = ({
 }) => {
   return (
     <button
-      className={`${styles.btntheme1} ${location_btn ? location_btn : ""}`}
+      className={`${styles.btntheme1} ${location_btn ? styles.location_btn : ""}`}
       type={type}
       onClick={type === "submit" ? undefined : onClick}  // ✔ FIX
       disabled={disabled}

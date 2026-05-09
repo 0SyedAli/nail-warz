@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { AuthBtn } from "@/components/AuthBtn/AuthBtn";
 import BallsLoading from "../Spinner/BallsLoading";
+import { showErrorToast } from "@/lib/toast";
 
 /* ---------- Days ---------- */
 const ALL_DAYS = [
@@ -18,7 +19,7 @@ const ALL_DAYS = [
   "Sunday",
 ];
 
-export default function EditTechnicianAvailablity({ isOpen, onClose, techId, onSuccess  }) {
+export default function EditTechnicianAvailablity({ isOpen, onClose, techId, onSuccess }) {
   const [loading, setLoading] = useState(true);
   const [originalData, setOriginalData] = useState(null);
 
@@ -93,7 +94,7 @@ export default function EditTechnicianAvailablity({ isOpen, onClose, techId, onS
 
         setLoading(false);
       } catch (err) {
-        alert(err.message);
+        showErrorToast(err.message);
         onClose();
       }
     };
@@ -145,7 +146,7 @@ export default function EditTechnicianAvailablity({ isOpen, onClose, techId, onS
 
       onClose();
     } catch (err) {
-      alert(err.message ?? "Something went wrong");
+      showErrorToast(err.message ?? "Something went wrong");
     }
   };
 
