@@ -9,7 +9,7 @@ import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { MdHistory } from "react-icons/md";
 import AddToBattleModal from "@/components/Modal/AddToBattleModal";
 
-export default function ContentDetail({ width1, height1 }) {
+export default function ContentDetail() {
   const { cId } = useParams();
   const router = useRouter();
   const [item, setItem] = useState(null);
@@ -63,8 +63,8 @@ export default function ContentDetail({ width1, height1 }) {
       <Image
         src={imgSrc}
         alt={alt}
-        width={`${width1}` || 40}
-        height={`${height1}` || 40}
+        width={1000}
+        height={500}
         style={{
           borderRadius: "10px",
           objectFit: "cover",
@@ -105,8 +105,6 @@ export default function ContentDetail({ width1, height1 }) {
                     ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${item.images[0]}`
                     : "/images/profile-avatar.jpg"
                 }
-                width1={1000}
-                height1={500}
                 alt={item.name}
               />
               <p className="mt-3 mb-1 text-muted">Description</p>
