@@ -234,7 +234,7 @@ export default function Services() {
                             <AuthBtn
                               title="Assign Technicain"
                               location_btn="btn  addTechBtn red"
-
+                              style_btn={{ fontSize: "12px", padding: "0 10px", height: "40px" }}
                               onClick={() => {
                                 setSelectedServiceId(s._id); // ✅ set selected service
                                 onTechOpen();        // ✅ open modal
@@ -250,6 +250,7 @@ export default function Services() {
                             <AuthBtn
                               title="Delete"
                               location_btn="btn orderBtn red"
+                              style_btn={{ fontSize: "12px", padding: "0 10px", height: "40px", backgroundColor: "#CC1111 !important" }}
                               onClick={() => {
                                 setSelectedService(s); // ✅ set selected service
                                 onDeleteOpen();        // ✅ open modal
