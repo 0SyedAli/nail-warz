@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    images: {
-        domains: ["apiforapp.link"],
+  images: {
+    domains: ["nailwarz.apiforapp.link"],
 
-    }
+  }
   //   ,
   //   async redirects() {
   //   return [

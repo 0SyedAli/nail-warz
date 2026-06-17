@@ -9,7 +9,7 @@ import { GiWorld } from "react-icons/gi";
 import { IoLocationSharp } from "react-icons/io5";
 import { MdOutlineAccessTime, MdAttachMoney } from "react-icons/md";
 import { HiTrendingUp } from "react-icons/hi";
-import { showErrorToast } from "@/lib/toast";
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 export default function VendorDetail() {
     const { vId } = useParams();
@@ -71,9 +71,9 @@ export default function VendorDetail() {
     /* ===================== DERIVED VALUES ===================== */
     const totalRevenue = revenueSummary?.totalRevenue ?? 0;
     const platformFee = revenueSummary?.platformFee?.amount ?? 0;
-    const vendorShare = revenueSummary?.vendorShare?.amount ?? 0;
-    const availableBalance = revenueSummary?.totalPayoutPending ?? 0;
-
+    const vendorShare = revenueSummary?.totalPayableAmount ?? 0;
+    const availableBalance = revenueSummary?.payableBalance ?? 0;
+    console.log(availableBalance, "availableBalance");
     /* ===================== DELETE ===================== */
     const deleteVendor = async () => {
         if (!confirm("Are you sure you want to delete this vendor?")) return;
@@ -196,7 +196,7 @@ export default function VendorDetail() {
                     />
                     <StatBox
                         title="Vendor Share (85%)"
-                        value={`$${vendorShare.toFixed(2)}`}
+                        value={`$${revenueSummary?.totalPayableAmount.toFixed(2)}`}
                         color="purple"
                         icon={<FaWallet size={20} className="text-purple opacity-50" style={{ color: "#7b2cbf" }} />}
                     />
@@ -278,7 +278,6 @@ export default function VendorDetail() {
 
                         <div className="label">Remaining Balance</div>
                         <div className="amount purple">${availableBalance.toFixed(2)}</div>
-
                         <input
                             className="input"
                             type="number"
@@ -286,6 +285,7 @@ export default function VendorDetail() {
                             placeholder="Enter amount"
                             value={amount}
                             onChange={e => setAmount(e.target.value)}
+                            disabled={availableBalance <= 0}
                         />
 
                         <input
@@ -293,11 +293,12 @@ export default function VendorDetail() {
                             placeholder="Remarks / Payment method"
                             value={remarks}
                             onChange={e => setRemarks(e.target.value)}
+                            disabled={availableBalance <= 0}
                         />
 
                         <button
                             className="payout-btn"
-                            disabled={paying}
+                            disabled={paying || availableBalance <= 0}
                             onClick={handlePayout}
                         >
                             {paying ? "Processing..." : "$ Process Payout"}
@@ -313,25 +314,25 @@ export default function VendorDetail() {
                         </div>
                         <div className="summary-row purple">
                             <span>Total Paid Out</span>
-                            <span>${revenueSummary?.totalPaidAmount.toFixed(2)}</span>
+                            <span>${revenueSummary?.totalPaid.toFixed(2)}</span>
                         </div>
-                        <div className="summary-row purple">
+                        {/* <div className="summary-row purple">
                             <span>Remaining Revenue</span>
-                            <span>${revenueSummary?.remainingRevenue.toFixed(2)}</span>
-                        </div>
+                            <span>${revenueSummary?.payableBalance.toFixed(2)}</span>
+                        </div> */}
 
                         <div className="summary-row red">
                             <span>Platform Fee (15%)</span>
-                            <span>${revenueSummary?.platformFee?.amount.toFixed(2)}</span>
+                            <span>${revenueSummary?.platformFee?.toFixed(2)}</span>
                         </div>
 
                         <div className="summary-row green">
                             <span>Vendor Share (85%)</span>
-                            <span>${revenueSummary?.vendorShare?.amount.toFixed(2)}</span>
+                            <span>${revenueSummary?.totalPayableAmount.toFixed(2)}</span>
                         </div>
                         <div className="summary-row">
                             <span><strong>Remaining Balance</strong></span>
-                            <span>${revenueSummary?.totalPayoutPending.toFixed(2)}</span>
+                            <span>${revenueSummary?.payableBalance.toFixed(2)}</span>
                         </div>
                     </div>
                 </div>
@@ -379,8 +380,8 @@ export default function VendorDetail() {
                                             <td>${p.amount}</td>
                                             <td>{p.remarks}</td>
                                             <td>
-                                                <span className={`status-badge text-capitalize bg-success ${p.status === "Paid" ? "completed" : ""}`}>
-                                                    {p.status}
+                                                <span className={`status-badge text-capitalize bg-success text-white `}>
+                                                    Paid
                                                 </span>
                                             </td>
                                         </tr>

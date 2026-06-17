@@ -206,8 +206,8 @@ const DashboardPanel = ({ activeTab }) => {
                     {filteredOrders.slice(0, 4).map((order, index) => (
                       <tr key={index}>
                         <td>{order.userId?.username || "Unknown"}</td>
-                        <td>{order.serviceId?.serviceName || "-"}</td>
-                        <td>{order.technicianId?.fullName || "-"}</td>
+                        <td>{order.serviceId?.map((s) => s.serviceName).join(", ") || "-"}</td>
+                        <td>{order.technicianId?.map((t) => t.fullName).join(", ") || "-"}</td>
                         <td>{formatDateTimeUS(order.date, order.time)}</td>
                         <td>${order.totalAmount}</td>
                         <td>{getStatusBadge(order.status)}</td>

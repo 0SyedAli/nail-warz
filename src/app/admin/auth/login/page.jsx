@@ -161,7 +161,7 @@ export default function LoginPage() {
           <InputField
             id="password"
             type={show ? "text" : "password"}
-            classInput="classInput mb-3"
+            classInput="classInput"
             placeholder="Enter password"
             show={show}
             handleClick={() => setShow(!show)}
@@ -172,6 +172,7 @@ export default function LoginPage() {
             title={"Login"}
             type="submit"
             disabled={loading}
+            style_btn={{ marginTop: "20px" }}
           />
           {/* ✅ Google Signup/Login Button */}
           {/* <div id="googleSignInDiv" className="mt-3 text-center"></div>

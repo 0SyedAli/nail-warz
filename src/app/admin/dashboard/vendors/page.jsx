@@ -197,8 +197,9 @@ export default function SuperAdminVendors() {
                                         <th>Business Name</th>
                                         {/* <th>Owner</th> */}
                                         <th>City</th>
-                                        <th>Join Date</th>
+                                        {/* <th>Join Date</th> */}
                                         <th>Total Revenue</th>
+                                        <th>Total Paid Out</th>
                                         <th>Average Ratting</th>
                                         <th>Cancel Count</th>
                                         <th>Payouts Pending</th>
@@ -213,12 +214,13 @@ export default function SuperAdminVendors() {
                                             <td>{v.salonName || "-"}</td>
                                             {/* <td>{v.email}</td> */}
                                             <td>{v?.city || "-"}</td>
-                                            <td>{new Date(v.createdAt).toLocaleDateString()}</td>
+                                            {/* <td>{new Date(v.createdAt).toLocaleDateString()}</td> */}
 
                                             <td className="fw-bold">${v.totalRevenue || 0}</td>
+                                            <td className="fw-bold">${v.totalPaid || 0}</td>
                                             <td className="fw-bold">{v.avgRating.toFixed(2) || 0}</td>
                                             <td className="fw-bold">{v.salonCancellationCount || 0}</td>
-                                            <td className="fw-bold">${v.revenueSummary.totalPayoutPending.toFixed(2) || 0}</td>
+                                            <td className="fw-bold">${v.revenueSummary?.payableBalance?.toFixed(2) || 0}</td>
                                             <td>
 
                                                 <span

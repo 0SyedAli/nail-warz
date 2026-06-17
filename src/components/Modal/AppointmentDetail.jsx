@@ -16,7 +16,7 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
   const [message, setMessage] = useState("");
   if (!booking) return null;
 
-  const { serviceId, userId, technicianId, date, time } = booking;
+  const { serviceId, userId, technicianId, date, time, totalAmount } = booking;
 
   /* ───── API Call ───── */
   const handleReschedule = async () => {
@@ -43,7 +43,7 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
       }
 
       setMessage("Reschedule successful ✅");
-      
+
       // Close modals first
       rescheduleDisc.onClose();
       onClose();
@@ -101,6 +101,7 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
     }
   };
 
+
   return (
     <>
       {/* ───── Main Appointment Detail Modal ───── */}
@@ -110,15 +111,26 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
         </button>
         <div className="aus_dialog appoint_detail">
           <h3>Appointment Information</h3>
-          <div className="row align-items-end gy-2 mb-4">
+          <div className="row align-items-start gy-2 mb-4">
             <div className="col-6">
-              <h5><strong>Service:</strong> {serviceId?.serviceName}</h5>
+              {/* <h5><strong>Service:</strong> {serviceId?.serviceName}</h5> */}
+              <h5><strong>Service:</strong></h5>
+              <ul className="mb-2 d-flex align-items-center gap-2 flex-wrap ps-1">
+                {serviceId?.map((service) => (
+                  <li key={service._id} className="badge bg-warning-subtle text-dark">{service.serviceName}</li>
+                ))}
+              </ul>
             </div>
             <div className="col-6">
               <h5><strong>Status:</strong> <span className={`badge py-2 ${booking?.status?.toLowerCase() === "accepted" ? "bg-success" : booking?.status?.toLowerCase() === "cancelled" || booking?.status?.toLowerCase() === "canceled" ? "bg-danger" : "bg-warning"}`}>{booking?.status}</span></h5>
             </div>
             <div className="col-6">
-              <h5><strong>Employee Name:</strong> {technicianId?.fullName}</h5>
+              <h5><strong>Employee Name:</strong></h5>
+              <ul className="mb-2 d-flex align-items-center gap-2 flex-wrap ps-1">
+                {technicianId?.map((technician) => (
+                  <li key={technician._id} className="badge bg-warning-subtle text-dark">{technician.fullName}</li>
+                ))}
+              </ul>
             </div>
             <div className="col-6">
               <h5><strong>Date:</strong> {date}</h5>
@@ -127,7 +139,7 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
               <h5><strong>Time:</strong> {time}</h5>
             </div>
             <div className="col-6">
-              <h5><strong>Price:</strong> ${serviceId?.price}</h5>
+              <h5><strong>Price:</strong> ${totalAmount}</h5>
             </div>
           </div>
 

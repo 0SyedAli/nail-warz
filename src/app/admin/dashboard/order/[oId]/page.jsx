@@ -199,11 +199,15 @@ export default function OrderDetailsPage() {
                                     <span className="text-muted">{order?.products?.map((p) => p.sku).join(", ")}</span>
                                 </div>
                                 <hr /> */}
-                                <div className="d-flex justify-content-between">
-                                    <span className="text-muted">Subtotal</span>
-                                    <span className="text-muted">${order?.subTotal?.toFixed(2)}</span>
-                                </div>
-                                <hr />
+                                {order?.subTotal ?
+                                    <>
+                                        <div className="d-flex justify-content-between">
+                                            <span className="text-muted">Subtotal</span>
+                                            <span className="text-muted">${order?.subTotal?.toFixed(2)}</span>
+                                        </div>
+                                        <hr />
+                                    </>
+                                    : null}
                                 {/* <div className="d-flex justify-content-between">
                                     <span className="text-muted">Discount Code</span>
                                     <span className="text-muted">{order?.discountCode?.code}</span>

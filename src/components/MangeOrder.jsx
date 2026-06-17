@@ -218,6 +218,26 @@ export default function ManageAppointments() {
         }
     };
 
+    const getServiceNames = (services = []) => {
+        if (!Array.isArray(services) || services.length === 0) return "-";
+
+        if (services.length === 1) {
+            return services[0]?.serviceName;
+        }
+
+        return `${services[0]?.serviceName}, ...`;
+    };
+
+    const getTechnicianNames = (technicians = []) => {
+        if (!Array.isArray(technicians) || technicians.length === 0) return "-";
+
+        if (technicians.length === 1) {
+            return technicians[0]?.fullName;
+        }
+
+        return `${technicians[0]?.fullName}, ...`;
+    };
+
     if (loading) {
         return (
             <div className="page pt-4 px-0">
@@ -357,8 +377,8 @@ export default function ManageAppointments() {
                                     currentAppointments.map((appt) => (
                                         <tr key={appt._id} >
                                             <td>{appt.userId?.username || "Unknown"}</td>
-                                            <td>{appt.serviceId?.serviceName || "-"}</td>
-                                            <td>{appt.technicianId?.fullName || "-"}</td>
+                                            <td>{getServiceNames(appt.serviceId)}</td>
+                                            <td>{getTechnicianNames(appt.technicianId)}</td>
                                             <td>{formatDateTimeUS(appt.date, appt.time)}</td>
                                             <td>${appt.totalAmount}</td>
                                             <td>{getStatusBadge(appt.status)}</td>
