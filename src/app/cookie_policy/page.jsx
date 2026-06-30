@@ -24,7 +24,7 @@ const Cookies = () => {
             {/* <Header /> */}
             {/* <WebBanner bannerTitle="Cookie Policy" /> */}
             <div className="container">
-                <div className="privacy-body privacy-body-mobile ">
+                <div className="privacy-body privacy-body-mobile mt-2 mb-5">
                     {/* Render the fetched HTML content */}
                     {cookiePolicy ? (
                         <div dangerouslySetInnerHTML={{ __html: cookiePolicy }} />
