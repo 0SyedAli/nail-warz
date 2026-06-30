@@ -137,14 +137,10 @@ export default function LoginPage() {
     <>
       {success ? <BallsLoading borderWidth="mx-auto" /> : (
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="d-flex align-items-center justify-content-center mb-3">
-            <Image
-              src="/images/logo.png"
-              width={120}
-              height={150}
-              alt="Logo"
-              className="logo-img"
-            />
+
+          <div className="text-center mb-4">
+            <h3 className="pb-2" style={{ color: "#C11111", fontWeight: "800", }}>Login Admin</h3>
+            <p>Enter your email and password to <br /> login to your account.</p>
           </div>
 
           <label htmlFor="email">Enter your email</label>

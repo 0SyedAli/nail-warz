@@ -7,7 +7,7 @@ const PrivacyPolicy = () => {
 
     // Fetch cookie policy data from the API
     useEffect(() => {
-        fetch("https://apiforapp.link/NailWarz/api/privacyPolicy")
+        fetch("https://nailwarz.apiforapp.link/api/privacyPolicy")
             .then(response => response.json())
             .then(data => {
                 if (data.success) {

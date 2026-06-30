@@ -11,7 +11,7 @@ const TermsCondition = () => {
 
     // Fetch cookie policy data from the API
     useEffect(() => {
-        fetch("https://apiforapp.link/NailWarz/api/termsOfServicesAndConditions")
+        fetch("https://nailwarz.apiforapp.link/api/termsOfServicesAndConditions")
             .then(response => response.json())
             .then(data => {
                 if (data.success) {

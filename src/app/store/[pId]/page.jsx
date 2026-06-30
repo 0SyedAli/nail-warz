@@ -78,11 +78,13 @@ export default function ProductPage() {
                                 0
                             </div>
                         </div>
-
-                        <RelatedProducts
-                            category={product.category}
-                            relatedProducts={relatedProducts}
-                        />
+                        {console.log(relatedProducts)}
+                        {relatedProducts.length > 0 && (
+                            <RelatedProducts
+                                category={product.category}
+                                relatedProducts={relatedProducts}
+                            />
+                        )}
                     </>
                 )}
             </div>
