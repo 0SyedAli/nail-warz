@@ -1,6 +1,5 @@
 "use client"
 import { useEffect, useState } from "react";
-import SpinnerLoading from "@/components/Spinner/SpinnerLoading";
 
 const PrivacyPolicy = () => {
     const [privacyPolicy, setPrivacyPolicy] = useState(null);
