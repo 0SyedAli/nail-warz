@@ -36,8 +36,54 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
       email: "",
       description: "",
       image: null,
+      portfolio: [],
     },
   });
+
+  /* portfolio previews */
+  const portfolioFiles = watch("portfolio") || [];
+  const [portfolioPreviews, setPortfolioPreviews] = useState([]);
+  useEffect(() => {
+    const newPreviews = portfolioFiles.map(item => {
+      if (item instanceof File) {
+        return {
+          key: item.name + item.size,
+          preview: URL.createObjectURL(item),
+          isNew: true,
+          file: item,
+        };
+      }
+      return {
+        key: item.name || item.preview || item,
+        preview: item.preview || item,
+        isNew: false,
+        name: item.name || item,
+      };
+    });
+    setPortfolioPreviews(newPreviews);
+
+    return () => {
+      newPreviews.forEach(p => {
+        if (p.isNew && p.preview.startsWith("blob:")) {
+          URL.revokeObjectURL(p.preview);
+        }
+      });
+    };
+  }, [portfolioFiles]);
+
+  const handlePortfolioChange = (e, currentPortfolio, onChange) => {
+    const files = Array.from(e.target.files || []);
+    const remainingSlots = 5 - currentPortfolio.length;
+    if (remainingSlots <= 0) return;
+    const newFiles = files.slice(0, remainingSlots);
+    onChange([...currentPortfolio, ...newFiles]);
+    e.target.value = "";
+  };
+
+  const removePortfolioImage = (index, currentPortfolio, onChange) => {
+    const updated = currentPortfolio.filter((_, i) => i !== index);
+    onChange(updated);
+  };
 
   // Watch image to handle preview
   const imageFile = watch("image");
@@ -84,7 +130,11 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
           phoneNumber: technician.phoneNumber,
           email: technician.email,
           description: technician.description,
-          image: null
+          image: null,
+          portfolio: (technician.portfolio || []).map((img) => ({
+            name: img,
+            preview: img.startsWith("http") ? img : `${process.env.NEXT_PUBLIC_IMAGE_URL}/${img}`,
+          })),
         });
 
         if (technician.image) {
@@ -150,6 +200,30 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
         fd.append("image", data.image);
       }
 
+      // Check if portfolio changed
+      const currentPortfolio = data.portfolio || [];
+      const originalPortfolio = originalData?.portfolio || [];
+
+      const hasPortfolioChanged =
+        currentPortfolio.length !== originalPortfolio.length ||
+        currentPortfolio.some((item, idx) => {
+          if (item instanceof File) return true;
+          const origItem = originalPortfolio[idx];
+          return (item.name || item) !== origItem;
+        });
+
+      if (hasPortfolioChanged) {
+        currentPortfolio.forEach(item => {
+          if (item instanceof File) {
+            fd.append("portfolio", item);
+          }
+        });
+        const remainingExisting = currentPortfolio
+          .filter(item => !(item instanceof File))
+          .map(item => item.name || item);
+        fd.append("existingPortfolio", JSON.stringify(remainingExisting));
+      }
+
       if (fd.entries().next().done) {
         onClose();
         return;
@@ -188,9 +262,13 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Edit Technician">
-      <button type="button" onClick={onClose} className="close_tech">
-        x
-      </button>
+      <div className="d-flex align-items-center justify-content-between">
+        <h3 style={{ fontWeight: "700" }}>Update Technician</h3>
+        <button type="button" onClick={onClose} className="close_tech">
+          x
+        </button>
+      </div>
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Upload Image */}
         <Controller
@@ -198,13 +276,13 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
           name="image"
           render={({ field }) => (
             <>
-              <label className="form-label mb-1">Upload Profile Image</label>
+              <label className="form-label mb-1">Edit Profile Image</label>
 
               {!preview ? (
                 <div className="add_upload_image mb-1" style={{ height: "120px", width: "120px" }}>
                   <div className="aui_content">
                     <Image src="/images/upload_icon.png" width={40} height={40} alt="" />
-                    <span>Upload Image</span>
+                    <span>Edit Image</span>
                   </div>
                   <input
                     type="file"
@@ -256,7 +334,69 @@ export default function EditTechnician({ isOpen, onClose, techId, onSuccess }) {
             </>
           )}
         />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        {/* Upload Portfolio */}
+        <Controller
+          control={control}
+          name="portfolio"
+          render={({ field }) => (
+            <div className="mt-3 text-start">
+              <label className="form-label mb-3 fw-medium text-dark" >
+                Edit Portfolio (Optional, Max 5 images)
+              </label>
+              <div className="d-flex flex-wrap gap-2 align-items-center">
+                {/* Portfolio Previews */}
+                {portfolioPreviews.map((item, index) => (
+                  <div key={item.key} style={{ position: "relative", width: "100px", height: "100px" }}>
+                    <Image
+                      src={item.preview}
+                      alt={`portfolio-preview-${index}`}
+                      width={100}
+                      height={100}
+                      className="border object-fit-cover h-100 w-100"
+                      style={{ borderRadius: "8px" }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removePortfolioImage(index, field.value || [], field.onChange)}
+                      style={{
+                        position: "absolute",
+                        top: -6,
+                        right: -6,
+                        background: "#fff",
+                        border: "1px solid #ccc",
+                        borderRadius: "50%",
+                        padding: "2px 5px",
+                        cursor: "pointer",
+                        lineHeight: 1,
+                      }}
+                      aria-label="Remove image"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+
+                {/* Upload button box if portfolio < 5 */}
+                {(field.value || []).length < 5 && (
+                  <div className="add_upload_image" style={{ height: "100px", width: "100px", margin: 0 }}>
+                    <div className="aui_content">
+                      <Image src="/images/upload_icon.png" width={30} height={30} alt="" />
+                      <span style={{ fontSize: "10px" }}>Upload Images</span>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => handlePortfolioChange(e, field.value || [], field.onChange)}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
           <div>
             <label className=" text-sm font-medium mb-0">Full Name</label>
             <InputField {...register("fullName")} placeholder="Full name" />

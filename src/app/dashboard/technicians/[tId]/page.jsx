@@ -207,13 +207,33 @@ export default function TechnicianPage({ params }) {
 
                     {/* Main Content Area */}
                     <div className="col-lg-8 col-xl-9">
-                        <div className="card">
+                        <div className="card mb-4">
                             <div className="card-body">
                                 <h5 className="card-title fw-semibold text-dark mb-3">
                                     Description / Bio
                                 </h5>
                                 <div className="text-muted lh-lg">
                                     {technicianData.description || "No description available."}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="card">
+                            <div className="card-body">
+                                <h5 className="card-title fw-semibold text-dark mb-3">
+                                    Portfolio Image
+                                </h5>
+                                <div className="tech_portfolio_image">
+                                    {technicianData.portfolio.map((image, index) => (
+                                        <Image
+                                            key={index}
+                                            src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}` || "/images/profile-avatar.jpg"}
+                                            alt={technicianData.fullName || "Unknown"}
+                                            className="rounded-1"
+                                            style={{ height: "120px", width: "120px" }}
+                                            width={120}
+                                            height={120}
+                                        />
+                                    ))}
                                 </div>
                             </div>
                         </div>

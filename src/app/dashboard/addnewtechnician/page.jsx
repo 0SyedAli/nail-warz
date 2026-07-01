@@ -28,6 +28,14 @@ const schema = Yup.object({
     .test("type", "Unsupported type", (f) =>
       f && ["image/jpeg", "image/png", "image/webp"].includes(f.type)
     ),
+  portfolio: Yup.array()
+    .of(
+      Yup.mixed()
+        .test("size", "Max 2 MB per image", (f) => !f || (f instanceof File && f.size <= 2 * 1024 * 1024))
+        .test("type", "Unsupported type", (f) => !f || (f instanceof File && ["image/jpeg", "image/png", "image/webp"].includes(f.type)))
+    )
+    .max(5, "Maximum 5 images allowed")
+    .optional(),
 });
 
 const AddTechnician = () => {
@@ -96,6 +104,7 @@ const AddTechnician = () => {
         return acc;
       }, {}),
       image: null,
+      portfolio: [],
     },
   });
 
@@ -108,6 +117,39 @@ const AddTechnician = () => {
     setPreview(url);
     return () => URL.revokeObjectURL(url);
   }, [file]);
+
+  /* portfolio previews */
+  const portfolioFiles = watch("portfolio") || [];
+  const [portfolioPreviews, setPortfolioPreviews] = useState([]);
+  useEffect(() => {
+    if (!portfolioFiles || portfolioFiles.length === 0) {
+      setPortfolioPreviews([]);
+      return;
+    }
+    const newPreviews = portfolioFiles
+      .filter((f) => f instanceof File)
+      .map((f) => URL.createObjectURL(f));
+
+    setPortfolioPreviews(newPreviews);
+
+    return () => {
+      newPreviews.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [portfolioFiles]);
+
+  const handlePortfolioChange = (e, currentPortfolio, onChange) => {
+    const files = Array.from(e.target.files || []);
+    const remainingSlots = 5 - currentPortfolio.length;
+    if (remainingSlots <= 0) return;
+    const newFiles = files.slice(0, remainingSlots);
+    onChange([...currentPortfolio, ...newFiles]);
+    e.target.value = "";
+  };
+
+  const removePortfolioImage = (index, currentPortfolio, onChange) => {
+    const updated = currentPortfolio.filter((_, i) => i !== index);
+    onChange(updated);
+  };
 
   /* ---------- submit ---------- */
   const onSubmit = async (data) => {
@@ -171,6 +213,11 @@ const AddTechnician = () => {
 
       fd.append("workingDays", JSON.stringify(dayPayload));
       fd.append("image", data.image);
+      if (data.portfolio && data.portfolio.length > 0) {
+        data.portfolio.forEach((file) => {
+          fd.append("portfolio", file);
+        });
+      }
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/createTechnician`, {
         method: "POST",
@@ -267,6 +314,9 @@ const AddTechnician = () => {
                 </>
               )}
             />
+
+
+
             {/* Basic fields */}
             {[
               { label: "Full Name", name: "fullName", ph: "Full name" },
@@ -350,7 +400,66 @@ const AddTechnician = () => {
               </div>
 
             </div> */}
+            {/* Upload Portfolio */}
+            <Controller
+              control={control}
+              name="portfolio"
+              render={({ field }) => (
+                <div className="mb-3 mt-2">
+                  <label className="form-label mb-1">Upload Portfolio (Optional, Max 5 images)</label>
+                  <div className="d-flex flex-wrap gap-2 align-items-center">
+                    {/* Portfolio Previews */}
+                    {portfolioPreviews.map((src, index) => (
+                      <div key={index} style={{ position: "relative", width: "120px", height: "120px" }}>
+                        <Image
+                          src={src}
+                          alt={`portfolio-preview-${index}`}
+                          width={120}
+                          height={120}
+                          className="border object-fit-cover h-100 w-100"
+                          style={{ borderRadius: "10px" }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removePortfolioImage(index, field.value || [], field.onChange)}
+                          style={{
+                            position: "absolute",
+                            top: -6,
+                            right: -6,
+                            background: "#fff",
+                            border: "1px solid #ccc",
+                            borderRadius: "50%",
+                            padding: "2px 5px",
+                            cursor: "pointer",
+                            lineHeight: 1,
+                          }}
+                          aria-label="Remove image"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
 
+                    {/* Upload button box if portfolio < 5 */}
+                    {(field.value || []).length < 5 && (
+                      <div className="add_upload_image" style={{ height: "120px", width: "120px", margin: 0 }}>
+                        <div className="aui_content">
+                          <Image src="/images/upload_icon.png" width={40} height={40} alt="" />
+                          <span>Upload Images</span>
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={(e) => handlePortfolioChange(e, field.value || [], field.onChange)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  {errors.portfolio && <p className="text-danger">{errors.portfolio.message}</p>}
+                </div>
+              )}
+            />
             <table className="table table-bordered wd_table mt-3">
               <thead>
                 <tr>

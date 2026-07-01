@@ -2421,6 +2421,18 @@ button.hamburger {
   min-height: 120px;
 }
 
+.tech_portfolio_image {
+  display: flex;
+  align-items: center;
+  gap: 10px
+}
+
+.tech_portfolio_image img {
+  border: 2px solid #C11111;
+  width: 120px;
+  height: 120px;
+}
+
 .tech_status_container {
   padding: 30px;
   padding-left: 40px;
