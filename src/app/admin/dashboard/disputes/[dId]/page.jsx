@@ -48,10 +48,9 @@ export default function DisputeDetails() {
     const [updateForm, setUpdateForm] = useState({
         status: "",
         adminNote: "",
-        resolvedInFavorOf: "User"
+        resolvedInFavorOf: ""
     });
     const messagesContainerRef = useRef(null);
-
 
     // 🔁 Fetch Dispute Data
     const fetchDispute = async (silent = false) => {
@@ -156,7 +155,13 @@ export default function DisputeDetails() {
     if (!dispute) return <p className="m-5 text-center">Dispute not found</p>;
 
     const firstResponse = dispute.responses?.[0];
-
+    const resolvedStatuses = [
+        "Resolved_Credit_Issued",
+        "Resolved_No_Action",
+        "Resolved_Vendor_Warning",
+        "Report_Only_Closed",
+        "Closed_Admin"
+    ];
     return (
         <div className="page min-vh-100 bg-light-subtle">
             <div className="dashboard_panel_inner pt-4 container-fluid">
@@ -170,13 +175,20 @@ export default function DisputeDetails() {
                     <div className="d-flex align-items-center gap-2">
                         Status:
                         <div className="d-flex gap-2">
-                            {(dispute.status === 'Refunded' || dispute.status === 'Resolved') && (
-                                <div className="badge py-2 px-3 rounded-pill bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25" style={{ fontSize: '0.85rem' }}>
-                                    Resolved In Favor: {dispute.resolvedInFavorOf}
+                            {resolvedStatuses.includes(dispute.status) && (
+                                <div className="badge py-2 px-3 rounded-pill bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
+                                    Resolved Status
                                 </div>
                             )}
-                            <div className={`badge py-2 px-4 rounded-pill shadow-sm ${dispute.status === 'Refunded' || dispute.status === 'Resolved' ? 'bg-success' : dispute.status === 'Rejected' ? 'bg-danger' : 'bg-warning text-dark'}`} style={{ fontSize: '0.9rem' }}>
-                                {dispute.status.replace('_', ' ')}
+                            <div
+                                className={`badge py-2 px-4 rounded-pill shadow-sm ${resolvedStatuses.includes(dispute.status)
+                                    ? "bg-success"
+                                    : dispute.status === "Submitted"
+                                        ? "bg-warning text-dark"
+                                        : "bg-primary"
+                                    }`}
+                            >
+                                {dispute.status.replaceAll("_", " ")}
                             </div>
                         </div>
                     </div>
@@ -202,8 +214,8 @@ export default function DisputeDetails() {
                                     </div>
                                     <div className="col-md-6">
                                         <div className="p-3 bg-light rounded-4 h-100 border border-secondary border-opacity-10">
-                                            <label className="text-muted small text-uppercase fw-bold mb-1 d-block">Reason</label>
-                                            <p className="fw-bold mb-0 text-dark fs-5">{dispute.reason}</p>
+                                            <label className="text-muted small text-uppercase fw-bold mb-1 d-block">Category</label>
+                                            <p className="fw-bold mb-0 text-dark fs-5">{dispute.category}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -214,7 +226,20 @@ export default function DisputeDetails() {
                                         {dispute.description || "No additional description provided."}
                                     </div>
                                 </div>
-
+                                <div className="mb-4">
+                                    <label className="text-muted small text-uppercase fw-bold mb-2">Requested Outcome</label>
+                                    <div className="p-3 bg-light rounded-4 border border-secondary border-opacity-10">
+                                        {dispute.requestedOutcome || "No additional description provided."}
+                                    </div>
+                                </div>
+                                {dispute.requestedOutcome === "Other" && (
+                                    <div className="mb-4">
+                                        <label className="text-muted small text-uppercase fw-bold mb-2">Other Explanation</label>
+                                        <div className="p-3 bg-light rounded-4 border border-secondary border-opacity-10">
+                                            {dispute.requestedOutcomeOtherExplanation}
+                                        </div>
+                                    </div>
+                                )}
                                 {dispute.attachments?.length > 0 && (
                                     <div>
                                         <label className="text-muted small text-uppercase fw-bold mb-2">Initial Attachments</label>
@@ -244,15 +269,19 @@ export default function DisputeDetails() {
                         {firstResponse ? (
                             <div className="card shadow-sm border-0 rounded-4 mb-4" style={{ borderRadius: '24px', borderLeft: '6px solid var(--bs-primary)' }}>
                                 <div className="card-body p-4">
-                                    <h5 className="fw-bold mb-4 d-flex align-items-center gap-2">
+                                    {/* <h5 className="fw-bold mb-4 d-flex align-items-center gap-2">
                                         <BsSend className="text-primary" />
-                                        Initial Response
-                                    </h5>
+                                        Vendor Response
+                                    </h5> */}
 
                                     <div className="d-flex align-items-center justify-content-between mb-3">
-                                        <div className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">
+                                        {/* <div className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">
                                             Respondent: {firstResponse.respondent}
-                                        </div>
+                                        </div> */}
+                                        <h5 className="fw-bold d-flex align-items-center gap-2">
+                                            <BsSend className="text-primary" />
+                                            Vendor Response
+                                        </h5>
                                         <small className="text-muted">{new Date(firstResponse.createdAt).toLocaleString()}</small>
                                     </div>
 
@@ -261,10 +290,10 @@ export default function DisputeDetails() {
                                     </div>
 
                                     {firstResponse.attachments?.length > 0 && (
-                                        <div className="d-flex flex-wrap gap-2">
+                                        <div className="d-flex flex-wrap gap-2 attachment-box">
                                             {firstResponse.attachments.map((file, i) => (
-                                                <div key={i} className="rounded-3 overflow-hidden shadow-sm" style={{ width: 60, height: 60 }}>
-                                                    <AttachmentWithFallback url={file ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${file}` : null} fallbackText="RES" size={60} />
+                                                <div key={i} className="rounded-3 overflow-hidden shadow-sm" style={{ width: 120, height: 120 }}>
+                                                    <AttachmentWithFallback url={file ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${file}` : null} fallbackText="RES" size={120} />
                                                 </div>
                                             ))}
                                         </div>
@@ -353,7 +382,7 @@ export default function DisputeDetails() {
                             <div className="card-header bg-success py-3 border-0">
                                 <h6 className="mb-0 text-white fw-bold">Appointment Context</h6>
                             </div>
-                            <div className="card-body p-4 text-center">
+                            {/* <div className="card-body p-4 text-center">
                                 {dispute.appointmentId ? (
                                     <>
                                         <h5 className="fw-bold text-primary mb-1">{dispute.appointmentId.serviceId?.serviceName}</h5>
@@ -382,6 +411,131 @@ export default function DisputeDetails() {
                                 ) : (
                                     <div className="py-5 text-muted">No appointment linked.</div>
                                 )}
+                            </div> */}
+                            <div className="card-body p-4">
+                                {dispute.appointmentId ? (
+                                    <>
+                                        {(() => {
+                                            const appointment = dispute.appointmentId;
+
+                                            const services = Array.isArray(appointment.serviceId)
+                                                ? appointment.serviceId
+                                                : appointment.serviceId
+                                                    ? [appointment.serviceId]
+                                                    : [];
+
+                                            const technicians = Array.isArray(appointment.technicianId)
+                                                ? appointment.technicianId
+                                                : appointment.technicianId
+                                                    ? [appointment.technicianId]
+                                                    : [];
+
+                                            return (
+                                                <>
+                                                    <div className="text-center mb-4">
+                                                        <h5 className="fw-bold text-primary mb-1">Service Details</h5>
+                                                        <div className="text-muted small">Appointment Information</div>
+                                                    </div>
+
+                                                    {/* Services */}
+                                                    <div className="mb-4">
+                                                        <label className="text-muted small text-uppercase fw-bold mb-2 d-block">
+                                                            Services
+                                                        </label>
+
+                                                        {services.length > 0 ? (
+                                                            services.map((service, index) => (
+                                                                <div
+                                                                    key={service._id || index}
+                                                                    className="p-3 bg-light rounded-4 mb-2"
+                                                                >
+                                                                    <div className="fw-bold text-dark">
+                                                                        {service.serviceName || "N/A"}
+                                                                    </div>
+
+                                                                    {service.price && (
+                                                                        <div className="text-muted small">
+                                                                            Price: ${service.price}
+                                                                        </div>
+                                                                    )}
+
+                                                                    {service.description && (
+                                                                        <div className="text-muted small mt-1">
+                                                                            {service.description}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            ))
+                                                        ) : (
+                                                            <div className="p-3 bg-light rounded-4 text-muted">
+                                                                No service linked.
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Technicians */}
+                                                    {/* <div className="mb-4">
+                                                        <label className="text-muted small text-uppercase fw-bold mb-2 d-block">
+                                                            Technicians
+                                                        </label>
+
+                                                        {technicians.length > 0 ? (
+                                                            technicians.map((tech, index) => (
+                                                                <div
+                                                                    key={tech._id || tech || index}
+                                                                    className="p-3 bg-light rounded-4 mb-2"
+                                                                >
+                                                                    <div className="fw-bold text-dark">
+                                                                        {typeof tech === "object"
+                                                                            ? tech.name || tech.fullName || tech.email || "N/A"
+                                                                            : tech}
+                                                                    </div>
+                                                                </div>
+                                                            ))
+                                                        ) : (
+                                                            <div className="p-3 bg-light rounded-4 text-muted">
+                                                                No technician linked.
+                                                            </div>
+                                                        )}
+                                                    </div> */}
+
+                                                    {/* Date Time */}
+                                                    <div className="row g-2 mb-4">
+                                                        <div className="col-6">
+                                                            <div className="p-3 bg-light rounded-4 text-center">
+                                                                <label className="text-muted small text-uppercase fw-bold mb-1 d-block">
+                                                                    Date
+                                                                </label>
+                                                                <span className="fw-bold">{appointment.date || "N/A"}</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="col-6">
+                                                            <div className="p-3 bg-light rounded-4 text-center">
+                                                                <label className="text-muted small text-uppercase fw-bold mb-1 d-block">
+                                                                    Time
+                                                                </label>
+                                                                <span className="fw-bold">{appointment.time || "N/A"}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Total Paid */}
+                                                    <div className="bg-success bg-opacity-10 p-4 rounded-4 text-center">
+                                                        <label className="text-success small text-uppercase fw-bold mb-1 d-block">
+                                                            Total Paid
+                                                        </label>
+                                                        <h2 className="fw-black text-success mb-0">
+                                                            ${appointment.totalAmount || 0}
+                                                        </h2>
+                                                    </div>
+                                                </>
+                                            );
+                                        })()}
+                                    </>
+                                ) : (
+                                    <div className="py-5 text-muted text-center">No appointment linked.</div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -401,7 +555,7 @@ export default function DisputeDetails() {
                                 <div className="modal-body py-4">
                                     <div className="mb-4">
                                         <label className="form-label text-muted small text-uppercase fw-bold">Select Status</label>
-                                        <select
+                                        {/* <select
                                             className="form-select border-0 bg-light p-3 rounded-3"
                                             value={updateForm.status}
                                             onChange={(e) => setUpdateForm({ ...updateForm, status: e.target.value, resolvedInFavorOf: e.target.value === "Resolved" ? "User" : "" })}
@@ -412,6 +566,52 @@ export default function DisputeDetails() {
                                             <option value="Resolved">Resolved</option>
                                             <option value="Rejected">Rejected</option>
                                             <option value="Refunded">Refunded (Charge User Wallet)</option>
+                                        </select> */}
+                                        <select
+                                            className="form-select border-0 bg-light p-3 rounded-3"
+                                            value={updateForm.status}
+                                            onChange={(e) =>
+                                                setUpdateForm({
+                                                    ...updateForm,
+                                                    status: e.target.value,
+                                                    resolvedInFavorOf: ""
+                                                })
+                                            }
+                                            required
+                                        >
+                                            <option value="">Select Status</option>
+
+                                            <option value="Under_Review">
+                                                Under Review
+                                            </option>
+
+                                            <option value="Vendor_Response_Requested">
+                                                Vendor Response Requested
+                                            </option>
+
+                                            <option value="Awaiting_Customer_Info">
+                                                Awaiting Customer Info
+                                            </option>
+
+                                            <option value="Resolved_Credit_Issued">
+                                                Resolved - Credit Issued
+                                            </option>
+
+                                            <option value="Resolved_No_Action">
+                                                Resolved - No Action
+                                            </option>
+
+                                            <option value="Resolved_Vendor_Warning">
+                                                Resolved - Vendor Warning
+                                            </option>
+
+                                            <option value="Report_Only_Closed">
+                                                Report Only - Closed
+                                            </option>
+
+                                            <option value="Closed_Admin">
+                                                Closed By Admin
+                                            </option>
                                         </select>
                                     </div>
 
@@ -425,28 +625,32 @@ export default function DisputeDetails() {
                                             onChange={(e) => setUpdateForm({ ...updateForm, adminNote: e.target.value })}
                                         ></textarea>
                                     </div>
-                                    {updateForm.status === "Resolved" && (
+                                    {[
+                                        "Resolved_Credit_Issued",
+                                        "Resolved_No_Action",
+                                        "Resolved_Vendor_Warning"
+                                    ].includes(updateForm.status) && (
 
-                                        <div className="mb-0">
-                                            <label className="form-label text-muted small text-uppercase fw-bold mb-3">Resolved In Favor Of</label>
-                                            <div className="d-flex gap-3 bg-light p-2 rounded-pill">
-                                                <button
-                                                    type="button"
-                                                    className={`btn flex-grow-1 rounded-pill py-2 fw-bold border-0 ${updateForm.resolvedInFavorOf === 'User' ? 'bg-white shadow-sm text-primary' : 'text-muted'}`}
-                                                    onClick={() => setUpdateForm({ ...updateForm, resolvedInFavorOf: 'User' })}
-                                                >
-                                                    User
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className={`btn flex-grow-1 rounded-pill py-2 fw-bold border-0 ${updateForm.resolvedInFavorOf === 'Vendor' ? 'bg-white shadow-sm text-primary' : 'text-muted'}`}
-                                                    onClick={() => setUpdateForm({ ...updateForm, resolvedInFavorOf: 'Vendor' })}
-                                                >
-                                                    Vendor
-                                                </button>
+                                            <div className="mb-0">
+                                                <label className="form-label text-muted small text-uppercase fw-bold mb-3">Resolved In Favor Of</label>
+                                                <div className="d-flex gap-3 bg-light p-2 rounded-pill">
+                                                    <button
+                                                        type="button"
+                                                        className={`btn flex-grow-1 rounded-pill py-2 fw-bold border-0 ${updateForm.resolvedInFavorOf === 'User' ? 'bg-white shadow-sm text-primary' : 'text-muted'}`}
+                                                        onClick={() => setUpdateForm({ ...updateForm, resolvedInFavorOf: 'User' })}
+                                                    >
+                                                        User
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className={`btn flex-grow-1 rounded-pill py-2 fw-bold border-0 ${updateForm.resolvedInFavorOf === 'Vendor' ? 'bg-white shadow-sm text-primary' : 'text-muted'}`}
+                                                        onClick={() => setUpdateForm({ ...updateForm, resolvedInFavorOf: 'Vendor' })}
+                                                    >
+                                                        Vendor
+                                                    </button>
+                                                </div>
                                             </div>
-                                        </div>
-                                    )}
+                                        )}
                                 </div>
                                 <div className="modal-footer border-top-0 pt-0 pb-4 px-4">
                                     <button type="button" className="btn btn-light rounded-pill px-4" onClick={() => setShowStatusModal(false)}>Cancel</button>

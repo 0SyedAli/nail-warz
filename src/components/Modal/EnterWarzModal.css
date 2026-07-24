@@ -1,0 +1,339 @@
+/* ===== Enter the Warz Modal styling ===== */
+
+.enter_warz_modal_wrapper.chakra-modal__content {
+  max-width: 600px !important;
+  border-radius: 24px !important;
+  overflow: hidden;
+  background: transparent !important;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.enter_warz_modal {
+  background: #FFF;
+  color: #000;
+  border-radius: 24px;
+  overflow-y: auto;
+  max-height: 85vh;
+  position: relative;
+  padding: 30px;
+  font-family: var(--font-poppins), sans-serif;
+  scrollbar-width: thin;
+  scrollbar-color: #6d0000 #120303;
+}
+
+.enter_warz_modal::-webkit-scrollbar {
+  width: 6px;
+}
+
+.enter_warz_modal::-webkit-scrollbar-track {
+  background: #120303;
+}
+
+.enter_warz_modal::-webkit-scrollbar-thumb {
+  background-color: #6d0000;
+  border-radius: 3px;
+}
+
+.enter_warz_modal_wrapper.chakra-modal__content .modal_container_body {
+  border: unset;
+  border-radius: unset;
+  padding: unset;
+  background-color: unset;
+  box-shadow: unset;
+}
+
+/* Header styling */
+.ewm_header {
+  position: relative;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ewm_title {
+  font-size: 26px !important;
+  font-weight: 800 !important;
+  background: linear-gradient(90deg, #ff4d4d, #f8a5c2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 6px !important;
+  letter-spacing: -0.5px;
+}
+
+.ewm_subtitle {
+  font-size: 14px;
+  color: #000;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.ewm_close_btn {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: #ffb3b3;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ewm_close_btn:hover {
+  background: rgba(255, 77, 77, 0.2);
+  color: #ffffff;
+  transform: rotate(90deg);
+}
+
+/* Form layouts */
+.ewm_form_group {
+  margin-bottom: 20px;
+}
+
+.ewm_label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #000;
+  margin-bottom: 8px;
+}
+
+.ewm_label span {
+  color: #ff4d4d;
+}
+
+/* Custom Input and Select designs */
+.ewm_input,
+.ewm_select,
+.ewm_textarea {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.062) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  color: #000 !important;
+  padding: 12px 16px !important;
+  font-size: 15px !important;
+  outline: none !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.ewm_input:focus,
+.ewm_select:focus,
+.ewm_textarea:focus {
+  border-color: rgba(255, 77, 77, 0.5) !important;
+  box-shadow: 0 0 0 4px rgba(255, 77, 77, 0.15) !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+}
+
+.ewm_select option {
+  background-color: #fff !important;
+  color: #000 !important;
+}
+
+.ewm_textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Social input group */
+.ewm_social_group {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .ewm_social_group {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Drag and Drop Upload Zone */
+.ewm_upload_zone {
+  border: 2px dashed rgba(255, 77, 77, 0.3);
+  background: rgba(255, 77, 77, 0.02);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.ewm_upload_zone:hover {
+  border-color: rgba(255, 77, 77, 0.7);
+  background: rgba(255, 77, 77, 0.05);
+}
+
+.ewm_upload_icon {
+  font-size: 32px;
+  color: #ff4d4d;
+  filter: drop-shadow(0 0 6px rgba(255, 77, 77, 0.3));
+  transition: transform 0.2s ease;
+}
+
+.ewm_upload_zone:hover .ewm_upload_icon {
+  transform: translateY(-4px);
+}
+
+.ewm_upload_text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #000;
+}
+
+.ewm_upload_hint {
+  font-size: 12px;
+  color: #000;
+}
+
+/* Image Preview Grid */
+.ewm_preview_grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.ewm_image_thumb {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.ewm_image_thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.ewm_image_thumb:hover img {
+  transform: scale(1.1);
+}
+
+.ewm_delete_thumb_btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  color: #ff4d4d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.ewm_delete_thumb_btn:hover {
+  background: #ff4d4d;
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+/* Footer & Buttons */
+.ewm_footer {
+  margin-top: 30px;
+  display: flex;
+  gap: 16px;
+}
+
+.ewm_btn_cancel {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ewm_btn_cancel:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ewm_btn_submit {
+  flex: 2;
+  background: linear-gradient(135deg, #c11111 0%, #800000 100%);
+  border: none;
+  border-radius: 14px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(193, 17, 17, 0.3);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.ewm_btn_submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(193, 17, 17, 0.5);
+  background: linear-gradient(135deg, #d81818 0%, #990000 100%);
+}
+
+.ewm_btn_submit:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.ewm_btn_submit:disabled,
+.ewm_btn_cancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Form Helper Validation Styles */
+.ewm_error_text {
+  color: #ff4d4d;
+  font-size: 12px;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Spinner */
+.ewm_spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: ewm_spin 0.8s linear infinite;
+}
+
+@keyframes ewm_spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

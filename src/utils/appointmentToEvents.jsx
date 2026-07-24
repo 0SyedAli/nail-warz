@@ -1,41 +1,81 @@
-// utils/groupAppointments.js
-import { parse } from "date-fns";
+// utils/appointmentToEvents.js
 
-export function groupAppointments(appointments) {
+export function groupAppointments(appointments = []) {
   const map = {};
 
-  appointments.forEach((a) => {
-    const key = `${a.date}-${a.time}`;
+  appointments.forEach((booking) => {
+    const serviceDetail = booking?.servicesDetail?.[0];
+
+    if (!serviceDetail?.scheduledAt) return;
+
+    const scheduledDate = new Date(serviceDetail.scheduledAt);
+
+    const key = scheduledDate.toISOString();
+
     if (!map[key]) {
       map[key] = {
-        date: a.date,
-        time: a.time,
+        date: scheduledDate,
+        time: scheduledDate,
         items: []
       };
     }
-    map[key].items.push(a);
+
+    map[key].items.push(booking);
   });
 
+
   return Object.values(map).map((group) => {
-    const first = group.items[0];
 
-    const start = parse(
-      `${first.date} ${first.time}`,
-      "dd-MM-yyyy hh:mm a",
-      new Date()
-    );
+    const start = group.date;
 
-    // const end = new Date(start.getTime() + 60 * 60 * 1000);
-    const end = new Date(start.getTime() + 30 * 60 * 1000); // 30 minutes
+    // return {
+    //   id: start.toISOString(),
+
+    //   title: `${group.items.length} Appointment${group.items.length > 1 ? "s" : ""
+    //     }`,
+
+    //   start,
+
+    //   end: new Date(
+    //     start.getTime() + 30 * 60 * 1000
+    //   ),
+
+    //   allDay: false,
+
+    //   count: group.items.length,
+
+    //   items: group.items,
+
+    //   // ✅ send string instead of Date object
+    //   time: start.toLocaleTimeString("en-US", {
+    //     hour: "2-digit",
+    //     minute: "2-digit",
+    //     hour12: true,
+    //   }),
+
+    //   // optional: useful for filtering later
+    //   date: start.toISOString().split("T")[0]
+    // };
     return {
-      id: `${first.date}-${first.time}`,
-      title: "New Appointment",
+      id: start.toISOString(),
+
+      title: `${group.items.length} Appointment${group.items.length > 1 ? "s" : ""
+        }`,
+
       start,
-      end,
-      allDay: false, // important for single block
+
+      end: new Date(
+        start.getTime() + 30 * 60 * 1000
+      ),
+
+      allDay: false,
+
       count: group.items.length,
+
       items: group.items,
-      time: first.time
+
+      // ISO date
+      date: start.toISOString()
     };
   });
 }

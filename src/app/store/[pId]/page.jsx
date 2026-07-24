@@ -8,8 +8,9 @@ import Header from "@/components/Home/Header";
 import Footer from "@/components/Home/Footer";
 import WebBanner from "@/components/Home/WebBanner";
 import AppCTASection from "@/components/Home/AppCTASection";
+import ImageGallery from "@/components/product/ImageGallery";
+import ProductInfo from "@/components/product/ProductInfo";
 import RelatedProducts from "@/components/product/RelatedProducts";
-
 export default function ProductPage() {
     const { pId } = useParams();
 
@@ -67,7 +68,7 @@ export default function ProductPage() {
                 bannerPara="Premium nail care products and professional tools"
             />
 
-            <div className="product-page container py-5">
+            {/* <div className="product-page container py-5">
                 {loading && <ProductSkeleton />}
                 {error && <ErrorState message={error} />}
 
@@ -75,7 +76,15 @@ export default function ProductPage() {
                     <>
                         <div className="row">
                             <div className="col-lg-6">
-                                0
+                                <ImageSlider
+                                    images={product.images}
+                                    name={product.name}
+                                />
+                            </div>
+                            <div className="col-lg-6">
+                                <ProductInfo
+                                    product={product}
+                                />
                             </div>
                         </div>
                         {console.log(relatedProducts)}
@@ -85,6 +94,29 @@ export default function ProductPage() {
                                 relatedProducts={relatedProducts}
                             />
                         )}
+                    </>
+                )}
+            </div> */}
+            <div className="product-page container py-5">
+                {loading && <ProductSkeleton />}
+                {error && <ErrorState message={error} />}
+
+                {!loading && !error && product && (
+                    <>
+                        <div className="row">
+                            <div className="col-lg-6">
+                                <ImageGallery images={product.images} />
+                            </div>
+
+                            <div className="col-lg-6">
+                                <ProductInfo product={product} />
+                            </div>
+                        </div>
+
+                        <RelatedProducts
+                            category={product.category}
+                            relatedProducts={relatedProducts}
+                        />
                     </>
                 )}
             </div>

@@ -16,7 +16,7 @@ export default function BattlesPage() {
     useEffect(() => {
         const fetchBattles = async () => {
             try {
-                const res = await api.get("/battle?participants=false");
+                const res = await api.get("/battle");
 
                 const result = res.data; // ✅ FIX
 

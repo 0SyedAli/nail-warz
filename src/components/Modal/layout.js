@@ -6,10 +6,10 @@ import {
 } from "@chakra-ui/react";
 
 
-function Modal({ isOpen, onClose, children, modalClass }) {
+function Modal({ isOpen, onClose, children, modalClass, overlayClass }) {
   return (
     <ChakraModal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
-      <ModalOverlay />
+      <ModalOverlay className={overlayClass} />
       <ModalContent className={modalClass}>
         <ModalBody>
           <div className={`modal_container `}>

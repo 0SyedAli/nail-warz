@@ -2,7 +2,6 @@ import { useState } from "react";
 import Modal from "./layout";
 import Image from "next/image";
 import { AuthBtn } from "../AuthBtn/AuthBtn";
-
 function TermAndConditionModal({ isOpen, onClose, onAgree, agree, setAgree }) {
   const [submitting, setSubmitting] = useState(false);
 

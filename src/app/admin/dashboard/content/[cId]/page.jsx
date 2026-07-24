@@ -99,14 +99,45 @@ export default function ContentDetail() {
           {/* LEFT */}
           <div className="col-lg-8">
             <div className="card p-3">
-              <Avatar
+              {/* <Avatar
                 src={
                   item.images && item.images?.[0]
                     ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${item.images[0]}`
                     : "/images/profile-avatar.jpg"
                 }
                 alt={item.name}
-              />
+              /> */}
+
+              {item.images && item.images.length > 0 && (
+                <div >
+                  <p className="text-muted mb-3">Selected Nail Art Design:</p>
+                  <div className="row g-2">
+                    {item.images.map((img, idx) => (
+                      <div key={idx} className="col-6">
+                        <Image
+                          src={`${process.env.NEXT_PUBLIC_IMAGE_URL}/${img}`}
+                          alt={`Nail art ${idx + 1}`}
+                          width={500}
+                          height={500}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                            borderRadius: "6px",
+                            padding: 20,
+                            border: "5px solid #fff",
+                            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+
+
+
               <p className="mt-3 mb-1 text-muted">Description</p>
               <p className="mb-3">{item.description}</p>
             </div>

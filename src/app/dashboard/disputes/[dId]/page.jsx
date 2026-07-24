@@ -176,8 +176,8 @@ export default function DisputeDetails() {
                                     </div>
                                     <div className="col-md-6">
                                         <div className="p-3 bg-light rounded-4 h-100 border border-secondary border-opacity-10">
-                                            <label className="text-muted small text-uppercase fw-bold mb-1 d-block">Reason</label>
-                                            <p className="fw-bold mb-0 text-dark fs-5">{dispute.reason}</p>
+                                            <label className="text-muted small text-uppercase fw-bold mb-1 d-block">Category</label>
+                                            <p className="fw-bold mb-0 text-dark fs-5">{dispute.category}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -188,6 +188,20 @@ export default function DisputeDetails() {
                                         {dispute.description || "No additional description provided."}
                                     </div>
                                 </div>
+                                <div className="mb-4">
+                                    <label className="text-muted small text-uppercase fw-bold mb-2">Requested Outcome</label>
+                                    <div className="p-3 bg-light rounded-4 border border-secondary border-opacity-10">
+                                        {dispute.requestedOutcome || "No additional description provided."}
+                                    </div>
+                                </div>
+                                {dispute.requestedOutcome === "Other" && (
+                                    <div className="mb-4">
+                                        <label className="text-muted small text-uppercase fw-bold mb-2">Other Explanation</label>
+                                        <div className="p-3 bg-light rounded-4 border border-secondary border-opacity-10">
+                                            {dispute.requestedOutcomeOtherExplanation}
+                                        </div>
+                                    </div>
+                                )}
 
                                 {dispute.attachments?.length > 0 && (
                                     <div>
@@ -218,15 +232,14 @@ export default function DisputeDetails() {
                         {firstResponse && (
                             <div className="card shadow-sm border-0 rounded-4 mb-4" style={{ borderRadius: '24px', borderLeft: '6px solid var(--bs-primary)' }}>
                                 <div className="card-body p-4">
-                                    <h5 className="fw-bold mb-4 d-flex align-items-center gap-2">
-                                        <BsSend className="text-primary" />
-                                        Initial Response
-                                    </h5>
-                                    
                                     <div className="d-flex align-items-center justify-content-between mb-3">
-                                        <div className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">
+                                        {/* <div className="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">
                                             Respondent: {firstResponse.respondent}
-                                        </div>
+                                        </div> */}
+                                        <h5 className="fw-bold d-flex align-items-center gap-2">
+                                            <BsSend className="text-primary" />
+                                            Vendor Response
+                                        </h5>
                                         <small className="text-muted">{new Date(firstResponse.createdAt).toLocaleString()}</small>
                                     </div>
 
@@ -234,13 +247,35 @@ export default function DisputeDetails() {
                                         {firstResponse.message}
                                     </div>
 
-                                    {firstResponse.attachments?.length > 0 && (
-                                        <div className="d-flex flex-wrap gap-2">
+                                    {/* {firstResponse.attachments?.length > 0 && (
+                                        <div className="d-flex flex-wrap gap-2 attachment-box">
                                             {firstResponse.attachments.map((file, i) => (
-                                                <div key={i} className="rounded-3 overflow-hidden shadow-sm" style={{ width: 60, height: 60 }}>
-                                                    <AttachmentWithFallback url={file ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${file}` : null} fallbackText="RES" size={60} />
+                                                <div key={i} className="rounded-3 overflow-hidden shadow-sm" style={{ width: 120, height: 120 }}>
+                                                    <AttachmentWithFallback url={file ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${file}` : null} fallbackText="RES" size={120} />
                                                 </div>
                                             ))}
+                                        </div>
+                                    )} */}
+                                    {firstResponse.attachments?.length > 0 && (
+                                        <div>
+                                            <label className="text-muted small text-uppercase fw-bold mb-2">Attachments</label>
+                                            <div className="d-flex flex-wrap gap-3">
+                                                {firstResponse.attachments.map((file, idx) => {
+                                                    const isImage = file?.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+                                                    const fileUrl = file ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${file}` : null;
+                                                    return (
+                                                        <div key={idx} className="attachment-box shadow-sm rounded-4 overflow-hidden position-relative" style={{ width: 120, height: 120 }}>
+                                                            {isImage && file ? (
+                                                                <AttachmentWithFallback url={fileUrl} fallbackText="IMAGE" size={120} />
+                                                            ) : (
+                                                                <a href={fileUrl} target="_blank" rel="noreferrer" className="w-100 h-100 bg-dark d-flex align-items-center justify-content-center text-white text-decoration-none">
+                                                                    <small className="fw-bold">VIEW VIDEO</small>
+                                                                </a>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
                                     )}
                                 </div>
@@ -360,12 +395,12 @@ export default function DisputeDetails() {
                             <div className="card-header bg-success py-3 border-0">
                                 <h6 className="mb-0 text-white fw-bold">Appointment Context</h6>
                             </div>
-                            <div className="card-body p-4 text-center">
+                            {/* <div className="card-body p-4 text-center">
                                 {dispute.appointmentId ? (
                                     <>
                                         <h5 className="fw-bold text-primary mb-1">{dispute.appointmentId.serviceId?.serviceName}</h5>
                                         <div className="text-muted small mb-4">Service Details</div>
-                                        
+
                                         <div className="row g-2 mb-4">
                                             <div className="col-6">
                                                 <div className="p-3 bg-light rounded-4">
@@ -388,6 +423,211 @@ export default function DisputeDetails() {
                                     </>
                                 ) : (
                                     <div className="py-5 text-muted">No appointment linked.</div>
+                                )}
+                            </div> */}
+                            {/* <div className="card-body p-4">
+                                {dispute.appointmentId ? (
+                                    <>
+                                        {(() => {
+                                            const appointment = dispute.appointmentId;
+
+                                            const services = Array.isArray(appointment.serviceId)
+                                                ? appointment.serviceId
+                                                : appointment.serviceId
+                                                    ? [appointment.serviceId]
+                                                    : [];
+
+                                            const technicians = Array.isArray(appointment.technicianId)
+                                                ? appointment.technicianId
+                                                : appointment.technicianId
+                                                    ? [appointment.technicianId]
+                                                    : [];
+
+                                            return (
+                                                <>
+                                                    <div className="text-center mb-4">
+                                                        <h5 className="fw-bold text-primary mb-1">Service Details</h5>
+                                                        <div className="text-muted small">Appointment Information</div>
+                                                    </div>
+
+                                                    <div className="mb-4">
+                                                        <label className="text-muted small text-uppercase fw-bold mb-2 d-block">
+                                                            Services
+                                                        </label>
+
+                                                        {services.length > 0 ? (
+                                                            services.map((service, index) => (
+                                                                <div
+                                                                    key={service._id || index}
+                                                                    className="p-3 bg-light rounded-4 mb-2"
+                                                                >
+                                                                    <div className="fw-bold text-dark">
+                                                                        {service.serviceName || "N/A"}
+                                                                    </div>
+
+                                                                    {service.price && (
+                                                                        <div className="text-muted small">
+                                                                            Price: ${service.price}
+                                                                        </div>
+                                                                    )}
+
+                                                                    {service.description && (
+                                                                        <div className="text-muted small mt-1">
+                                                                            {service.description}
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            ))
+                                                        ) : (
+                                                            <div className="p-3 bg-light rounded-4 text-muted">
+                                                                No service linked.
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="row g-2 mb-4">
+                                                        <div className="col-6">
+                                                            <div className="p-3 bg-light rounded-4 text-center">
+                                                                <label className="text-muted small text-uppercase fw-bold mb-1 d-block">
+                                                                    Date
+                                                                </label>
+                                                                <span className="fw-bold">{appointment.date || "N/A"}</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="col-6">
+                                                            <div className="p-3 bg-light rounded-4 text-center">
+                                                                <label className="text-muted small text-uppercase fw-bold mb-1 d-block">
+                                                                    Time
+                                                                </label>
+                                                                <span className="fw-bold">{appointment.time || "N/A"}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="bg-success bg-opacity-10 p-4 rounded-4 text-center">
+                                                        <label className="text-success small text-uppercase fw-bold mb-1 d-block">
+                                                            Total Paid
+                                                        </label>
+                                                        <h2 className="fw-black text-success mb-0">
+                                                            ${appointment.totalAmount || 0}
+                                                        </h2>
+                                                    </div>
+                                                </>
+                                            );
+                                        })()}
+                                    </>
+                                ) : (
+                                    <div className="py-5 text-muted text-center">No appointment linked.</div>
+                                )}
+                            </div> */}
+
+                            <div className="card-body p-4">
+                                {dispute.appointmentId ? (
+                                    (() => {
+                                        const appointment = dispute.appointmentId;
+
+                                        const services = appointment.servicesDetail || [];
+
+                                        return (
+                                            <>
+                                                <div className="text-center mb-4">
+                                                    <h5 className="fw-bold text-primary mb-1">Appointment Details</h5>
+
+                                                    <div className="text-muted small">Complete Booking Context</div>
+                                                </div>
+
+                                                {/* Booking Status */}
+
+                                                <div className="mb-4 d-flex align-items-center justify-content-between">
+                                                    <label className="text-muted small text-uppercase fw-bold d-block">
+                                                        Appointment Status
+                                                    </label>
+
+                                                    <div className="">
+                                                        <span className={`badge py-2 px-3 ${appointment.status?.toLowerCase() === "completed"
+                                                            ? "bg-success"
+                                                            : appointment.status?.toLowerCase() === "cancelled" ||
+                                                                appointment.status?.toLowerCase() === "canceled"
+                                                                ? "bg-danger"
+                                                                : "bg-warning text-dark"
+                                                            }`}>
+                                                            {appointment.status}
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Services */}
+
+                                                <div className="mb-4">
+                                                    <label className="text-muted small text-uppercase fw-bold mb-2 d-block">
+                                                        Services
+                                                    </label>
+
+                                                    {services.length > 0 ? (
+                                                        services.map((service, index) => (
+                                                            <div
+                                                                key={service._id || index}
+                                                                className="p-3 bg-light rounded-4 mb-3"
+                                                            >
+                                                                <div className="d-flex justify-content-between align-items-start">
+                                                                    <div>
+                                                                        <h6 className="fw-bold mb-1">{service.serviceName}</h6>
+
+                                                                        <p className="text-muted small mb-1">
+                                                                            Price: ${service.price}
+                                                                        </p>
+
+                                                                        <p className="text-muted small mb-1">
+                                                                            Technician:
+                                                                            <strong> {service.technician?.fullName || "-"}</strong>
+                                                                        </p>
+                                                                    </div>
+
+                                                                    <span className={`badge ${service.status?.toLowerCase() === "completed"
+                                                                        ? "bg-success"
+                                                                        : service.status?.toLowerCase() === "cancelled"
+                                                                            ? "bg-danger"
+                                                                            : "bg-warning text-dark"
+                                                                        }`}>
+                                                                        {service.status}
+                                                                    </span>
+                                                                </div>
+
+                                                                <div className="mt-3">
+                                                                    <label className="text-muted small fw-bold">
+                                                                        Scheduled At
+                                                                    </label>
+
+                                                                    <p className="mb-0 fw-semibold">
+                                                                        {service.scheduledAt
+                                                                            ? new Date(service.scheduledAt).toLocaleString()
+                                                                            : "-"}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        <div className="p-3 bg-light rounded-4 text-muted">
+                                                            No services found.
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="bg-success bg-opacity-10 p-4 rounded-4 text-center">
+                                                    <label className="text-success small text-uppercase fw-bold mb-1 d-block">
+                                                        Total Appointment Amount
+                                                    </label>
+
+                                                    <h2 className="fw-black text-success mb-0">
+                                                        ${appointment.totalAmount || 0}
+                                                    </h2>
+                                                </div>
+                                            </>
+                                        );
+                                    })()
+                                ) : (
+                                    <div className="py-5 text-muted text-center">No appointment linked.</div>
                                 )}
                             </div>
                         </div>

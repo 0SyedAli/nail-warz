@@ -21,12 +21,14 @@ export default function Dashboard({ children }) {
     addnewtechnician: { title: "Add New Technician" },
     appointments: { title: "Appointment Management" },
     appointmentslist: { title: "Appointment List" },
+    appointmentdetails: { title: "Appointment Details" },
     payouthistory: { title: "Payout History" },
     accountsettings: { title: "Account Settings" },
     categories: { title: "Manage Vendor Catagories" },
     disputes: { title: "Disputes" },
     disputeDetails: { title: "Dispute Details" },
     categoryrequest: { title: "Category Requests" },
+    discountrequest: { title: "Discount Requests" },
   };
 
   useEffect(() => {
@@ -44,6 +46,9 @@ export default function Dashboard({ children }) {
     }
     if (parts[1] === "disputes" && parts.length > 2) {
       headerKey = "disputeDetails";
+    }
+    if (parts[1] === "appointmentslist" && parts.length > 2) {
+      headerKey = "appointmentdetails";
     }
 
     setHeader(content[headerKey]);

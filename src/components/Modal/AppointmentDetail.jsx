@@ -187,12 +187,12 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
                       Cancel Booking
                     </button>
 
-                    <button
+                    {/* <button
                       className="appoint_btn reschedule"
                       onClick={rescheduleDisc.onOpen}
                     >
                       Reschedule
-                    </button>
+                    </button> */}
 
                     <button
                       className="appoint_btn completed"

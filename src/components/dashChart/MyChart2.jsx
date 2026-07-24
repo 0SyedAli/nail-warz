@@ -41,9 +41,9 @@ export default function Dashboard() {
                 setDashboardData(data)
 
                 // Find today's revenue
-                const todayDate = today.toLocaleDateString("en-GB").split("/").reverse().join("-") // dd-mm-yyyy
-                const todayData = data.data.find((d) => d.date === todayDate)
-                setTodayRevenue(todayData ? todayData.revenue : 0)
+                // const todayDate = today.toLocaleDateString("en-GB").split("/").reverse().join("-") // dd-mm-yyyy
+                // const todayData = data.data.find((d) => d.date === todayDate)
+                // setTodayRevenue(todayData ? todayData.revenue : 0)
             }
         } catch (error) {
             console.error("Error fetching dashboard data:", error)
@@ -184,7 +184,7 @@ export default function Dashboard() {
                                 borderRadius: "5px",
                             }}>
                                 <h3 className="overview-title fw-bolder m-0">Today's Revenue:</h3>
-                                <div className="total-amount">{formatCurrency(todayRevenue)}</div>
+                                <div className="total-amount">{formatCurrency(dashboardData.todayRevenue)}</div>
                             </div>
                         </div>
 

@@ -228,13 +228,13 @@ export default function OrderDetailsPage() {
                                         )
                                     </span>
                                     <span className="">
-                                        -${order?.discountAmount ? order?.discountAmount.toFixed(2) : "0.00"}
+                                        ${order?.discountAmount ? order?.discountAmount.toFixed(2) : "0.00"}
                                     </span>
                                 </div>
                                 <hr />
                                 <div className="d-flex justify-content-between">
                                     <span className="text-muted">Shipping Price</span>
-                                    <span className="text-muted">+${order?.shippingCharges?.toFixed(2)}</span>
+                                    <span className="text-muted">${order?.shippingCharges?.toFixed(2)}</span>
                                 </div>
                                 <hr />
                                 <div className="d-flex justify-content-between fw-bold mt-2">

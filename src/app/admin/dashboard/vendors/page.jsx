@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { BsSearch, BsEye } from "react-icons/bs";
 import BallsLoading from "@/components/Spinner/BallsLoading";
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 const PAGE_SIZE = 10;
 
@@ -116,6 +117,53 @@ export default function SuperAdminVendors() {
 
     const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
 
+    const toggleUserStatus = async (vendorId, currentStatus, e) => {
+        e.stopPropagation();
+
+        try {
+            const newStatus = !currentStatus;
+
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor/${vendorId}`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${Cookies.get("token")}`,
+                    },
+                    body: JSON.stringify({
+                        isVerified: newStatus,
+                    }),
+                }
+            );
+
+            const json = await res.json();
+
+            if (!res.ok || !json.success) {
+                throw new Error(json.message || "Failed to update vendor status");
+            }
+
+            // vendors state update
+            setVendors(prev =>
+                prev.map(v =>
+                    v._id === vendorId ? { ...v, isVerified: newStatus } : v
+                )
+            );
+
+            // filtered state update
+            setFiltered(prev =>
+                prev.map(v =>
+                    v._id === vendorId ? { ...v, isVerified: newStatus } : v
+                )
+            );
+
+            showSuccessToast(`Vendor ${newStatus ? "approved" : "unapproved"} successfully`);
+
+        } catch (err) {
+            showErrorToast(err.message);
+        }
+    };
+
     if (loading) return
     <div className="page pt-4 px-0">
         <div
@@ -221,20 +269,31 @@ export default function SuperAdminVendors() {
                                             <td className="fw-bold">{v.avgRating.toFixed(2) || 0}</td>
                                             <td className="fw-bold">{v.salonCancellationCount || 0}</td>
                                             <td className="fw-bold">${v.revenueSummary?.payableBalance?.toFixed(2) || 0}</td>
-                                            <td>
+                                            <td className="user-toggle" onClick={(e) => e.stopPropagation()}>
+                                                <div className="form-check form-switch d-flex align-items-center ps-0 gap-2 m-0">
+                                                    <input
+                                                        className="form-check-input"
+                                                        type="checkbox"
+                                                        role="switch"
+                                                        checked={Boolean(v.isVerified)}
+                                                        onChange={(e) =>
+                                                            toggleUserStatus(v._id, v.isVerified, e)
+                                                        }
+                                                    />
 
-                                                <span
-                                                    style={{
-                                                        padding: "6px 12px",
-                                                        borderRadius: "20px",
-                                                        fontSize: "12px",
-                                                        fontWeight: 600,
-                                                        backgroundColor: !v?.isDeleted ? "#e6f4ea" : "#f1f3f5",
-                                                        color: !v?.isDeleted ? "#1e7e34" : "#6c757d"
-                                                    }}
-                                                >
-                                                    {!v?.isDeleted ? "Active" : "Inactive"}
-                                                </span>
+                                                    <span
+                                                        style={{
+                                                            padding: "6px 12px",
+                                                            borderRadius: "20px",
+                                                            fontSize: "12px",
+                                                            fontWeight: 600,
+                                                            backgroundColor: v?.isVerified ? "#e6f4ea" : "#f1f3f5",
+                                                            color: v?.isVerified ? "#1e7e34" : "#6c757d"
+                                                        }}
+                                                    >
+                                                        {v?.isVerified ? "Approved" : "Pending"}
+                                                    </span>
+                                                </div>
                                             </td>
                                             <td>
                                                 <button

@@ -14,7 +14,8 @@ import BallsLoading from "./Spinner/BallsLoading";
 
 export default function ManageAppointments() {
     const searchParams = useSearchParams();
-    const timing = searchParams.get("timing");  // "09:30AM"
+    const date = searchParams.get("date");
+    console.log(date);
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -59,18 +60,20 @@ export default function ManageAppointments() {
             let url = `${process.env.NEXT_PUBLIC_API_URL}/getBookingsBySalonId?salonId=${salonId}`;
 
             // Add timing if available
-            if (timing) {
-                url += `&time=${timing}`;
-            }
-
+            // if (timing) {
+            //     url += `&time=${timing}`;
+            // }
             if (date) {
-                // Convert JS Date object → "dd-mm-yyyy"
-                const day = String(date.getDate()).padStart(2, "0");
-                const month = String(date.getMonth() + 1).padStart(2, "0");
-                const year = date.getFullYear();
-                const formattedDate = `${day}-${month}-${year}`;
+                const localDate = new Date(
+                    date.getFullYear(),
+                    date.getMonth(),
+                    date.getDate(),
+                    12, // noon
+                    0,
+                    0
+                );
 
-                url += `&date=${formattedDate}`;
+                url += `&scheduledAt=${localDate.toISOString()}`;
             }
 
             const response = await fetch(url);
@@ -79,16 +82,17 @@ export default function ManageAppointments() {
             const result = await response.json();
             if (result.success) {
                 // setAppointments(result.data);
-                const parseDateTime = (dateStr, timeStr) => {
-                    // Convert "13-10-2025" → "2025-10-13"
-                    const [day, month, year] = dateStr.split("-");
-                    return new Date(`${year}-${month}-${day} ${timeStr}`);
-                };
-
                 const sortedData = [...result.data].sort((a, b) => {
-                    const dateA = parseDateTime(a.date, a.time);
-                    const dateB = parseDateTime(b.date, b.time);
-                    return dateB - dateA; // newest → oldest
+
+                    const dateA = new Date(
+                        a.servicesDetail?.[0]?.scheduledAt || a.createdAt
+                    );
+
+                    const dateB = new Date(
+                        b.servicesDetail?.[0]?.scheduledAt || b.createdAt
+                    );
+
+                    return dateB - dateA;
                 });
                 setAppointments(sortedData);
                 calculateStats(sortedData);
@@ -107,63 +111,83 @@ export default function ManageAppointments() {
     };
 
     const calculateStats = (data) => {
-        const stats = data.reduce(
-            (acc, appt) => {
-                // acc.all++;
-                // Only count appointments that are not "pending" for the "All" count
-                if (appt.status.toLowerCase() !== "pending") {
-                    acc.all++;
+
+        let stats = {
+            all: 0,
+            accepted: 0,
+            completed: 0,
+            canceled: 0
+        };
+
+
+        data.forEach(appt => {
+
+            appt.servicesDetail?.forEach(service => {
+
+                const status = service.status?.toLowerCase();
+
+
+                if (status !== "pending") {
+                    stats.all++;
                 }
 
-                switch (appt.status.toLowerCase()) {
-                    case "accepted":
-                        acc.accepted++;
-                        break;
-                    case "canceled":
-                    case "cancelled":
-                        acc.canceled++;
-                        break;
-                    case "completed":
-                        acc.completed++;
-                        break;
-                }
 
-                return acc;
-            },
-            { all: 0, accepted: 0, canceled: 0, completed: 0 }
-        );
+                if (status === "accepted")
+                    stats.accepted++;
+
+                if (status === "completed")
+                    stats.completed++;
+
+                if (status === "cancelled" || status === "canceled")
+                    stats.canceled++;
+
+            });
+
+        });
+
 
         setStats(stats);
     };
 
 
+    // useEffect(() => {
+    //     if (!salonId) return;
+    //     fetchAppointments();
+    // }, [salonId]);
     useEffect(() => {
         if (!salonId) return;
-        fetchAppointments();
-    }, [salonId, timing]);
 
-    const getStatusBadge = (status) => {
-        console.log(status);
+        if (date) {
+            fetchAppointments(new Date(date));
+        } else {
+            fetchAppointments();
+        }
+
+    }, [salonId, date]);
+
+    const getStatusBadge = (status = "") => {
+
         switch (status.toLowerCase()) {
+
             case "completed":
                 return <span className="badge py-2 bg-success">Completed</span>;
+
             case "accepted":
                 return <span className="badge py-2 bg-primary">Accepted</span>;
-            case "canceled":
+
             case "cancelled":
-                return <span className="badge py-2 bg-danger">Canceled</span>;
+            case "canceled":
+                return <span className="badge py-2 bg-danger">Cancelled</span>;
+
             default:
                 return <span className="badge py-2 bg-secondary">{status}</span>;
         }
     };
-    const formatDateTimeUS = (dateStr, timeStr) => {
+    const formatDateTimeUS = (dateTime) => {
         try {
-            // Convert "10-10-2025" → "2025-10-10"
-            const [day, month, year] = dateStr.split("-");
-            const formatted = `${year}-${month}-${day} ${timeStr}`;
-            const date = new Date(formatted);
+            if (!dateTime) return "-";
 
-            return date.toLocaleString("en-US", {
+            return new Date(dateTime).toLocaleString("en-US", {
                 year: "numeric",
                 month: "short",
                 day: "numeric",
@@ -171,8 +195,9 @@ export default function ManageAppointments() {
                 minute: "2-digit",
                 hour12: true,
             });
+
         } catch {
-            return `${dateStr} ${timeStr}`;
+            return "-";
         }
     };
 
@@ -185,8 +210,17 @@ export default function ManageAppointments() {
         .filter(appt => appt.status.toLowerCase() !== "pending")
         .filter((appt) => {
             const name = (appt.userId?.username || "").toLowerCase();
-            const tech = (appt.technicianId?.fullName || "").toLowerCase();
-            const service = (appt.serviceId?.serviceName || "").toLowerCase();
+            const services = appt.servicesDetail || [];
+
+            const tech = services
+                .map(s => s.technician?.fullName)
+                .join(" ")
+                .toLowerCase();
+
+            const service = services
+                .map(s => s.serviceName)
+                .join(" ")
+                .toLowerCase();
             const status = (appt.status || "").toLowerCase();
             const search = searchTerm.toLowerCase();
 
@@ -219,23 +253,33 @@ export default function ManageAppointments() {
     };
 
     const getServiceNames = (services = []) => {
-        if (!Array.isArray(services) || services.length === 0) return "-";
+
+        if (!services.length) return "-";
 
         if (services.length === 1) {
-            return services[0]?.serviceName;
+            return services[0].serviceName;
         }
 
-        return `${services[0]?.serviceName}, ...`;
+        return `${services[0].serviceName}, +${services.length - 1}`;
     };
 
-    const getTechnicianNames = (technicians = []) => {
-        if (!Array.isArray(technicians) || technicians.length === 0) return "-";
+    const getTechnicianNames = (services = []) => {
+
+        if (!services.length) return "-";
+
+        const technicians = services
+            .map(item => item.technician?.fullName)
+            .filter(Boolean);
+
+
+        if (!technicians.length) return "-";
+
 
         if (technicians.length === 1) {
-            return technicians[0]?.fullName;
+            return technicians[0];
         }
 
-        return `${technicians[0]?.fullName}, ...`;
+        return `${technicians[0]}, +${technicians.length - 1}`;
     };
 
     if (loading) {
@@ -377,15 +421,15 @@ export default function ManageAppointments() {
                                     currentAppointments.map((appt) => (
                                         <tr key={appt._id} >
                                             <td>{appt.userId?.username || "Unknown"}</td>
-                                            <td>{getServiceNames(appt.serviceId)}</td>
-                                            <td>{getTechnicianNames(appt.technicianId)}</td>
-                                            <td>{formatDateTimeUS(appt.date, appt.time)}</td>
+                                            <td>{getServiceNames(appt.servicesDetail)}</td>
+                                            <td>{getTechnicianNames(appt.servicesDetail)}</td>
+                                            <td>{formatDateTimeUS(appt.servicesDetail?.[0]?.scheduledAt)}</td>
                                             <td>${appt.totalAmount}</td>
-                                            <td>{getStatusBadge(appt.status)}</td>
+                                            <td>{getStatusBadge(appt.servicesDetail?.[0]?.status || appt.status)}</td>
                                             <td>
                                                 <button
                                                     className="btn btn-outline-dark btn-sm"
-                                                    onClick={() => fetchBookingDetail(appt._id)}
+                                                    onClick={() => router.push(`/dashboard/appointmentslist/${appt._id}`)}
                                                 >
                                                     View Details
                                                 </button>

@@ -50,12 +50,19 @@ export default function WeeklyCalendar() {
                 if (res.success) {
                     // reuse your existing helper – it should return { title, start, end, time, old? }
                     const grouped = groupAppointments(res.data);
-
+                    console.log("grouped", grouped)
                     // FullCalendar accepts the same structure: { title, start, end, extendedProps }
+                    // const mapped = grouped.map((g) => ({
+                    //     ...g,
+                    //     extendedProps: {
+                    //         time: g.time,
+                    //         old: g.old,
+                    //     },
+                    // }));
                     const mapped = grouped.map((g) => ({
                         ...g,
                         extendedProps: {
-                            time: g.time,
+                            date: g.date,
                             old: g.old,
                         },
                     }));
@@ -67,15 +74,27 @@ export default function WeeklyCalendar() {
     }, [salonId]);
 
     // ----------------------------- CLICK ON EVENT -----------------------------
+    // const handleEventClick = (info) => {
+    //     const timing = info.event.extendedProps.time;
+    //     console.log("timing", timing);
+    //     if (timing) {
+    //         router.push(`appointmentslist?timing=${timing.replace(/\s+/g, "")}`);
+    //     } else {
+    //         router.push(`appointmentslist`);
+    //     }
+    // };
+
     const handleEventClick = (info) => {
-        const timing = info.event.extendedProps.time;
-        if (timing) {
-            router.push(`appointmentslist?timing=${timing.replace(/\s+/g, "")}`);
+        const date = info.event.extendedProps.date;
+
+        if (date) {
+            router.push(
+                `appointmentslist?date=${encodeURIComponent(date)}`
+            );
         } else {
             router.push(`appointmentslist`);
         }
     };
-
     // ----------------------------- CUSTOM BUTTON HANDLERS -----------------------------
     const handlePrev = () => {
         const api = calendarRef.current?.getApi();

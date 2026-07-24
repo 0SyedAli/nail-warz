@@ -54,6 +54,30 @@ const SideBar = () => {
       ],
     },
     {
+      href: "/admin/dashboard/discount",
+      icon: "/images/layer-icon.png",
+      text: "Discount Product",
+      related: [
+        "/admin/dashboard/discount"
+      ],
+    },
+    {
+      href: "/admin/dashboard/bookingdiscount",
+      icon: "/images/layer-icon.png",
+      text: "Discount Booking",
+      related: [
+        "/admin/dashboard/bookingdiscount"
+      ],
+    },
+    {
+      href: "/admin/dashboard/discountrequest",
+      icon: "/images/report-data.png",
+      text: "Discount Proposals",
+      related: [
+        "/admin/dashboard/discountrequest"
+      ],
+    },
+    {
       href: "/admin/dashboard/battles",
       icon: "/images/warz-icon.png",
       text: "Battle Management",
@@ -98,15 +122,7 @@ const SideBar = () => {
       related: [
         "/admin/dashboard/pushnotification"
       ],
-    },
-    {
-      href: "/admin/dashboard/discount",
-      icon: "/images/layer-icon.png",
-      text: "Discount Management",
-      related: [
-        "/admin/dashboard/discount"
-      ],
-    },
+    }
   ];
   // useEffect(() => {
   //   setActiveTab(pathname);
@@ -116,8 +132,11 @@ const SideBar = () => {
     if (item.href === "/admin/dashboard") {
       return pathname === "/admin/dashboard";
     }
-    return item.related.some((route) =>
-      pathname.startsWith(route)
+
+    return item.related.some(
+      (route) =>
+        pathname === route ||
+        pathname.startsWith(`${route}/`)
     );
   };
   const handleHover = (href) => {

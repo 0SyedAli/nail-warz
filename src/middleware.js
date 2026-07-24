@@ -13,8 +13,8 @@ export function middleware(request) {
   }
 
   // Public Routes List
-  const vendorPublicRoutes = ["/auth/login", "/auth/signup", "/auth/forgot", "/auth/reset"];
-  const userPublicRoutes = ["/user-auth/login", "/user-auth/signup", "/user-auth/forgot", "/user-auth/reset"];
+  const vendorPublicRoutes = ["/auth/login", "/auth/signup", "/auth/forgot", "/auth/reset", "/auth/otp"];
+  const userPublicRoutes = ["/user-auth/login", "/user-auth/signup", "/user-auth/forgot", "/user-auth/reset", "/user-auth/otp"];
   const adminPublicRoutes = ["/admin/auth/login"];
 
   const isVendorPublic = vendorPublicRoutes.includes(pathname);
@@ -37,17 +37,17 @@ export function middleware(request) {
   }
 
   // 2. Authenticated State -> Protected Route Access Control
-  
+
   // Admin Protection
   if (pathname.startsWith("/admin") && role !== "admin") {
-     return NextResponse.redirect(new URL("/admin/auth/login", request.url));
+    return NextResponse.redirect(new URL("/admin/auth/login", request.url));
   }
 
   // Vendor Protection
   if ((pathname.startsWith("/dashboard") || (pathname.startsWith("/auth") && !isVendorPublic)) && role !== "vendor") {
-     return NextResponse.redirect(new URL("/auth/login", request.url));
+    return NextResponse.redirect(new URL("/auth/login", request.url));
   }
-  
+
   // 3. Authenticated State -> Redirect away from public login pages
   if (isPublicRoute) {
     if (role === "admin") {

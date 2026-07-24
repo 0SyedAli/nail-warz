@@ -58,6 +58,12 @@ const SideBar = () => {
       related: ["/dashboard/categoryrequest"],
     },
     {
+      href: "/dashboard/discountrequest",
+      icon: "/images/report-data.png", // Using an appropriate icon
+      text: "Discount Requests",
+      related: ["/dashboard/discountrequest"],
+    },
+    {
       href: "/dashboard/payouthistory",
       icon: "/images/payout-icon.png",
       text: "Payout History",

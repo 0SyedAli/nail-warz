@@ -38,8 +38,8 @@ export default function Disputes() {
                         console.error("Error parsing user cookie", e);
                     }
 
-                    const filteredDisputes = vendorIdCookie 
-                        ? res.data.disputes.filter(d => d.vendorId?._id === vendorIdCookie) 
+                    const filteredDisputes = vendorIdCookie
+                        ? res.data.disputes.filter(d => d.vendorId?._id === vendorIdCookie)
                         : res.data.disputes;
 
                     setItems(filteredDisputes);
@@ -114,7 +114,7 @@ export default function Disputes() {
                                     <tr>
                                         <th className="ps-4">User</th>
                                         <th>Vendor</th>
-                                        <th>Reason</th>
+                                        <th>Category</th>
                                         <th>Raised By</th>
                                         <th>Status</th>
                                         <th className="text-center">Actions</th>
@@ -140,7 +140,7 @@ export default function Disputes() {
                                                 <small className="text-muted">{c.vendorId?.name}</small>
                                             </td>
                                             <td>
-                                                <div className="text-truncate" style={{ maxWidth: 200 }}>{c.reason}</div>
+                                                <div style={{ maxWidth: 200 }}>{c.category}</div>
                                             </td>
                                             <td>
                                                 <span className={`badge bg-light text-dark border`}>{c.raisedBy}</span>

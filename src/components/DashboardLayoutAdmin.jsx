@@ -28,7 +28,9 @@ export default function Dashboard({ children }) {
     pushnotification: { title: "Push Notification" },
     disputes: { title: "Disputes Management" },
     disputesDetails: { title: "Dispute Details" },
-    discount: { title: "Discount Management" },
+    discount: { title: "Discount Product" },
+    bookingdiscount: { title: "Discount Booking" },
+    discountrequest: { title: "Booking Discount Requests" },
   };
   useEffect(() => {
     const parts = pathname.split("/").filter(Boolean);
@@ -51,6 +53,12 @@ export default function Dashboard({ children }) {
     }
     if (parts[2] === "disputes" && parts.length > 3) {
       headerKey = "disputesDetails";
+    }
+    if (parts[2] === "bookingdiscount") {
+      headerKey = "bookingdiscount";
+    }
+    if (parts[2] === "discountrequest") {
+      headerKey = "discountrequest";
     }
 
     setHeader(content[headerKey]);

@@ -2,12 +2,11 @@
 import { useEffect, useState, useCallback } from "react";
 import Modal from "./layout";
 import { useForm, Controller } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 import { AuthBtn } from "@/components/AuthBtn/AuthBtn";
 import BallsLoading from "../Spinner/BallsLoading";
-import { showErrorToast } from "@/lib/toast";
+import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
 /* ---------- Days ---------- */
 const ALL_DAYS = [
@@ -26,6 +25,7 @@ export default function EditTechnicianAvailablity({ isOpen, onClose, techId, onS
 
   const {
     register,
+    control,
     handleSubmit,
     watch,
     reset,
@@ -62,7 +62,7 @@ export default function EditTechnicianAvailablity({ isOpen, onClose, techId, onS
       };
     });
     setPortfolioPreviews(newPreviews);
-    
+
     return () => {
       newPreviews.forEach(p => {
         if (p.isNew && p.preview.startsWith("blob:")) {
@@ -176,8 +176,8 @@ export default function EditTechnicianAvailablity({ isOpen, onClose, techId, onS
       // Check if portfolio changed
       const currentPortfolio = data.portfolio || [];
       const originalPortfolio = originalData?.portfolio || [];
-      
-      const hasPortfolioChanged = 
+
+      const hasPortfolioChanged =
         currentPortfolio.length !== originalPortfolio.length ||
         currentPortfolio.some((item, idx) => {
           if (item instanceof File) return true;
@@ -215,10 +215,11 @@ export default function EditTechnicianAvailablity({ isOpen, onClose, techId, onS
       const result = await res.json();
       if (!res.ok || !result.success) {
         throw new Error(result.message || "Update failed");
+
       }
       // ✅ Trigger parent refresh
       if (typeof onSuccess === "function") onSuccess();
-
+      showSuccessToast("Technician updated successfully");
       onClose();
     } catch (err) {
       showErrorToast(err.message ?? "Something went wrong");

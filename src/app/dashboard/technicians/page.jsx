@@ -179,6 +179,7 @@ const Technicians = () => {
                     <th>Start Date</th>
                     <th>Phone Number</th>
                     <th>Description</th>
+                    <th>Status</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -187,12 +188,17 @@ const Technicians = () => {
                   {currentSlice.map((t) => (
                     <tr key={t._id}>
                       <td># {t._id.slice(-5)}</td>
-                      <td>{t.fullName}</td>
-                      <td>{t.email}</td>
-                      <td>{new Date(t.createdAt).toLocaleDateString()}</td>
+                      <td>{t.fullName || "-"}</td>
+                      <td>{t.email || "-"}</td>
+                      <td>{new Date(t.createdAt).toLocaleDateString() || "-"}</td>
                       {/* <td>{t.phoneNumber || "-"}</td> */}
-                      <td>{formatUSPhone(t.phoneNumber)}</td>
+                      <td>{formatUSPhone(t.phoneNumber) || "-"}</td>
                       <td>{t.description || "-"}</td>
+                      <td>
+                        <div className={`badge ${t.isDeleted ? "bg-danger" : "bg-success"}`} style={{ fontSize: "12px" }}>
+                          {t.isDeleted ? "Deleted" : "Active" || "-"}
+                        </div>
+                      </td>
                       <td>
                         <div className="d-flex gap-2">
                           <button

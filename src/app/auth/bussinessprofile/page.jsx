@@ -318,7 +318,7 @@ export default function BussinessProfile() {
 
       const result = await res.json();
       if (!res.ok || !result.success) throw new Error(result.message);
-
+      clearAllCookies();
       showSuccessToast("Profile updated successfully");
       router.push("/auth/login");
     } catch (err) {

@@ -61,17 +61,29 @@ const DashboardPanel = ({ activeTab }) => {
 
         if (json.success) {
           // already sorted like in manage page
-          const parseDateTime = (dateStr, timeStr) => {
-            const [day, month, year] = dateStr.split("-");
-            return new Date(`${year}-${month}-${day} ${timeStr}`);
-          };
+          // const parseDateTime = (dateStr, timeStr) => {
+          //   const [day, month, year] = dateStr.split("-");
+          //   return new Date(`${year}-${month}-${day} ${timeStr}`);
+          // };
+
+          // const sortedData = [...json.data].sort((a, b) => {
+          //   const dateA = parseDateTime(a.date, a.time);
+          //   const dateB = parseDateTime(b.date, b.time);
+          //   return dateB - dateA;
+          // });
 
           const sortedData = [...json.data].sort((a, b) => {
-            const dateA = parseDateTime(a.date, a.time);
-            const dateB = parseDateTime(b.date, b.time);
+
+            const dateA = new Date(
+              a.servicesDetail?.[0]?.scheduledAt || a.createdAt
+            );
+
+            const dateB = new Date(
+              b.servicesDetail?.[0]?.scheduledAt || b.createdAt
+            );
+
             return dateB - dateA;
           });
-
           setOrders(sortedData);
           setEmpty(sortedData.length === 0);
           setError(null);
@@ -103,14 +115,11 @@ const DashboardPanel = ({ activeTab }) => {
 
     return status.includes(activeTab.toLowerCase());
   });
-  const formatDateTimeUS = (dateStr, timeStr) => {
+  const formatDateTimeUS = (dateTime) => {
     try {
-      // Convert "10-10-2025" → "2025-10-10"
-      const [day, month, year] = dateStr.split("-");
-      const formatted = `${year}-${month}-${day} ${timeStr}`;
-      const date = new Date(formatted);
+      if (!dateTime) return "-";
 
-      return date.toLocaleString("en-US", {
+      return new Date(dateTime).toLocaleString("en-US", {
         year: "numeric",
         month: "short",
         day: "numeric",
@@ -118,23 +127,58 @@ const DashboardPanel = ({ activeTab }) => {
         minute: "2-digit",
         hour12: true,
       });
+
     } catch {
-      return `${dateStr} ${timeStr}`;
+      return "-";
     }
   };
 
-  const getStatusBadge = (status) => {
+  const getStatusBadge = (status = "") => {
+
     switch (status.toLowerCase()) {
+
       case "completed":
         return <span className="badge py-2 bg-success">Completed</span>;
-      case "pending":
+
       case "accepted":
-        return <span className="badge py-2 bg-primary">New</span>;
+        return <span className="badge py-2 bg-primary">Accepted</span>;
+
+      case "cancelled":
       case "canceled":
-        return <span className="badge py-2 bg-danger">Canceled</span>;
+        return <span className="badge py-2 bg-danger">Cancelled</span>;
+
       default:
         return <span className="badge py-2 bg-secondary">{status}</span>;
     }
+  };
+  const getServiceNames = (services = []) => {
+
+    if (!services.length) return "-";
+
+    if (services.length === 1) {
+      return services[0].serviceName;
+    }
+
+    return `${services[0].serviceName}, +${services.length - 1}`;
+  };
+
+  const getTechnicianNames = (services = []) => {
+
+    if (!services.length) return "-";
+
+    const technicians = services
+      .map(item => item.technician?.fullName)
+      .filter(Boolean);
+
+
+    if (!technicians.length) return "-";
+
+
+    if (technicians.length === 1) {
+      return technicians[0];
+    }
+
+    return `${technicians[0]}, +${technicians.length - 1}`;
   };
   const fetchBookingDetail = async (id) => {
     try {
@@ -206,15 +250,15 @@ const DashboardPanel = ({ activeTab }) => {
                     {filteredOrders.slice(0, 4).map((order, index) => (
                       <tr key={index}>
                         <td>{order.userId?.username || "Unknown"}</td>
-                        <td>{order.serviceId?.map((s) => s.serviceName).join(", ") || "-"}</td>
-                        <td>{order.technicianId?.map((t) => t.fullName).join(", ") || "-"}</td>
-                        <td>{formatDateTimeUS(order.date, order.time)}</td>
+                        <td>{getServiceNames(order.servicesDetail)}</td>
+                        <td>{getTechnicianNames(order.servicesDetail)}</td>
+                        <td>{formatDateTimeUS(order.servicesDetail?.[0]?.scheduledAt)}</td>
                         <td>${order.totalAmount}</td>
                         <td>{getStatusBadge(order.status)}</td>
                         <td>
                           <button
                             className="btn btn-outline-primary btn-sm"
-                            onClick={() => fetchBookingDetail(order._id)}
+                            onClick={() => router.push(`/dashboard/appointmentslist/${order._id}`)}
                           >
                             View Details
                           </button>

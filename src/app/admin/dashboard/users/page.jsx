@@ -261,10 +261,11 @@ export default function SuperAdminUsers() {
                                         <tr
                                             key={u._id}
                                             style={{ cursor: "pointer" }}
-                                            onClick={() => {
-                                                setSelectedUser(u);
-                                                setIsOpen(true);
-                                            }}
+                                            // onClick={() => {
+                                            //     setSelectedUser(u);
+                                            //     setIsOpen(true);
+                                            // }}
+                                            onClick={() => router.push(`/admin/dashboard/users/${u._id}`)}
                                         >
                                             <td>#{u._id.slice(-5)}</td>
                                             <td>{u.firstName || "-"}</td>

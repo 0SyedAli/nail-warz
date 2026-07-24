@@ -234,14 +234,14 @@ export default function PayoutHistory() {
             {/* Total Revenue */}
             <AdminDashboardCard
               title="Your Total Revenue"
-              value={`$${(summary.totalRevenue ?? 0).toLocaleString()}`}
+              value={`$${(summary.totalRevenue.toFixed(2) ?? 0).toLocaleString()}`}
               icon={LuDollarSign}
             />
 
             {/* Wallet Balance */}
             <AdminDashboardCard
-              title="Nail Warz Commission (15%)"
-              value={`$${summary.platformFee.amount ?? 0}`}
+              title="Nail Warz Commission"
+              value={`$${summary.platformFee.toFixed(2) ?? 0}`}
               icon_class="payoutCommisionIcon"
               // value={'$15'}
               icon={FiPercent}
@@ -250,14 +250,14 @@ export default function PayoutHistory() {
             {/* Active Battles */}
             <AdminDashboardCard
               title="Total Received"
-              value={`$${summary.totalPaidAmount ?? 0}`}
+              value={`$${summary.totalPaid.toFixed(2) ?? 0}`}
               icon={LuDollarSign}
             />
 
             {/* Wallet Balance */}
             <AdminDashboardCard
               title="Your Pending Payouts"
-              value={`$${summary.totalPayoutPending ?? 0}`}
+              value={`$${summary.totalPayableAmount.toFixed(2) ?? 0}`}
               icon={LuDollarSign}
             />
           </div>
@@ -294,22 +294,48 @@ export default function PayoutHistory() {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentPayouts.map((p, i) => (
-                    <tr key={p.transactionId}>
-                      {/* <td>{(page - 1) * PAGE_SIZE + i + 1}</td> */}
-                      <td>{p.transactionId}</td>
-                      <td>{vendor?.salonName || "-"}</td>
-                      <td>{p.payoutMethod}</td>
-                      <td className="fw-bold">${p.amount}</td>
-                      <td>
-                        <span className="badge bg-success">Received</span>
+                  {currentPayouts.length > 0 ? (
+                    currentPayouts.map((p, i) => (
+                      <tr key={p.transactionId}>
+                        {/* <td>{(page - 1) * PAGE_SIZE + i + 1}</td> */}
+
+                        <td>{p.transactionId}</td>
+
+                        <td>
+                          {vendor?.salonName || "-"}
+                        </td>
+
+                        <td>
+                          {p.payoutMethod}
+                        </td>
+
+                        <td className="fw-bold">
+                          ${p.amount}
+                        </td>
+
+                        <td>
+                          <span className="badge bg-success">
+                            Received
+                          </span>
+                        </td>
+
+                        <td>
+                          {new Date(p.payoutDate).toLocaleString()}
+                        </td>
+
+                        <td>
+                          {p.remarks || "-"}
+                        </td>
+
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={7} className="text-center">
+                        No payouts found for this date range.
                       </td>
-                      <td>
-                        {new Date(p.payoutDate).toLocaleString()}
-                      </td>
-                      <td>{p.remarks || "-"}</td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
