@@ -41,11 +41,19 @@ export default function ManageAppointments() {
         }
     }, [router]);
     const [stats, setStats] = useState({
-        all: 0,
-        canceled: 0,
-        completed: 0,
+        // all: 0,
+        // canceled: 0,
+        // completed: 0,
         // pending: 0,
-        accepted: 0,
+        // accepted: 0,
+        all: 0,
+        confirmed: 0,
+        completed: 0,
+        canceled: 0,
+        in_progress: 0,
+        rescheduled: 0,
+        expired: 0,
+        payment_pending: 0
     });
 
     const fetchAppointments = async (date = null) => {
@@ -110,41 +118,95 @@ export default function ManageAppointments() {
         }
     };
 
-    const calculateStats = (data) => {
+    // const calculateStats = (data) => {
 
+    //     let stats = {
+    //         all: 0,
+    //         accepted: 0,
+    //         completed: 0,
+    //         canceled: 0
+    //     };
+
+
+    //     data.forEach(appt => {
+
+    //         appt.servicesDetail?.forEach(service => {
+
+    //             const status = service.status?.toLowerCase();
+
+
+    //             if (status !== "pending") {
+    //                 stats.all++;
+    //             }
+
+
+    //             if (status === "accepted")
+    //                 stats.accepted++;
+
+    //             if (status === "completed")
+    //                 stats.completed++;
+
+    //             if (status === "cancelled" || status === "canceled")
+    //                 stats.canceled++;
+
+    //         });
+
+    //     });
+
+
+    //     setStats(stats);
+    // };
+    const calculateStats = (data) => {
         let stats = {
             all: 0,
-            accepted: 0,
+            confirmed: 0,
             completed: 0,
-            canceled: 0
+            canceled: 0,
+            in_progress: 0,
+            rescheduled: 0,
+            expired: 0,
+            payment_pending: 0
         };
 
-
         data.forEach(appt => {
-
             appt.servicesDetail?.forEach(service => {
 
-                const status = service.status?.toLowerCase();
+                const status = service.status;
 
+                stats.all++;
 
-                if (status !== "pending") {
-                    stats.all++;
+                switch (status) {
+                    case "Confirmed":
+                        stats.confirmed++;
+                        break;
+
+                    case "Completed":
+                        stats.completed++;
+                        break;
+
+                    case "Canceled":
+                        stats.canceled++;
+                        break;
+
+                    case "In_Progress":
+                        stats.in_progress++;
+                        break;
+
+                    case "Rescheduled":
+                        stats.rescheduled++;
+                        break;
+
+                    case "Expired":
+                        stats.expired++;
+                        break;
+
+                    case "PaymentPending":
+                        stats.payment_pending++;
+                        break;
                 }
 
-
-                if (status === "accepted")
-                    stats.accepted++;
-
-                if (status === "completed")
-                    stats.completed++;
-
-                if (status === "cancelled" || status === "canceled")
-                    stats.canceled++;
-
             });
-
         });
-
 
         setStats(stats);
     };
@@ -165,22 +227,67 @@ export default function ManageAppointments() {
 
     }, [salonId, date]);
 
+    // const getStatusBadge = (status = "") => {
+
+    //     switch (status.toLowerCase()) {
+
+    //         case "completed":
+    //             return <span className="badge py-2 bg-success">Completed</span>;
+
+    //         case "accepted":
+    //             return <span className="badge py-2 bg-primary">Accepted</span>;
+
+    //         case "cancelled":
+    //         case "canceled":
+    //             return <span className="badge py-2 bg-danger">Cancelled</span>;
+
+    //         default:
+    //             return <span className="badge py-2 bg-secondary">{status}</span>;
+    //     }
+    // };
     const getStatusBadge = (status = "") => {
 
-        switch (status.toLowerCase()) {
+        switch (status) {
 
-            case "completed":
-                return <span className="badge py-2 bg-success">Completed</span>;
+            case "PaymentPending":
+                return <span className="badge py-2 bg-warning text-dark">
+                    Payment Pending
+                </span>;
 
-            case "accepted":
-                return <span className="badge py-2 bg-primary">Accepted</span>;
+            case "Confirmed":
+                return <span className="badge py-2 bg-primary">
+                    Confirmed
+                </span>;
 
-            case "cancelled":
-            case "canceled":
-                return <span className="badge py-2 bg-danger">Cancelled</span>;
+            case "Rescheduled":
+                return <span className="badge py-2 bg-info text-dark">
+                    Rescheduled
+                </span>;
+
+            case "In_Progress":
+                return <span className="badge py-2 bg-secondary">
+                    In Progress
+                </span>;
+
+            case "Completed":
+                return <span className="badge py-2 bg-success">
+                    Completed
+                </span>;
+
+            case "Canceled":
+                return <span className="badge py-2 bg-danger">
+                    Canceled
+                </span>;
+
+            case "Expired":
+                return <span className="badge py-2 bg-dark">
+                    Expired
+                </span>;
 
             default:
-                return <span className="badge py-2 bg-secondary">{status}</span>;
+                return <span className="badge py-2 bg-light text-dark">
+                    {status}
+                </span>;
         }
     };
     const formatDateTimeUS = (dateTime) => {
@@ -207,7 +314,10 @@ export default function ManageAppointments() {
     };
 
     const filteredAppointments = appointments
-        .filter(appt => appt.status.toLowerCase() !== "pending")
+        // .filter(appt => appt.status.toLowerCase() !== "pending")
+        .filter(
+            appt => appt.status !== "PaymentPending"
+        )
         .filter((appt) => {
             const name = (appt.userId?.username || "").toLowerCase();
             const services = appt.servicesDetail || [];
@@ -321,8 +431,8 @@ export default function ManageAppointments() {
                     Calender View
                 </button>
             </div>
-            <div className="row g-2 g-sm-3 mb-4 row-cols-2 row-cols-sm-3 row-cols-lg-4">
-                {["All", "Accepted", "Completed", "Canceled"].map((label, i) => (
+            <div className="row g-2 g-sm-3 mb-4 row-cols-1 row-cols-md-2 row-cols-sm-3 row-cols-lg-5">
+                {["All", "Confirmed", "In_Progress", "Completed", "Canceled"].map((label, i) => (
                     <div className="col" key={i}>
                         <div
                             className={`card border-start border-${["", "primary", "success", "danger"][i]
@@ -425,7 +535,7 @@ export default function ManageAppointments() {
                                             <td>{getTechnicianNames(appt.servicesDetail)}</td>
                                             <td>{formatDateTimeUS(appt.servicesDetail?.[0]?.scheduledAt)}</td>
                                             <td>${appt.totalAmount}</td>
-                                            <td>{getStatusBadge(appt.servicesDetail?.[0]?.status || appt.status)}</td>
+                                            <td>{getStatusBadge(appt.status)}</td>
                                             <td>
                                                 <button
                                                     className="btn btn-outline-dark btn-sm"

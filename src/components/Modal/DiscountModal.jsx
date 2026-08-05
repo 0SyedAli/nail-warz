@@ -169,6 +169,7 @@ export default function DiscountModal({ isOpen, onClose, discount, onSuccess }) 
                 >
                   <NumberInputField />
                 </NumberInput>
+                <Text fontSize="xs" color="gray.500">Discount valid once the cart reaches this amount.</Text>
               </FormControl>
 
               <FormControl isRequired>
@@ -179,6 +180,8 @@ export default function DiscountModal({ isOpen, onClose, discount, onSuccess }) 
                   value={formData.expiryDate}
                   onChange={handleChange}
                 />
+                <Text fontSize="xs" color="gray.500">Discount code will expire on this date.</Text>
+
               </FormControl>
             </HStack>
 

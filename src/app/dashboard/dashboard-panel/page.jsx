@@ -143,9 +143,8 @@ const DashboardPanel = ({ activeTab }) => {
       case "accepted":
         return <span className="badge py-2 bg-primary">Accepted</span>;
 
-      case "cancelled":
       case "canceled":
-        return <span className="badge py-2 bg-danger">Cancelled</span>;
+        return <span className="badge py-2 bg-danger">Canceled</span>;
 
       default:
         return <span className="badge py-2 bg-secondary">{status}</span>;

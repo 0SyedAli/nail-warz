@@ -23,6 +23,7 @@ export default function TechnicianPage({ params }) {
     const [technicianData, setTechnicianData] = useState(null);
     const [selectedTechnician, setSelectedTechnician] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [updatingStatus, setUpdatingStatus] = useState(false);
     const [error, setError] = useState(null);
 
     // Fetch Technician Data
@@ -79,6 +80,33 @@ export default function TechnicianPage({ params }) {
             onDeleteClose(); // ✅ also close in error case
         }
     };
+
+    const updateTechnicianStatus = async (technicianId, currentStatus) => {
+        try {
+            setUpdatingStatus(true);
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/toggleTechnicianStatus/${technicianId}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ isActive: !currentStatus }),
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                setTechnicianData((prev) => ({ ...prev, isActive: !currentStatus }));
+                showSuccessToast(data.message || "Technician status updated successfully.");
+            } else {
+                showErrorToast(data.message || "Failed to update status.");
+            }
+        } catch (err) {
+            showErrorToast("Server error while updating status.");
+        } finally {
+            setUpdatingStatus(false);
+        }
+    };
+
     const handleEditAvailClick = (tech) => {
         setTechnicianData(tech);
         onEditAvailOpen();
@@ -140,6 +168,19 @@ export default function TechnicianPage({ params }) {
                                     </h3>
                                     <div className="small text-muted">Total Days</div>
                                 </div>
+                            </div>
+                            <div className="d-flex align-items-center gap-3 mt-3">
+                                <span className={`status-badge text-capitalize  mt-0 ${technicianData.isActive ? "active" : "inactive bg-secondary text-white"}`}>
+                                    {technicianData.isActive ? "Active" : "Inactive"}
+                                </span>
+                                <button
+                                    type="button"
+                                    className={`btn btn-sm ${technicianData.isActive ? "btn-danger" : "btn-success"}`}
+                                    onClick={() => updateTechnicianStatus(technicianData._id, technicianData.isActive)}
+                                    disabled={updatingStatus}
+                                >
+                                    {updatingStatus ? "Updating…" : technicianData.isActive ? "Set Inactive" : "Set Active"}
+                                </button>
                             </div>
                         </div>
                     </div>

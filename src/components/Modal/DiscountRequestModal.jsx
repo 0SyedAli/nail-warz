@@ -171,7 +171,7 @@ const DiscountRequestModal = ({
             setLoading(false);
         }
     };
-
+    const today = moment().format("YYYY-MM-DD");
     return (
         <Modal isOpen={isOpen} onClose={onClose} size="2xl" isCentered>
             <ModalOverlay backdropFilter="blur(4px)" />
@@ -227,7 +227,7 @@ const DiscountRequestModal = ({
                                     Discount Value
                                 </Text>
                                 <HStack spacing={2}>
-                                    <Text fontSize="2xl"  mb={0} fontWeight="800" color="#C11111">
+                                    <Text fontSize="2xl" mb={0} fontWeight="800" color="#C11111">
                                         {request.type === "percentage"
                                             ? `${request.value}%`
                                             : `$${request.value}`}
@@ -348,6 +348,7 @@ const DiscountRequestModal = ({
                                             name="startDate"
                                             value={formData.startDate}
                                             onChange={handleChange}
+                                            min={today}
                                             borderColor="gray.300"
                                             _focus={{
                                                 borderColor: "#C11111",
@@ -385,6 +386,7 @@ const DiscountRequestModal = ({
                                             name="endDate"
                                             value={formData.endDate}
                                             onChange={handleChange}
+                                            min={today}
                                             borderColor="gray.300"
                                             _focus={{
                                                 borderColor: "#C11111",

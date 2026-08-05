@@ -14,7 +14,7 @@ export default function Dashboard({ children }) {
   const content = {
     dashboard: { title: "Dashboard" },
     technicians: { title: "Manage Technicians" },
-    technicianDetails: { title: "Technician Availability" },
+    technicianDetails: { title: "Technician Profile" },
     services: { title: "Manage Services" },
     serviceDetails: { title: "Edit Service" },
     addnewservice: { title: "Add New Service" },

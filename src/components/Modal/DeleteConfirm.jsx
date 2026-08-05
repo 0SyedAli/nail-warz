@@ -15,13 +15,6 @@ function DeleteConfirm({ isOpen, onClose, onConfirm }) {
 
                 <div className="d-flex align-items-center justify-content-center gap-3">
                     <button
-                        className="btn themebtn4 green w-100"
-                        style={{ borderRadius: "12px" }}
-                        onClick={onClose}
-                    >
-                        Cancel
-                    </button>
-                    <button
                         className="btn themebtn4 red w-100 border fw-bold"
                         style={{
                             borderRadius: "12px",
@@ -39,6 +32,14 @@ function DeleteConfirm({ isOpen, onClose, onConfirm }) {
                             e.currentTarget.style.color = "#C11111";
                             e.currentTarget.style.borderColor = "";
                         }}
+                        onClick={onClose}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="btn themebtn4 green w-100"
+                        style={{ borderRadius: "12px" }}
+
                         onClick={onConfirm}
                     >
                         Delete

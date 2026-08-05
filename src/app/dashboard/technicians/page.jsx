@@ -16,6 +16,7 @@ const Technicians = () => {
   const [filteredTechs, setFilteredTechs] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [updatingStatus, setUpdatingStatus] = useState(null);
   const [error, setError] = useState(null);
   const [salonId, setSalonId] = useState("");
   const [selectedTechnician, setSelectedTechnician] = useState(null);
@@ -83,6 +84,47 @@ const Technicians = () => {
     setSelectedTechnician(tech);
     onEditAvailOpen();
   };
+
+  const handleToggleStatus = async (technicianId, currentStatus) => {
+    if (!technicianId) return;
+    setUpdatingStatus(technicianId);
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/toggleTechnicianStatus/${technicianId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ isActive: !currentStatus }),
+        }
+      );
+
+      const json = await res.json();
+
+      if (json.success) {
+        setTechs((prev) =>
+          prev.map((tech) =>
+            tech._id === technicianId ? { ...tech, isActive: !currentStatus } : tech
+          )
+        );
+        setFilteredTechs((prev) =>
+          prev.map((tech) =>
+            tech._id === technicianId ? { ...tech, isActive: !currentStatus } : tech
+          )
+        );
+        showSuccessToast(json.message || "Technician status updated successfully.");
+      } else {
+        showErrorToast(json.message || "Failed to update technician status.");
+      }
+    } catch (err) {
+      showErrorToast("Server error while updating technician status.");
+    } finally {
+      setUpdatingStatus(null);
+    }
+  };
+
   const handleUpdateSuccess = () => {
     showSuccessToast("Technician updated successfully!");
     onEditClose();
@@ -194,13 +236,52 @@ const Technicians = () => {
                       {/* <td>{t.phoneNumber || "-"}</td> */}
                       <td>{formatUSPhone(t.phoneNumber) || "-"}</td>
                       <td>{t.description || "-"}</td>
-                      <td>
-                        <div className={`badge ${t.isDeleted ? "bg-danger" : "bg-success"}`} style={{ fontSize: "12px" }}>
-                          {t.isDeleted ? "Deleted" : "Active" || "-"}
+                      {/* <td>
+                        <div
+                          className={`badge ${t.isActive ? "bg-success" : "bg-secondary"}`}
+                          style={{ fontSize: "12px" }}
+                        >
+                          {t.isActive ? "Active" : "Inactive"}
                         </div>
+                        <button
+                          className={`btn btn-sm ${t.isActive ? "btn-warning text-dark" : "btn-success"}`}
+                          onClick={() => handleToggleStatus(t._id, !!t.isActive)}
+                          disabled={updatingStatus === t._id}
+                        >
+                          {updatingStatus === t._id
+                            ? "Updating..."
+                            : t.isActive
+                              ? "Set Inactive"
+                              : "Set Active"}
+                        </button>
+                      </td> */}
+                      <td>
+                        <div className="d-flex align-items-center gap-2">
+                          <span
+                            className={`badge ${t.isActive ? "bg-success" : "bg-secondary"}`}
+                            style={{ fontSize: "12px" }}
+                          >
+                            {t.isActive ? "Active" : "Inactive"}
+                          </span>
+
+                          <div className="form-check form-switch m-0">
+                            <input
+                              className="form-check-input nail-warz-switch"
+                              type="checkbox"
+                              role="switch"
+                              checked={Boolean(t.isActive)}
+                              disabled={updatingStatus === t._id}
+                              onChange={() => handleToggleStatus(t._id, t.isActive)}
+                            />
+                          </div>
+                        </div>
+
+                        {/* {updatingStatus === t._id && (
+                          <small className="text-muted">Updating...</small>
+                        )} */}
                       </td>
                       <td>
-                        <div className="d-flex gap-2">
+                        <div className="d-flex flex-wrap gap-2">
                           <button
                             className="btn btn-outline-secondary btn-sm"
                             onClick={() => router.push(`technicians/${t._id}`)}
@@ -217,8 +298,9 @@ const Technicians = () => {
                             className="btn btn-outline-danger btn-sm"
                             onClick={() => handleEditAvailClick(t)}
                           >
-                            Manage Availablity
+                            Manage Availability
                           </button>
+
                         </div>
                       </td>
                     </tr>

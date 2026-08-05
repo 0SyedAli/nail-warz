@@ -505,9 +505,9 @@ const AdminCategoryRequestPage = () => {
                     <VStack align="flex-start" spacing={1} gridColumn={{ md: "span 2" }} sx={{ border: "1px solid #ccc", borderRadius: "10px", p: 3 }}>
                       <Text fontSize="xs" fontWeight="700" color="gray.500" sx={{ mb: 0 }}>BUSINESS ADDRESS</Text>
                       <Text fontWeight="500" sx={{ mb: 0 }}>{selectedRequest.vendorId?.bussinessAddress || selectedRequest.vendorId?.locationName || "N/A"}</Text>
-                      {selectedRequest.vendorId?.city && (
+                      {selectedRequest.vendorId?.location && (
                         <Text fontSize="sm" color="gray.500" sx={{ mb: 0 }}>
-                          {selectedRequest.vendorId.city}, {selectedRequest.vendorId.state} {selectedRequest.vendorId.zipCode}
+                          {selectedRequest.vendorId.location.locationName}, {selectedRequest.vendorId.zipCode}
                         </Text>
                       )}
                     </VStack>

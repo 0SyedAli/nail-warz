@@ -98,7 +98,66 @@ export default function PayoutHistory() {
   }, [vendorId]);
 
 
+  // const handleFetch = (sDate = startDate, eDate = endDate) => {
+  //   if (!vendorId) return;
+
+  //   const fetchPayoutHistory = async () => {
+  //     setLoading(true);
+  //     setError(null);
+
+  //     try {
+  //       let url = `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor/${vendorId}`;
+  //       const params = new URLSearchParams();
+  //       // if (sDate) params.append("startDate", sDate);
+
+  //       // if (eDate) params.append("endDate", eDate);
+
+  //       if (sDate && typeof sDate === "string") {
+  //         params.append("startDate", sDate);
+  //       }
+
+  //       if (eDate && typeof eDate === "string") {
+  //         params.append("endDate", eDate);
+  //       }
+  //       if (params.toString()) {
+  //         url += `?${params.toString()}`;
+  //       }
+  //       console.log(startDate, typeof startDate);
+  //       console.log(endDate, typeof endDate);
+  //       const res = await fetch(url, {
+  //         headers: {
+  //           Authorization: `Bearer ${Cookies.get("token")}`,
+  //         },
+  //       });
+
+  //       const json = await res.json();
+
+  //       if (!json.success) {
+  //         setPayouts([]);
+  //         setFilteredPayouts([]);
+  //         setSummary(null);
+  //         setError(json.message || "Something went wrong");
+  //         return;
+  //       }
+
+  //       const history = json.revenueSummary?.payoutHistory || [];
+  //       setPayouts(history);
+  //       setFilteredPayouts(history);
+  //       setSummary(json.revenueSummary);
+  //       setVendor(json.vendor);
+  //     } catch (err) {
+  //       setError("Server error. Please try again later.");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchPayoutHistory();
+  // };
+
   const handleFetch = (sDate = startDate, eDate = endDate) => {
+    console.log("Start Date:", sDate);
+    console.log("End Date:", eDate);
     if (!vendorId) return;
 
     const fetchPayoutHistory = async () => {
@@ -106,13 +165,24 @@ export default function PayoutHistory() {
       setError(null);
 
       try {
+
         let url = `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor/${vendorId}`;
+
         const params = new URLSearchParams();
-        if (sDate) params.append("startDate", sDate);
-        if (eDate) params.append("endDate", eDate);
+
+        if (sDate && typeof sDate === "string") {
+          params.append("startDate", sDate);
+        }
+
+        if (eDate && typeof eDate === "string") {
+          params.append("endDate", eDate);
+        }
+
         if (params.toString()) {
           url += `?${params.toString()}`;
         }
+
+        console.log("API URL:", url);
 
         const res = await fetch(url, {
           headers: {
@@ -131,10 +201,12 @@ export default function PayoutHistory() {
         }
 
         const history = json.revenueSummary?.payoutHistory || [];
+
         setPayouts(history);
         setFilteredPayouts(history);
         setSummary(json.revenueSummary);
         setVendor(json.vendor);
+
       } catch (err) {
         setError("Server error. Please try again later.");
       } finally {
@@ -142,10 +214,9 @@ export default function PayoutHistory() {
       }
     };
 
+
     fetchPayoutHistory();
   };
-
-
   /* 🔍 Search */
   useEffect(() => {
     if (!searchTerm) {
@@ -205,10 +276,10 @@ export default function PayoutHistory() {
           </div>
           <button
             className="btn btn-danger"
-            onClick={handleFetch}
+            onClick={() => handleFetch(startDate, endDate)}
             disabled={!startDate || !endDate}
           >
-            Fetch
+            View History
           </button>
           {(startDate || endDate) && (
             <button

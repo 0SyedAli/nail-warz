@@ -208,7 +208,7 @@ const TopBar = ({ header }) => {
         <h1>{header}</h1>
       </div>
 
-      <div className="tc_profile">
+      <div className="tc_profile flex-wrap">
         {/* Stripe Connect Button */}
         {isStripeConnected ? (
           <button className="stripe_btn_connected" disabled title="Stripe account is connected">
@@ -266,18 +266,19 @@ const TopBar = ({ header }) => {
             Review Warning
           </div>
         )}
-
-        <div>
-          <h4>{salonName}</h4>
-          <h5>{location}</h5>
+        <div className="d-flex flex-row-reverse flex-md-row flex-wrap gap-2">
+          <div>
+            <h4>{salonName}</h4>
+            <h5>{location}</h5>
+          </div>
+          <Image
+            src={image ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}` : "/images/avatar.png"}
+            width={50}
+            height={50}
+            style={{ borderRadius: "100%", minWidth: "50px", minHeight: "50px" }}
+            alt=""
+          />
         </div>
-        <Image
-          src={image ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}` : "/images/avatar.png"}
-          width={50}
-          height={50}
-          style={{ borderRadius: "100%", minWidth: "50px", minHeight: "50px" }}
-          alt=""
-        />
       </div>
 
       {/* Abuse Warning Modal */}

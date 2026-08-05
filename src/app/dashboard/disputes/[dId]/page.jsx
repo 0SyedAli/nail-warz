@@ -547,8 +547,7 @@ export default function DisputeDetails() {
                                                     <div className="">
                                                         <span className={`badge py-2 px-3 ${appointment.status?.toLowerCase() === "completed"
                                                             ? "bg-success"
-                                                            : appointment.status?.toLowerCase() === "cancelled" ||
-                                                                appointment.status?.toLowerCase() === "canceled"
+                                                            : appointment.status?.toLowerCase() === "canceled"
                                                                 ? "bg-danger"
                                                                 : "bg-warning text-dark"
                                                             }`}>

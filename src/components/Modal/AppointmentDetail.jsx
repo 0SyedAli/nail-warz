@@ -122,7 +122,7 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
               </ul>
             </div>
             <div className="col-6">
-              <h5><strong>Status:</strong> <span className={`badge py-2 ${booking?.status?.toLowerCase() === "accepted" ? "bg-success" : booking?.status?.toLowerCase() === "cancelled" || booking?.status?.toLowerCase() === "canceled" ? "bg-danger" : "bg-warning"}`}>{booking?.status}</span></h5>
+              <h5><strong>Status:</strong> <span className={`badge py-2 ${booking?.status?.toLowerCase() === "accepted" ? "bg-success" : booking?.status?.toLowerCase() === "canceled" ? "bg-danger" : "bg-warning"}`}>{booking?.status}</span></h5>
             </div>
             <div className="col-6">
               <h5><strong>Employee Name:</strong></h5>
@@ -212,7 +212,7 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
               )}
 
               {/* ✅ If Booking is Canceled */}
-              {(booking.status.toLowerCase() === "canceled" || booking.status.toLowerCase() === "cancelled") && (
+              {(booking.status.toLowerCase() === "canceled") && (
                 <button className="appoint_btn cancel" disabled>
                   Booking Canceled
                 </button>
@@ -238,7 +238,7 @@ function AppointmentDetail({ isOpen, onClose, modalClass, booking, onUpdated }) 
           <div className="mt-4 d-flex align-items-center gap-2 flex-wrap justify-content-center">
             <button
               className="appoint_btn px-5"
-              onClick={() => handleUpdateStatus("Cancelled")}
+              onClick={() => handleUpdateStatus("Canceled")}
               disabled={loading}
             >
               {loading ? <Spinner /> : "Confirm"}

@@ -133,6 +133,36 @@ export default function AppointmentDetailPage() {
         }
     };
 
+    const getStatusBadge = (status = "") => {
+
+        switch (status) {
+
+            case "PaymentPending":
+                return "bg-warning text-dark";
+
+            case "Confirmed":
+                return "bg-primary";
+
+            case "Rescheduled":
+                return "bg-info text-dark";
+
+            case "In_Progress":
+                return "bg-secondary";
+
+            case "Completed":
+                return "bg-success";
+
+            case "Canceled":
+                return "bg-danger";
+
+            case "Expired":
+                return "bg-dark";
+
+            default:
+                return "bg-light text-dark";
+        }
+    };
+
     if (loading) {
         return <div className="py-5 text-center">Loading...</div>;
     }
@@ -150,15 +180,15 @@ export default function AppointmentDetailPage() {
                 >
                     ← Back
                 </button>
-                {/* {booking.status !== "Completed" && booking.status !== "Canceled" && booking.status !== "Cancelled" && (
+                {booking.status !== "Completed" && booking.status !== "Canceled" && (
                     <div className="d-flex gap-2">
-                        <button
+                        {/* <button
                             className="btn btn-success"
                             onClick={() => updateBookingStatus("Completed")}
                             disabled={updating}
                         >
                             Complete Booking
-                        </button>
+                        </button> */}
 
                         <button
                             className="btn btn-danger"
@@ -167,9 +197,37 @@ export default function AppointmentDetailPage() {
                             Cancel Booking
                         </button>
                     </div>
-                )} */}
+                )}
             </div>
+            {showCancel && (
+                <div className="card mb-4 border-danger">
+                    <div className="card-body">
+                        <h5>Cancel Appointment</h5>
 
+                        <textarea
+                            className="form-control mb-3"
+                            placeholder="Enter cancel reason"
+                            value={cancelReason}
+                            onChange={(e) => setCancelReason(e.target.value)}
+                        />
+
+                        <button
+                            className="btn btn-danger me-2"
+                            onClick={() => updateBookingStatus("Canceled")}
+                            disabled={updating}
+                        >
+                            {updating ? <Spinner size="sm" /> : "Confirm Cancel"}
+                        </button>
+
+                        <button
+                            className="btn btn-secondary"
+                            onClick={() => setShowCancel(false)}
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
             <div className="card mb-4">
                 <div className="card-body">
                     <div className="d-flex justify-content-between">
@@ -180,10 +238,13 @@ export default function AppointmentDetailPage() {
                         </div>
 
                         <div>
-                            <span
-                                className={`badge py-2 px-3 ${booking.status === "Completed" ? "bg-success" : booking.status === "Canceled" || booking.status === "Cancelled" ? "bg-danger" : "bg-primary"
+                            {/* <span
+                                className={`badge py-2 px-3 ${booking.status === "Completed" ? "bg-success" : booking.status === "Canceled" ? "bg-danger" : "bg-primary"
                                     }`}
                             >
+                                {booking.status}
+                            </span> */}
+                            <span className={`badge py-2 px-3 ${getStatusBadge(booking.status)}`}>
                                 {booking.status}
                             </span>
                         </div>
@@ -202,13 +263,13 @@ export default function AppointmentDetailPage() {
                             </div>
                         </div>
 
-                        <div className="col-md-4">
+                        {/* <div className="col-md-4">
                             <div className="bg-light p-3 rounded h-100">
                                 <h6>Payment</h6>
 
                                 <p className={`badge ${booking.paymentStatus === "Success" ? "bg-success" : "bg-danger"} py-2 px-3`}>{booking.paymentStatus}</p>
                             </div>
-                        </div>
+                        </div> */}
 
                         <div className="col-md-4">
                             <div className="bg-light p-3 rounded h-100">
@@ -242,7 +303,7 @@ export default function AppointmentDetailPage() {
 
                     {booking.status === "Canceled" && (
                         <div className="alert alert-danger mt-3">
-                            <strong>Cancelled Appointment Reason</strong>
+                            <strong>Canceled Appointment Reason</strong>
 
                             <p className="mb-1">
                                 By: {booking.canceledBy || "-"}
@@ -262,35 +323,7 @@ export default function AppointmentDetailPage() {
 
             {/* Cancel Box */}
 
-            {showCancel && (
-                <div className="card mb-4 border-danger">
-                    <div className="card-body">
-                        <h5>Cancel Appointment</h5>
 
-                        <textarea
-                            className="form-control mb-3"
-                            placeholder="Enter cancel reason"
-                            value={cancelReason}
-                            onChange={(e) => setCancelReason(e.target.value)}
-                        />
-
-                        <button
-                            className="btn btn-danger me-2"
-                            onClick={() => updateBookingStatus("Canceled")}
-                            disabled={updating}
-                        >
-                            {updating ? <Spinner size="sm" /> : "Confirm Cancel"}
-                        </button>
-
-                        <button
-                            className="btn btn-secondary"
-                            onClick={() => setShowCancel(false)}
-                        >
-                            Close
-                        </button>
-                    </div>
-                </div>
-            )}
 
             {/* Services */}
 
@@ -316,8 +349,7 @@ export default function AppointmentDetailPage() {
                             </div>
 
                             <div className="col-md-4 text-md-end">
-                                <span className={`badge py-2 px-3 ${item.status === "Completed" ? "bg-success" : item.status === "Canceled" || item.status === "Cancelled" ? "bg-danger" : "bg-primary"
-                                    }`}>
+                                <span className={`badge py-2 px-3 ${getStatusBadge(item.status)}`}>
                                     {item.status}
                                 </span>
                             </div>
@@ -361,14 +393,14 @@ export default function AppointmentDetailPage() {
                                 </button>
                             )}
 
-                            {(item.status === "Confirmed" || item.status === "Rescheduled") && (
+                            {/* {(item.status === "Confirmed" || item.status === "Rescheduled") && (
                                 <button
                                     className="btn btn-danger btn-sm"
                                     onClick={() => updateServiceStatus(item._id, "Canceled")}
                                 >
                                     Cancel Service
                                 </button>
-                            )}
+                            )} */}
                         </div>
                     </div>
                 </div>
