@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-import { BsSearch, BsEye } from "react-icons/bs";
+import { BsSearch } from "react-icons/bs";
 import BallsLoading from "@/components/Spinner/BallsLoading";
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 
@@ -13,9 +13,10 @@ export default function SuperAdminVendors() {
     const router = useRouter();
 
     const [vendors, setVendors] = useState([]);
-    const [filtered, setFiltered] = useState([]);
     const [stats, setStats] = useState(null);
+    const [pagination, setPagination] = useState(null);
     const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -24,54 +25,48 @@ export default function SuperAdminVendors() {
     // 🔐 Auth
     useEffect(() => {
         if (!Cookies.get("token")) router.push("/admin/auth/login");
-    }, []);
+    }, [router]);
 
-    // 🔁 Fetch Vendors
-    // const fetchVendors = async () => {
-    //     setLoading(true);
-    //     try {
-    //         const res = await fetch(
-    //             `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor`,
-    //             {
-    //                 headers: {
-    //                     Authorization: `Bearer ${Cookies.get("token")}`,
-    //                 },
-    //             }
-    //         );
+    // ⏱️ Debounce Search
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(search);
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [search]);
 
-    //         const json = await res.json();
-    //         if (!json.success) throw new Error(json.message);
-
-    //         setVendors(json.vendors);
-    //         setFiltered(json.vendors);
-    //         setStats(json.stats);
-    //     } catch (e) {
-    //         setError(e.message);
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // };
-    const fetchVendors = async (filter = null) => {
+    // 🔁 Fetch Vendors from Backend
+    const fetchVendors = async (p = page, filter = smartFilter, q = debouncedSearch) => {
         setLoading(true);
+        setError(null);
         try {
-            let url = `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor`;
+            const params = new URLSearchParams();
+            params.append("page", p);
+            params.append("limit", PAGE_SIZE);
 
             if (filter) {
-                url += `?smartFilter=${filter}`;
+                params.append("smartFilter", filter);
             }
 
-            const res = await fetch(url, {
-                headers: {
-                    Authorization: `Bearer ${Cookies.get("token")}`,
-                },
-            });
+            if (q && q.trim()) {
+                params.append("search", q.trim());
+            }
+
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor?${params.toString()}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get("token")}`,
+                    },
+                }
+            );
 
             const json = await res.json();
-            if (!json.success) throw new Error(json.message);
+            if (!json.success) throw new Error(json.message || "Failed to fetch vendors");
 
-            setVendors(json.vendors);
-            setFiltered(json.vendors);
-            setStats(json.stats);
+            setVendors(json.vendors || []);
+            setStats(json.stats || null);
+            setPagination(json.pagination || null);
         } catch (e) {
             setError(e.message);
         } finally {
@@ -79,43 +74,16 @@ export default function SuperAdminVendors() {
         }
     };
 
-
     useEffect(() => {
-        fetchVendors();
-    }, []);
-
+        fetchVendors(page, smartFilter, debouncedSearch);
+    }, [page, smartFilter, debouncedSearch]);
 
     const handleSmartFilter = (filterKey) => {
         setSmartFilter(filterKey);
-        setSearch("");
         setPage(1);
-        fetchVendors(filterKey);
     };
-    // 🔎 Search
-    useEffect(() => {
-        const f = vendors.filter(v =>
-            `${v.salonName} ${v.email} ${v.locationName}`
-                .toLowerCase()
-                .includes(search.toLowerCase())
-        );
-        setFiltered(f);
-        setPage(1);
-    }, [search, vendors]);
 
-    // 🔢 Sort by Revenue
-    // const currentVendors = useMemo(() => {
-    //     const sorted = [...filtered].sort(
-    //         (a, b) => (b.totalRevenue || 0) - (a.totalRevenue || 0)
-    //     );
-    //     const start = (page - 1) * PAGE_SIZE;
-    //     return sorted.slice(start, start + PAGE_SIZE);
-    // }, [filtered, page]);
-    const currentVendors = useMemo(() => {
-        const start = (page - 1) * PAGE_SIZE;
-        return filtered.slice(start, start + PAGE_SIZE);
-    }, [filtered, page]);
-
-    const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+    const totalPages = pagination?.totalPages || 1;
 
     const toggleUserStatus = async (vendorId, currentStatus, e) => {
         e.stopPropagation();
@@ -150,31 +118,12 @@ export default function SuperAdminVendors() {
                 )
             );
 
-            // filtered state update
-            setFiltered(prev =>
-                prev.map(v =>
-                    v._id === vendorId ? { ...v, isVerified: newStatus } : v
-                )
-            );
-
             showSuccessToast(`Vendor ${newStatus ? "approved" : "unapproved"} successfully`);
 
         } catch (err) {
             showErrorToast(err.message);
         }
     };
-
-    if (loading) return
-    <div className="page pt-4 px-0">
-        <div
-            className="d-flex justify-content-center align-items-center"
-            style={{ minHeight: "400px" }}
-        >
-            <BallsLoading />
-        </div>
-    </div>
-        ;
-    if (error) return <p className="m-4 text-danger">{error}</p>;
 
     return (
         <div className="page">
@@ -185,6 +134,9 @@ export default function SuperAdminVendors() {
                     <div className="row g-3 mb-4">
                         <StatCard title="Total Vendors" value={stats.totalVendor} />
                         <StatCard title="Active Vendors" value={stats.activeVendor} />
+                        {stats.pendingVendor !== undefined && (
+                            <StatCard title="Pending Vendors" value={stats.pendingVendor} />
+                        )}
                         <StatCard title="Total Revenue" value={`$${stats.totalRevenue}`} />
                     </div>
                 )}
@@ -202,7 +154,10 @@ export default function SuperAdminVendors() {
                                     style={{ width: 280 }}
                                     placeholder="Search vendors…"
                                     value={search}
-                                    onChange={e => setSearch(e.target.value)}
+                                    onChange={e => {
+                                        setSearch(e.target.value);
+                                        setPage(1);
+                                    }}
                                 />
                             </div>
                         </div>
@@ -216,6 +171,13 @@ export default function SuperAdminVendors() {
                             </button>
 
                             <button
+                                className={`btn btn-sm ${smartFilter === "pendingApproval" ? "btn-dark" : "btn-outline-dark"}`}
+                                onClick={() => handleSmartFilter("pendingApproval")}
+                            >
+                                Pending Approval
+                            </button>
+
+                            <button
                                 className={`btn btn-sm ${smartFilter === "highCancellationRate" ? "btn-dark" : "btn-outline-dark"}`}
                                 onClick={() => handleSmartFilter("highCancellationRate")}
                             >
@@ -223,17 +185,17 @@ export default function SuperAdminVendors() {
                             </button>
 
                             <button
-                                className={`btn btn-sm ${smartFilter === "lowRatting" ? "btn-dark" : "btn-outline-dark"}`}
-                                onClick={() => handleSmartFilter("lowRatting")}
+                                className={`btn btn-sm ${smartFilter === "lowRating" ? "btn-dark" : "btn-outline-dark"}`}
+                                onClick={() => handleSmartFilter("lowRating")}
                             >
-                                Low Ratting
+                                Low Rating
                             </button>
 
                             <button
-                                className={`btn btn-sm ${smartFilter === "highRatting" ? "btn-dark" : "btn-outline-dark"}`}
-                                onClick={() => handleSmartFilter("highRatting")}
+                                className={`btn btn-sm ${smartFilter === "highRating" ? "btn-dark" : "btn-outline-dark"}`}
+                                onClick={() => handleSmartFilter("highRating")}
                             >
-                                High Ratting
+                                High Rating
                             </button>
                         </div>
                     </div>
@@ -243,12 +205,10 @@ export default function SuperAdminVendors() {
                                 <thead className="table-light">
                                     <tr>
                                         <th>Business Name</th>
-                                        {/* <th>Owner</th> */}
                                         <th>City</th>
-                                        {/* <th>Join Date</th> */}
                                         <th>Total Revenue</th>
                                         <th>Total Paid Out</th>
-                                        <th>Average Ratting</th>
+                                        <th>Average Rating</th>
                                         <th>Cancel Count</th>
                                         <th>Payouts Pending</th>
                                         <th>Status</th>
@@ -257,61 +217,82 @@ export default function SuperAdminVendors() {
                                 </thead>
 
                                 <tbody>
-                                    {currentVendors.map(v => (
-                                        <tr key={v._id}>
-                                            <td>{v.salonName || "-"}</td>
-                                            {/* <td>{v.email}</td> */}
-                                            <td>{v?.city || "-"}</td>
-                                            {/* <td>{new Date(v.createdAt).toLocaleDateString()}</td> */}
-
-                                            <td className="fw-bold">${v.totalRevenue || 0}</td>
-                                            <td className="fw-bold">${v.totalPaid || 0}</td>
-                                            <td className="fw-bold">{v.avgRating.toFixed(2) || 0}</td>
-                                            <td className="fw-bold">{v.salonCancellationCount || 0}</td>
-                                            <td className="fw-bold">${v.revenueSummary?.payableBalance?.toFixed(2) || 0}</td>
-                                            <td className="user-toggle" onClick={(e) => e.stopPropagation()}>
-                                                <div className="form-check form-switch d-flex align-items-center ps-0 gap-2 m-0">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        role="switch"
-                                                        checked={Boolean(v.isVerified)}
-                                                        onChange={(e) =>
-                                                            toggleUserStatus(v._id, v.isVerified, e)
-                                                        }
-                                                    />
-
-                                                    <span
-                                                        style={{
-                                                            padding: "6px 12px",
-                                                            borderRadius: "20px",
-                                                            fontSize: "12px",
-                                                            fontWeight: 600,
-                                                            backgroundColor: v?.isVerified ? "#e6f4ea" : "#f1f3f5",
-                                                            color: v?.isVerified ? "#1e7e34" : "#6c757d"
-                                                        }}
-                                                    >
-                                                        {v?.isVerified ? "Approved" : "Pending"}
-                                                    </span>
+                                    {loading ? (
+                                        <tr>
+                                            <td colSpan="9" className="text-center py-5">
+                                                <div
+                                                    className="d-flex justify-content-center align-items-center"
+                                                    style={{ minHeight: "200px" }}
+                                                >
+                                                    <BallsLoading />
                                                 </div>
                                             </td>
-                                            <td>
-                                                <button
-                                                    className="btn btn-outline-secondary btn-sm text-nowrap"
-                                                    onClick={() => router.push(`/admin/dashboard/vendors/${v._id}`)}
-                                                >
-                                                    {/* <BsEye />  */}
-                                                    View Details
-                                                </button>
+                                        </tr>
+                                    ) : error ? (
+                                        <tr>
+                                            <td colSpan="9" className="text-center py-4 text-danger">
+                                                {error}
                                             </td>
                                         </tr>
-                                    ))}
+                                    ) : vendors.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="9" className="text-center py-4 text-muted">
+                                                No vendors found
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        vendors.map(v => (
+                                            <tr key={v._id}>
+                                                <td>{v.salonName || "-"}</td>
+                                                <td>{v?.city || "-"}</td>
+                                                <td className="fw-bold">${v.totalRevenue || 0}</td>
+                                                <td className="fw-bold">${v.totalPaid || 0}</td>
+                                                <td className="fw-bold">{v.avgRating?.toFixed(2) || 0}</td>
+                                                <td className="fw-bold">{v.salonCancellationCount || 0}</td>
+                                                <td className="fw-bold">${v.revenueSummary?.payableBalance?.toFixed(2) || 0}</td>
+                                                <td className="user-toggle" onClick={(e) => e.stopPropagation()}>
+                                                    <div className="form-check form-switch d-flex align-items-center ps-0 gap-2 m-0">
+                                                        <input
+                                                            className="form-check-input"
+                                                            type="checkbox"
+                                                            role="switch"
+                                                            checked={Boolean(v.isVerified)}
+                                                            onChange={(e) =>
+                                                                toggleUserStatus(v._id, v.isVerified, e)
+                                                            }
+                                                        />
+
+                                                        <span
+                                                            style={{
+                                                                padding: "6px 12px",
+                                                                borderRadius: "20px",
+                                                                fontSize: "12px",
+                                                                fontWeight: 600,
+                                                                backgroundColor: v?.isVerified ? "#e6f4ea" : "#f1f3f5",
+                                                                color: v?.isVerified ? "#1e7e34" : "#6c757d"
+                                                            }}
+                                                        >
+                                                            {v?.isVerified ? "Approved" : "Pending"}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <button
+                                                        className="btn btn-outline-secondary btn-sm text-nowrap"
+                                                        onClick={() => router.push(`/admin/dashboard/vendors/${v._id}`)}
+                                                    >
+                                                        View Details
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-                {totalPages > 1 && (
+                {!loading && totalPages > 1 && (
                     <div className="pagination justify-content-end mt-4">
                         <button
                             onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -337,12 +318,12 @@ export default function SuperAdminVendors() {
                     </div>
                 )}
             </div>
-        </div >
+        </div>
     );
 }
 
 const StatCard = ({ title, value }) => (
-    <div className="col-md-4">
+    <div className="col">
         <div className="card h-100">
             <div className="card-body">
                 <p className="text-muted mb-1">{title}</p>

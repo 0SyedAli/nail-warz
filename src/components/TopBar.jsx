@@ -268,8 +268,8 @@ const TopBar = ({ header }) => {
         )}
         <div className="d-flex flex-row-reverse flex-md-row flex-wrap gap-2">
           <div>
-            <h4>{salonName}</h4>
-            <h5>{location}</h5>
+            {salonName && <h4>{salonName}</h4>}
+            {location && <h5>{location}</h5>}
           </div>
           <Image
             src={image ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}` : "/images/avatar.png"}

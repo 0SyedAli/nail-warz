@@ -151,7 +151,7 @@ const DiscountRequestPage = () => {
         >
           <VStack align="flex-start" spacing={1}>
             <Flex align="center" gap={2}>
-              <Icon as={FaPercent} fontSize="28px" color="#C11111" />
+              {/* <Icon as={FaPercent} fontSize="28px" color="#C11111" /> */}
               <Heading size="lg" fontWeight="800" letterSpacing="tight">
                 Discount Requests
               </Heading>
@@ -447,7 +447,7 @@ const DiscountRequestPage = () => {
         onSuccess={getRequests}
         vendorId={vendorId}
       />
-      
+
       <DiscountRequestModal
         isOpen={isViewOpen}
         onClose={onViewClose}
