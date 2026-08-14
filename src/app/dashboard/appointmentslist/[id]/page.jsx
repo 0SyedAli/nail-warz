@@ -133,33 +133,78 @@ export default function AppointmentDetailPage() {
         }
     };
 
+    // const getStatusBadge = (status = "") => {
+
+    //     switch (status) {
+
+    //         case "PaymentPending":
+    //             return "bg-warning text-dark";
+
+    //         case "Confirmed":
+    //             return "bg-primary";
+
+    //         case "Rescheduled":
+    //             return "bg-info text-dark";
+
+    //         case "In_Progress":
+    //             return "bg-secondary";
+
+    //         case "Completed":
+    //             return "bg-success";
+
+    //         case "Canceled":
+    //             return "bg-danger";
+
+    //         case "Expired":
+    //             return "bg-dark";
+
+    //         default:
+    //             return "bg-light text-dark";
+    //     }
+    // };
     const getStatusBadge = (status = "") => {
 
         switch (status) {
 
             case "PaymentPending":
-                return "bg-warning text-dark";
+                return <span className="badge py-2 bg-warning text-dark">
+                    Payment Pending
+                </span>;
 
             case "Confirmed":
-                return "bg-primary";
+                return <span className="badge py-2 bg-primary">
+                    Confirmed
+                </span>;
 
             case "Rescheduled":
-                return "bg-info text-dark";
+                return <span className="badge py-2 bg-info text-dark">
+                    Rescheduled
+                </span>;
 
             case "In_Progress":
-                return "bg-secondary";
+                return <span className="badge py-2 bg-secondary">
+                    In Progress
+                </span>;
 
             case "Completed":
-                return "bg-success";
+                return <span className="badge py-2 bg-success">
+                    Completed
+                </span>;
 
             case "Canceled":
-                return "bg-danger";
+                return <span className="badge py-2 bg-danger">
+                    Canceled
+                </span>;
 
             case "Expired":
-                return "bg-dark";
+                return <span className="badge py-2 bg-dark">
+                    Expired
+                </span>;
 
             default:
-                return "bg-light text-dark";
+                return <span className="badge py-2 bg-light text-dark">
+                    {status}
+                </span>;
         }
     };
 
@@ -244,9 +289,7 @@ export default function AppointmentDetailPage() {
                             >
                                 {booking.status}
                             </span> */}
-                            <span className={`badge py-2 px-3 ${getStatusBadge(booking.status)}`}>
-                                {booking.status}
-                            </span>
+                            {getStatusBadge(booking.status)}
                         </div>
                     </div>
 
@@ -349,9 +392,10 @@ export default function AppointmentDetailPage() {
                             </div>
 
                             <div className="col-md-4 text-md-end">
-                                <span className={`badge py-2 px-3 ${getStatusBadge(item.status)}`}>
+                                {/* <span className={`badge py-2 px-3 ${getStatusBadge(item.status)}`}>
                                     {item.status}
-                                </span>
+                                </span> */}
+                                {getStatusBadge(item.status)}
                             </div>
                         </div>
 

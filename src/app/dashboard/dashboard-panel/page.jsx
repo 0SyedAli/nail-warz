@@ -133,23 +133,70 @@ const DashboardPanel = ({ activeTab }) => {
     }
   };
 
+  // const getStatusBadge = (status = "") => {
+
+  //   switch (status.toLowerCase()) {
+
+  //     case "completed":
+  //       return <span className="badge py-2 bg-success">Completed</span>;
+
+  //     case "accepted":
+  //       return <span className="badge py-2 bg-primary">Accepted</span>;
+
+  //     case "canceled":
+  //       return <span className="badge py-2 bg-danger">Canceled</span>;
+
+  //     default:
+  //       return <span className="badge py-2 bg-secondary">{status}</span>;
+  //   }
+  // };
+
   const getStatusBadge = (status = "") => {
 
-    switch (status.toLowerCase()) {
+    switch (status) {
 
-      case "completed":
-        return <span className="badge py-2 bg-success">Completed</span>;
+      case "PaymentPending":
+        return <span className="badge py-2 bg-warning text-dark">
+          Payment Pending
+        </span>;
 
-      case "accepted":
-        return <span className="badge py-2 bg-primary">Accepted</span>;
+      case "Confirmed":
+        return <span className="badge py-2 bg-primary">
+          Confirmed
+        </span>;
 
-      case "canceled":
-        return <span className="badge py-2 bg-danger">Canceled</span>;
+      case "Rescheduled":
+        return <span className="badge py-2 bg-info text-dark">
+          Rescheduled
+        </span>;
+
+      case "In_Progress":
+        return <span className="badge py-2 bg-secondary">
+          In Progress
+        </span>;
+
+      case "Completed":
+        return <span className="badge py-2 bg-success">
+          Completed
+        </span>;
+
+      case "Canceled":
+        return <span className="badge py-2 bg-danger">
+          Canceled
+        </span>;
+
+      case "Expired":
+        return <span className="badge py-2 bg-dark">
+          Expired
+        </span>;
 
       default:
-        return <span className="badge py-2 bg-secondary">{status}</span>;
+        return <span className="badge py-2 bg-light text-dark">
+          {status}
+        </span>;
     }
   };
+
   const getServiceNames = (services = []) => {
 
     if (!services.length) return "-";
