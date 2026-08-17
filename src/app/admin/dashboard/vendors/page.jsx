@@ -137,7 +137,7 @@ export default function SuperAdminVendors() {
                         {stats.pendingVendor !== undefined && (
                             <StatCard title="Pending Vendors" value={stats.pendingVendor} />
                         )}
-                        <StatCard title="Total Revenue" value={`$${stats.totalRevenue}`} />
+                        <StatCard title="Total Revenue" value={`$${stats.totalRevenue.toFixed(2)}`} />
                     </div>
                 )}
 
@@ -207,6 +207,7 @@ export default function SuperAdminVendors() {
                                         <th>Business Name</th>
                                         <th>City</th>
                                         <th>Total Revenue</th>
+                                        <th>Platform Fee</th>
                                         <th>Total Paid Out</th>
                                         <th>Average Rating</th>
                                         <th>Cancel Count</th>
@@ -219,7 +220,7 @@ export default function SuperAdminVendors() {
                                 <tbody>
                                     {loading ? (
                                         <tr>
-                                            <td colSpan="9" className="text-center py-5">
+                                            <td colSpan="10" className="text-center py-5">
                                                 <div
                                                     className="d-flex justify-content-center align-items-center"
                                                     style={{ minHeight: "200px" }}
@@ -230,13 +231,13 @@ export default function SuperAdminVendors() {
                                         </tr>
                                     ) : error ? (
                                         <tr>
-                                            <td colSpan="9" className="text-center py-4 text-danger">
+                                            <td colSpan="10" className="text-center py-4 text-danger">
                                                 {error}
                                             </td>
                                         </tr>
                                     ) : vendors.length === 0 ? (
                                         <tr>
-                                            <td colSpan="9" className="text-center py-4 text-muted">
+                                            <td colSpan="10" className="text-center py-4 text-muted">
                                                 No vendors found
                                             </td>
                                         </tr>
@@ -245,8 +246,9 @@ export default function SuperAdminVendors() {
                                             <tr key={v._id}>
                                                 <td>{v.salonName || "-"}</td>
                                                 <td>{v?.city || "-"}</td>
-                                                <td className="fw-bold">${v.totalRevenue || 0}</td>
-                                                <td className="fw-bold">${v.totalPaid || 0}</td>
+                                                <td className="fw-bold">${v.revenueSummary.totalRevenue.toFixed(2) || 0}</td>
+                                                <td className="fw-bold">${v.revenueSummary.platformFee.toFixed(2) || 0}</td>
+                                                <td className="fw-bold">${v.revenueSummary.totalPaid.toFixed(2) || 0}</td>
                                                 <td className="fw-bold">{v.avgRating?.toFixed(2) || 0}</td>
                                                 <td className="fw-bold">{v.salonCancellationCount || 0}</td>
                                                 <td className="fw-bold">${v.revenueSummary?.payableBalance?.toFixed(2) || 0}</td>

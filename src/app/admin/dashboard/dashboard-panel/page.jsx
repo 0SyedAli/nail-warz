@@ -252,7 +252,7 @@ export default function SuperAdminDashboard() {
             {/* Total Revenue */}
             <AdminDashboardCard
               title="Total Revenue"
-              value={`$${(stats.totalRevenue ?? 0).toLocaleString()}`}
+              value={`$${(stats.totalRevenue.toFixed(2) ?? 0).toLocaleString()}`}
               change={stats.revenueChange?.message ?? 'No data'}
               icon={LuDollarSign}
               icon_class="icon-dash"
@@ -262,7 +262,7 @@ export default function SuperAdminDashboard() {
             {/* Wallet Balance */}
             <AdminDashboardCard
               title="Total User's Wallet"
-              value={`$${stats.walletBalance ?? 0}`}
+              value={`$${stats.walletBalance.toFixed(2) ?? 0}`}
               icon={LuWallet}
               icon_class="icon-dash"
 
@@ -443,8 +443,8 @@ export default function SuperAdminDashboard() {
                   <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                     <h6 className="fw-semibold mb-0">Top Performing Vendors</h6>
                     <div className="d-flex gap-2">
-                      <select 
-                        className="form-select form-select-sm border-0 bg-light shadow-none" 
+                      <select
+                        className="form-select form-select-sm border-0 bg-light shadow-none"
                         style={{ width: "auto", cursor: "pointer" }}
                         value={filterType}
                         onChange={(e) => setFilterType(e.target.value)}
@@ -454,8 +454,8 @@ export default function SuperAdminDashboard() {
                       </select>
                       {filterType === 'monthly' && (
                         <>
-                          <select 
-                            className="form-select form-select-sm border-0 bg-light shadow-none" 
+                          <select
+                            className="form-select form-select-sm border-0 bg-light shadow-none"
                             style={{ width: "auto", cursor: "pointer" }}
                             value={selectedMonth}
                             onChange={(e) => setSelectedMonth(e.target.value)}
@@ -464,13 +464,13 @@ export default function SuperAdminDashboard() {
                               <option key={m} value={m}>{m}</option>
                             ))}
                           </select>
-                          <select 
-                            className="form-select form-select-sm border-0 bg-light shadow-none" 
+                          <select
+                            className="form-select form-select-sm border-0 bg-light shadow-none"
                             style={{ width: "auto", cursor: "pointer" }}
                             value={selectedYear}
                             onChange={(e) => setSelectedYear(e.target.value)}
                           >
-                            {['2024', '2025', '2026', '2027'].map(y => (
+                            {['2024', '2025', '2026', '2027', '2028', '2029', '2030'].map(y => (
                               <option key={y} value={y}>{y}</option>
                             ))}
                           </select>
@@ -488,7 +488,7 @@ export default function SuperAdminDashboard() {
                       key={vendor._id}
                       name={vendor.salonName || "N/A"}
                       location={vendor.locationName || vendor.city || "Unknown"}
-                      amount={`$${(vendor.totalSales ?? 0).toLocaleString()}`}
+                      amount={`$${(vendor.totalSales.toFixed(2) ?? 0).toLocaleString()}`}
                       vendorId={vendor._id}
                       image={vendor.profileImage ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${vendor.profileImage}` : null}
                     />

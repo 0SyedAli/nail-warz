@@ -172,8 +172,8 @@ export default function SuperAdminUsers() {
                         <StatCard title="Total Users" value={stats.totalUser} />
                         <StatCard title="Active Users" value={stats.activeUser} />
                         <StatCard title="Total Bookings" value={stats.totalOrders} />
-                        <StatCard title="Total Revenue" value={`$${stats.totalRevenue}`} />
-                        <StatCard title="Total Wallet Balance" value={`$${stats.totalWalletBalance}`} />
+                        <StatCard title="Total Revenue" value={`$${stats.totalRevenue.toFixed(2)}`} />
+                        <StatCard title="Total Wallet Balance" value={`$${stats.totalWalletBalance.toFixed(2)}`} />
                     </div>
                 )}
 
@@ -274,9 +274,9 @@ export default function SuperAdminUsers() {
                                             <td>{new Date(u.createdAt).toLocaleDateString()}</td>
                                             <td>{u.appointmentCount}</td>
                                             <td>{u.cancelledByCount}</td>
-                                            <td>${u.walletBalance}</td>
+                                            <td>${u.walletBalance.toFixed(2)}</td>
                                             <td className="fw-bold ">
-                                                ${u.totalSpend}
+                                                ${u.totalSpend.toFixed(2)}
                                             </td>
                                             {/* {smartFilter === "inactive" ? (
                                                 <span

@@ -452,10 +452,16 @@ export default function VendorDetail() {
                         icon={<MdAttachMoney size={24} className="text-success opacity-50" />}
                     />
                     <StatBox
+                        title="Platform Commission"
+                        value={`$${revenueSummary?.platformFee.toFixed(2)}`}
+                        color="purple"
+                        icon={<MdAttachMoney size={24} className="text-purple opacity-50" style={{ color: "#7b2cbf" }} />}
+                    />
+                    <StatBox
                         title="Payable Balance"
                         value={`$${revenueSummary?.payableBalance.toFixed(2)}`}
-                        color="purple"
-                        icon={<FaWallet size={20} className="text-purple opacity-50" style={{ color: "#7b2cbf" }} />}
+                        color="red"
+                        icon={<FaWallet size={20} className="text-purple opacity-50" style={{ color: "#dc3545" }} />}
                     />
                     <StatBox
                         title="Total Bookings"
@@ -570,6 +576,15 @@ export default function VendorDetail() {
                             <span>Total Revenue</span>
                             <span>${revenueSummary?.totalRevenue.toFixed(2)}</span>
                         </div>
+                        <div className="summary-row red">
+                            <span>Platform Commission</span>
+                            <span>${revenueSummary?.platformFee?.toFixed(2)}</span>
+                        </div>
+                        <div className="summary-row green">
+                            <span>Vendor Share</span>
+                            <span>${revenueSummary?.totalPayableAmount.toFixed(2)}</span>
+                        </div>
+
                         <div className="summary-row purple">
                             <span>Total Paid Out</span>
                             <span>${revenueSummary?.totalPaid.toFixed(2)}</span>
@@ -578,16 +593,6 @@ export default function VendorDetail() {
                             <span>Remaining Revenue</span>
                             <span>${revenueSummary?.payableBalance.toFixed(2)}</span>
                         </div> */}
-
-                        <div className="summary-row red">
-                            <span>Platform Fee</span>
-                            <span>${revenueSummary?.platformFee?.toFixed(2)}</span>
-                        </div>
-
-                        <div className="summary-row green">
-                            <span>Vendor Share</span>
-                            <span>${revenueSummary?.totalPayableAmount.toFixed(2)}</span>
-                        </div>
                         <div className="summary-row">
                             <span><strong>Remaining Balance</strong></span>
                             <span>${revenueSummary?.payableBalance.toFixed(2)}</span>
