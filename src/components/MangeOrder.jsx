@@ -1,34 +1,76 @@
 "use client";
-import { useState, useEffect } from "react";
-import { BsSearch, BsChevronLeft, BsChevronRight } from "react-icons/bs";
+import { useState, useEffect, useCallback } from "react";
+import { BsSearch, BsChevronLeft, BsChevronRight, BsXCircle } from "react-icons/bs";
 import { FaCalendarAlt } from "react-icons/fa";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "@/styles/refund.css";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import SpinnerLoading from "./Spinner/SpinnerLoading";
 import AppointmentDetail from "./Modal/AppointmentDetail";
 import Cookies from "js-cookie";
 import { useDisclosure } from "@chakra-ui/react";
 import BallsLoading from "./Spinner/BallsLoading";
 
+export const APPOINTMENT_STATUS = {
+    // PAYMENT_PENDING: "PaymentPending",
+    CONFIRMED: "Confirmed",
+    RESCHEDULED: "Rescheduled",  // Both parties agreed to a new time
+    IN_PROGRESS: "In_Progress",  // started the service
+    COMPLETED: "Completed",
+    CANCELED: "Canceled",
+    EXPIRED: "Expired",
+};
+
+const STATUS_TABS = [
+    { key: "All", label: "All", statusValue: "", activeClass: "bg-dark text-white", badgeClass: "bg-dark text-white" },
+    { key: APPOINTMENT_STATUS.CONFIRMED, label: "Confirmed", statusValue: APPOINTMENT_STATUS.CONFIRMED, activeClass: "bg-primary text-white", badgeClass: "bg-primary text-white" },
+    { key: APPOINTMENT_STATUS.RESCHEDULED, label: "Rescheduled", statusValue: APPOINTMENT_STATUS.RESCHEDULED, activeClass: "bg-info text-dark", badgeClass: "bg-info text-dark" },
+    { key: APPOINTMENT_STATUS.IN_PROGRESS, label: "In Progress", statusValue: APPOINTMENT_STATUS.IN_PROGRESS, activeClass: "bg-secondary text-white", badgeClass: "bg-secondary text-white" },
+    { key: APPOINTMENT_STATUS.COMPLETED, label: "Completed", statusValue: APPOINTMENT_STATUS.COMPLETED, activeClass: "bg-success text-white", badgeClass: "bg-success text-white" },
+    { key: APPOINTMENT_STATUS.CANCELED, label: "Canceled", statusValue: APPOINTMENT_STATUS.CANCELED, activeClass: "bg-danger text-white", badgeClass: "bg-danger text-white" },
+    { key: APPOINTMENT_STATUS.EXPIRED, label: "Expired", statusValue: APPOINTMENT_STATUS.EXPIRED, activeClass: "bg-dark text-white", badgeClass: "bg-dark text-white" },
+];
+
 export default function ManageAppointments() {
     const searchParams = useSearchParams();
-    const date = searchParams.get("date");
-    console.log(date);
+    const router = useRouter();
+    const pathname = usePathname();
+
+    // Parse initial params from URL
+    const initialStatus = searchParams.get("status") || "All";
+    const initialSearch = searchParams.get("search") || "";
+    const initialDateStr = searchParams.get("scheduledAt") || searchParams.get("date") || null;
+    const initialPage = parseInt(searchParams.get("page") || "1", 10);
+    const initialLimit = parseInt(searchParams.get("limit") || "10", 10);
+
     const { isOpen, onOpen, onClose } = useDisclosure();
-    const [searchTerm, setSearchTerm] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [selectedStatus, setSelectedStatus] = useState(initialStatus);
+    const [searchTerm, setSearchTerm] = useState(initialSearch);
+    const [currentPage, setCurrentPage] = useState(isNaN(initialPage) ? 1 : initialPage);
+    const [itemsPerPage, setItemsPerPage] = useState(isNaN(initialLimit) ? 10 : initialLimit);
+    const [selectedDate, setSelectedDate] = useState(initialDateStr ? new Date(initialDateStr) : null);
+
     const [appointments, setAppointments] = useState([]);
+    const [totalServerCount, setTotalServerCount] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showCalendar, setShowCalendar] = useState(false);
-    const [selectedDate, setSelectedDate] = useState(null);
     const [bookingDetail, setBookingDetail] = useState(null);
     const [salonId, setSalonId] = useState(null);
-    const router = useRouter();
-    //   /* ─────────────── Get salonId from cookie ─────────────── */
+
+    const [stats, setStats] = useState({
+        all: 0,
+        // [APPOINTMENT_STATUS.PAYMENT_PENDING]: 0,
+        [APPOINTMENT_STATUS.CONFIRMED]: 0,
+        [APPOINTMENT_STATUS.RESCHEDULED]: 0,
+        [APPOINTMENT_STATUS.IN_PROGRESS]: 0,
+        [APPOINTMENT_STATUS.COMPLETED]: 0,
+        [APPOINTMENT_STATUS.CANCELED]: 0,
+        [APPOINTMENT_STATUS.EXPIRED]: 0,
+    });
+
+    /* ─────────────── Get salonId from cookie ─────────────── */
     useEffect(() => {
         const cookie = Cookies.get("user");
         if (!cookie) return router.push("/auth/login");
@@ -40,73 +82,99 @@ export default function ManageAppointments() {
             router.push("/auth/login");
         }
     }, [router]);
-    const [stats, setStats] = useState({
-        // all: 0,
-        // canceled: 0,
-        // completed: 0,
-        // pending: 0,
-        // accepted: 0,
-        all: 0,
-        confirmed: 0,
-        completed: 0,
-        canceled: 0,
-        in_progress: 0,
-        rescheduled: 0,
-        expired: 0,
-        payment_pending: 0
-    });
 
-    const fetchAppointments = async (date = null) => {
+    // Function to synchronize state with URL query parameters
+    const syncUrlParams = useCallback((newParams) => {
+        const params = new URLSearchParams(searchParams.toString());
+
+        Object.entries(newParams).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== "" && value !== "All") {
+                params.set(key, String(value));
+            } else {
+                params.delete(key);
+            }
+        });
+
+        const queryString = params.toString();
+        const newUrl = queryString ? `${pathname}?${queryString}` : pathname;
+        router.replace(newUrl, { scroll: false });
+    }, [pathname, router, searchParams]);
+
+    const calculateStats = (data) => {
+        let statsObj = {
+            all: 0,
+            [APPOINTMENT_STATUS.CONFIRMED]: 0,
+            [APPOINTMENT_STATUS.RESCHEDULED]: 0,
+            [APPOINTMENT_STATUS.IN_PROGRESS]: 0,
+            [APPOINTMENT_STATUS.COMPLETED]: 0,
+            [APPOINTMENT_STATUS.CANCELED]: 0,
+            [APPOINTMENT_STATUS.EXPIRED]: 0,
+        };
+
+        data.forEach(appt => {
+            const status = appt.status || appt.servicesDetail?.[0]?.status;
+            if (status === "PaymentPending") return;
+            statsObj.all++;
+            if (status && statsObj[status] !== undefined) {
+                statsObj[status]++;
+            }
+        });
+
+        setStats(statsObj);
+    };
+
+    const fetchAppointments = async () => {
+        if (!salonId) return;
         try {
             setLoading(true);
             setError(null);
 
-            // let url = `${process.env.NEXT_PUBLIC_API_URL}/getBookingsBySalonId?salonId=${salonId}&timing=${timing}`;
+            const queryObj = { salonId };
 
-            if (!salonId) return;
-
-            let url = `${process.env.NEXT_PUBLIC_API_URL}/getBookingsBySalonId?salonId=${salonId}`;
-
-            // Add timing if available
-            // if (timing) {
-            //     url += `&time=${timing}`;
-            // }
-            if (date) {
-                const localDate = new Date(
-                    date.getFullYear(),
-                    date.getMonth(),
-                    date.getDate(),
-                    12, // noon
-                    0,
-                    0
-                );
-
-                url += `&scheduledAt=${localDate.toISOString()}`;
+            if (selectedStatus && selectedStatus !== "All") {
+                queryObj.status = selectedStatus;
             }
+            if (searchTerm.trim()) {
+                queryObj.search = searchTerm.trim();
+            }
+            if (selectedDate) {
+                const localDate = new Date(
+                    selectedDate.getFullYear(),
+                    selectedDate.getMonth(),
+                    selectedDate.getDate(),
+                    12, 0, 0
+                );
+                queryObj.scheduledAt = localDate.toISOString();
+            }
+            queryObj.page = currentPage;
+            queryObj.limit = itemsPerPage;
+
+            const queryParams = new URLSearchParams(queryObj);
+            const url = `${process.env.NEXT_PUBLIC_API_URL}/getBookingsBySalonId?${queryParams.toString()}`;
 
             const response = await fetch(url);
             if (!response.ok) throw new Error("Failed to fetch appointments");
 
             const result = await response.json();
             if (result.success) {
-                // setAppointments(result.data);
-                const sortedData = [...result.data].sort((a, b) => {
-
-                    const dateA = new Date(
-                        a.servicesDetail?.[0]?.scheduledAt || a.createdAt
-                    );
-
-                    const dateB = new Date(
-                        b.servicesDetail?.[0]?.scheduledAt || b.createdAt
-                    );
-
+                const fetchedData = Array.isArray(result.data) ? result.data : [];
+                const sortedData = [...fetchedData].sort((a, b) => {
+                    const dateA = new Date(a.servicesDetail?.[0]?.scheduledAt || a.createdAt);
+                    const dateB = new Date(b.servicesDetail?.[0]?.scheduledAt || b.createdAt);
                     return dateB - dateA;
                 });
                 setAppointments(sortedData);
+
+                const totalFromApi = result.pagination?.totalRecords ?? result.pagination?.total ?? result.totalRecords ?? result.totalCount ?? result.total;
+                if (totalFromApi !== undefined && totalFromApi !== null) {
+                    setTotalServerCount(Number(totalFromApi));
+                } else {
+                    setTotalServerCount(null);
+                }
                 calculateStats(sortedData);
             } else if (result.message === "No bookings found for this salon") {
-                // Show empty state instead of error
                 setAppointments([]);
+                setTotalServerCount(0);
                 calculateStats([]);
             } else {
                 throw new Error(result.message || "No appointments found");
@@ -118,182 +186,162 @@ export default function ManageAppointments() {
         }
     };
 
-    // const calculateStats = (data) => {
-
-    //     let stats = {
-    //         all: 0,
-    //         accepted: 0,
-    //         completed: 0,
-    //         canceled: 0
-    //     };
-
-
-    //     data.forEach(appt => {
-
-    //         appt.servicesDetail?.forEach(service => {
-
-    //             const status = service.status?.toLowerCase();
-
-
-    //             if (status !== "pending") {
-    //                 stats.all++;
-    //             }
-
-
-    //             if (status === "accepted")
-    //                 stats.accepted++;
-
-    //             if (status === "completed")
-    //                 stats.completed++;
-
-    //             if (status === "cancelled" || status === "canceled")
-    //                 stats.canceled++;
-
-    //         });
-
-    //     });
-
-
-    //     setStats(stats);
-    // };
-    const calculateStats = (data) => {
-        let stats = {
-            all: 0,
-            confirmed: 0,
-            completed: 0,
-            canceled: 0,
-            in_progress: 0,
-            rescheduled: 0,
-            expired: 0,
-            payment_pending: 0
-        };
-
-        data.forEach(appt => {
-            appt.servicesDetail?.forEach(service => {
-
-                const status = service.status;
-
-                stats.all++;
-
-                switch (status) {
-                    case "Confirmed":
-                        stats.confirmed++;
-                        break;
-
-                    case "Completed":
-                        stats.completed++;
-                        break;
-
-                    case "Canceled":
-                        stats.canceled++;
-                        break;
-
-                    case "In_Progress":
-                        stats.in_progress++;
-                        break;
-
-                    case "Rescheduled":
-                        stats.rescheduled++;
-                        break;
-
-                    case "Expired":
-                        stats.expired++;
-                        break;
-
-                    case "PaymentPending":
-                        stats.payment_pending++;
-                        break;
-                }
-
-            });
-        });
-
-        setStats(stats);
-    };
-
-
-    // useEffect(() => {
-    //     if (!salonId) return;
-    //     fetchAppointments();
-    // }, [salonId]);
     useEffect(() => {
-        if (!salonId) return;
-
-        if (date) {
-            fetchAppointments(new Date(date));
-        } else {
+        if (salonId) {
             fetchAppointments();
         }
+    }, [salonId, selectedStatus, selectedDate, currentPage, itemsPerPage]);
 
-    }, [salonId, date]);
+    // Handle search debounce
+    useEffect(() => {
+        if (!salonId) return;
+        const timer = setTimeout(() => {
+            fetchAppointments();
+        }, 400);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
 
-    // const getStatusBadge = (status = "") => {
+    // Handler when status tab is clicked
+    const handleStatusTabChange = (statusKey) => {
+        setSelectedStatus(statusKey);
+        setCurrentPage(1);
+        syncUrlParams({
+            status: statusKey,
+            search: searchTerm,
+            scheduledAt: selectedDate ? selectedDate.toISOString() : "",
+            page: 1,
+            limit: itemsPerPage,
+        });
+    };
 
-    //     switch (status.toLowerCase()) {
+    // Handler when search changes
+    const handleSearchChange = (value) => {
+        setSearchTerm(value);
+        setCurrentPage(1);
+        syncUrlParams({
+            status: selectedStatus,
+            search: value,
+            scheduledAt: selectedDate ? selectedDate.toISOString() : "",
+            page: 1,
+            limit: itemsPerPage,
+        });
+    };
 
-    //         case "completed":
-    //             return <span className="badge py-2 bg-success">Completed</span>;
+    // Handler when date changes
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+        setShowCalendar(false);
+        setCurrentPage(1);
+        syncUrlParams({
+            status: selectedStatus,
+            search: searchTerm,
+            scheduledAt: date ? date.toISOString() : "",
+            page: 1,
+            limit: itemsPerPage,
+        });
+    };
 
-    //         case "accepted":
-    //             return <span className="badge py-2 bg-primary">Accepted</span>;
+    const clearDateFilter = () => {
+        setSelectedDate(null);
+        setCurrentPage(1);
+        syncUrlParams({
+            status: selectedStatus,
+            search: searchTerm,
+            scheduledAt: "",
+            page: 1,
+            limit: itemsPerPage,
+        });
+    };
 
-    //         case "cancelled":
-    //         case "canceled":
-    //             return <span className="badge py-2 bg-danger">Cancelled</span>;
+    // Handler for page change
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+        syncUrlParams({
+            status: selectedStatus,
+            search: searchTerm,
+            scheduledAt: selectedDate ? selectedDate.toISOString() : "",
+            page: newPage,
+            limit: itemsPerPage,
+        });
+    };
 
-    //         default:
-    //             return <span className="badge py-2 bg-secondary">{status}</span>;
-    //     }
-    // };
+    // Handler for limit change
+    const handleLimitChange = (newLimit) => {
+        setItemsPerPage(newLimit);
+        setCurrentPage(1);
+        syncUrlParams({
+            status: selectedStatus,
+            search: searchTerm,
+            scheduledAt: selectedDate ? selectedDate.toISOString() : "",
+            page: 1,
+            limit: newLimit,
+        });
+    };
+
+    // Client side filtering as fallback if API returns full dataset un-filtered
+    const filteredAppointments = appointments.filter((appt) => {
+        const apptStatus = appt.status || appt.servicesDetail?.[0]?.status;
+        if (apptStatus === "PaymentPending") return false;
+
+        // Status filter
+        if (selectedStatus && selectedStatus !== "All") {
+            if (apptStatus !== selectedStatus) return false;
+        }
+
+        // Search term filter
+        if (searchTerm.trim()) {
+            const search = searchTerm.toLowerCase();
+            const name = (appt.userId?.username || "").toLowerCase();
+            const email = (appt.userId?.email || "").toLowerCase();
+            const services = appt.servicesDetail || [];
+            const tech = services.map(s => s.technician?.fullName).join(" ").toLowerCase();
+            const service = services.map(s => s.serviceName).join(" ").toLowerCase();
+            const status = (appt.status || "").toLowerCase();
+
+            const matchesSearch = name.includes(search) ||
+                email.includes(search) ||
+                tech.includes(search) ||
+                service.includes(search) ||
+                status.includes(search);
+
+            if (!matchesSearch) return false;
+        }
+
+        return true;
+    });
+
+    // Pagination calculations (handling server pagination fallback)
+    const isServerPaginated = totalServerCount !== null;
+    const effectiveTotalCount = isServerPaginated ? totalServerCount : filteredAppointments.length;
+    const totalPages = Math.max(1, Math.ceil(effectiveTotalCount / itemsPerPage));
+    const currentAppointments = isServerPaginated ? filteredAppointments : filteredAppointments.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + currentAppointments.length, effectiveTotalCount);
+
     const getStatusBadge = (status = "") => {
-
         switch (status) {
-
             case "PaymentPending":
-                return <span className="badge py-2 bg-warning text-dark">
-                    Payment Pending
-                </span>;
-
+                return <span className="badge py-2 bg-warning text-dark">Payment Pending</span>;
             case "Confirmed":
-                return <span className="badge py-2 bg-primary">
-                    Confirmed
-                </span>;
-
+                return <span className="badge py-2 bg-primary">Confirmed</span>;
             case "Rescheduled":
-                return <span className="badge py-2 bg-info text-dark">
-                    Rescheduled
-                </span>;
-
+                return <span className="badge py-2 bg-info text-dark">Rescheduled</span>;
             case "In_Progress":
-                return <span className="badge py-2 bg-secondary">
-                    In Progress
-                </span>;
-
+                return <span className="badge py-2 bg-secondary">In Progress</span>;
             case "Completed":
-                return <span className="badge py-2 bg-success">
-                    Completed
-                </span>;
-
+                return <span className="badge py-2 bg-success">Completed</span>;
             case "Canceled":
-                return <span className="badge py-2 bg-danger">
-                    Canceled
-                </span>;
-
+                return <span className="badge py-2 bg-danger">Canceled</span>;
             case "Expired":
-                return <span className="badge py-2 bg-dark">
-                    Expired
-                </span>;
-
+                return <span className="badge py-2 bg-dark">Expired</span>;
             default:
-                return <span className="badge py-2 bg-light text-dark">
-                    {status}
-                </span>;
+                return <span className="badge py-2 bg-light text-dark">{status || "-"}</span>;
         }
     };
+
     const formatDateTimeUS = (dateTime) => {
         try {
             if (!dateTime) return "-";
-
             return new Date(dateTime).toLocaleString("en-US", {
                 year: "numeric",
                 month: "short",
@@ -302,110 +350,36 @@ export default function ManageAppointments() {
                 minute: "2-digit",
                 hour12: true,
             });
-
         } catch {
             return "-";
         }
     };
 
-
-    const viewAppointmentDetails = (id) => {
-        router.push(`/super-admin/dashboard/manage-appointments/${id}`);
-    };
-
-    const filteredAppointments = appointments
-        // .filter(appt => appt.status.toLowerCase() !== "pending")
-        .filter(
-            appt => appt.status !== "PaymentPending"
-        )
-        .filter((appt) => {
-            const name = (appt.userId?.username || "").toLowerCase();
-            const services = appt.servicesDetail || [];
-
-            const tech = services
-                .map(s => s.technician?.fullName)
-                .join(" ")
-                .toLowerCase();
-
-            const service = services
-                .map(s => s.serviceName)
-                .join(" ")
-                .toLowerCase();
-            const status = (appt.status || "").toLowerCase();
-            const search = searchTerm.toLowerCase();
-
-            return (
-                name.includes(search) ||
-                tech.includes(search) ||
-                service.includes(search) ||
-                status.includes(search)
-            );
-        });
-
-    const totalPages = Math.ceil(filteredAppointments.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentAppointments = filteredAppointments.slice(startIndex, endIndex);
-    //   /* ─────────────── Fetch bookings ─────────────── */
-
-    const fetchBookingDetail = async (id) => {
-        try {
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/getBookingById?bookingId=${id}`
-            );
-            const json = await res.json();
-            if (!json.success) throw new Error("Failed to load booking");
-            setBookingDetail(json.data);
-            onOpen();
-        } catch (e) {
-            console.error("Booking Detail Error:", e.message);
-        }
-    };
-
     const getServiceNames = (services = []) => {
-
         if (!services.length) return "-";
-
-        if (services.length === 1) {
-            return services[0].serviceName;
-        }
-
+        if (services.length === 1) return services[0].serviceName;
         return `${services[0].serviceName}, +${services.length - 1}`;
     };
 
     const getTechnicianNames = (services = []) => {
-
         if (!services.length) return "-";
-
-        const technicians = services
-            .map(item => item.technician?.fullName)
-            .filter(Boolean);
-
-
+        const technicians = services.map(item => item.technician?.fullName).filter(Boolean);
         if (!technicians.length) return "-";
-
-
-        if (technicians.length === 1) {
-            return technicians[0];
-        }
-
+        if (technicians.length === 1) return technicians[0];
         return `${technicians[0]}, +${technicians.length - 1}`;
     };
 
-    if (loading) {
+    if (loading && appointments.length === 0) {
         return (
             <div className="page pt-4 px-0">
-                <div
-                    className="d-flex justify-content-center align-items-center"
-                    style={{ minHeight: "400px" }}
-                >
+                <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "400px" }}>
                     <BallsLoading />
                 </div>
             </div>
         );
     }
 
-    if (error) {
+    if (error && appointments.length === 0) {
         return (
             <div className="page pt-4">
                 <div className="alert alert-danger" role="alert">
@@ -421,49 +395,72 @@ export default function ManageAppointments() {
 
     return (
         <div className="page pt-4">
-            {/* Stats Cards */}
-
-            <div className="text-end mb-3">
+            <div className="d-flex justify-content-center justify-content-sm-between flex-wrap gap-2 align-items-center mb-3">
+                <h4 className="fw-bold mb-0">Customer Appointments</h4>
                 <button
                     className="btn btn-outline-danger btn-sm px-4 py-2 fs-6 rounded-3"
                     onClick={() => router.push("/dashboard/appointments")}
                 >
-                    Calender View
+                    Calendar View
                 </button>
             </div>
-            <div className="row g-2 g-sm-3 mb-4 row-cols-1 row-cols-md-2 row-cols-sm-3 row-cols-lg-5">
-                {["All", "Confirmed", "In_Progress", "Completed", "Canceled"].map((label, i) => (
-                    <div className="col" key={i}>
-                        <div
-                            className={`card border-start border-${["", "primary", "success", "danger"][i]
-                                } border-4`}
-                        >
-                            <div className="card-body al-cb py-3">
-                                <h5>{label}</h5>
-                                <h4 className="mb-0">
-                                    {stats[label.toLowerCase()] ?? 0}
-                                </h4>
-                            </div>
-                        </div>
-                    </div>
-                ))}
+
+            {/* Status Navigation Tabs */}
+            <div>
+                <div className="nav nav-pills flex-nowrap overflow-auto pb-2 gap-2" style={{ scrollbarWidth: "thin" }}>
+                    {STATUS_TABS.map((tab) => {
+                        const isActive = selectedStatus === tab.key;
+                        const count = tab.key === "All" ? stats.all : (stats[tab.key] ?? 0);
+                        const activeClass = tab.activeClass || "bg-dark text-white";
+                        const activeBadgeClass = activeClass.includes("text-dark") ? "bg-dark text-white" : "bg-white text-dark";
+
+                        return (
+                            <button
+                                key={tab.key}
+                                className={`nav-link text-nowrap d-flex align-items-center gap-2 px-3 py-2 ${isActive ? `${activeClass} fw-bold shadow-sm` : "bg-light text-dark border"
+                                    }`}
+                                style={{ borderRadius: "20px", cursor: "pointer", transition: "all 0.2s" }}
+                                onClick={() => handleStatusTabChange(tab.key)}
+                            >
+                                <span>{tab.label}</span>
+                                <span className={`badge rounded-pill ${isActive ? activeBadgeClass : tab.badgeClass}`} style={{ minWidth: "20px", height: "20px", display: 'flex', justifyContent: "center", alignItems: "center" }}>
+                                    {/* {count} */}
+                                </span>
+                                {/* {count !== undefined && (
+                                    <span className={`badge rounded-pill ${isActive ? activeBadgeClass : tab.badgeClass}`} style={{ minWidth: "20px", height: "20px", display: 'flex', justifyContent: "center", alignItems: "center" }}>
+                                        {count}
+                                    </span>
+                                )} */}
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
 
-            {/* Table */}
-            <div className="card">
-                <div className="card-header bg-white d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <h5 className="fw-bolder mb-0">Customer Appointments</h5>
-                    <div className="d-flex align-items-center gap-2 position-relative al-topper flex-wrap flex-md-nowrap">
+            {/* Table Card */}
+            <div className="card shadow-sm border-0">
+                <div className="card-header bg-white py-3 d-flex justify-content-center justify-content-sm-between align-items-center flex-wrap gap-2">
+                    <h5 className="fw-bolder mb-0">Appointments List</h5>
+                    <div className="d-flex align-items-center justify-content-center justify-content-sm-start gap-2 position-relative al-topper flex-wrap flex-md-nowrap">
                         {/* Calendar button */}
-                        <button
-                            className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
-                            onClick={() => setShowCalendar(!showCalendar)}
-                        >
-                            <FaCalendarAlt />
-                            {selectedDate
-                                ? selectedDate.toLocaleDateString()
-                                : "Select Date"}
-                        </button>
+                        <div className="position-relative d-flex align-items-center">
+                            <button
+                                className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-1"
+                                onClick={() => setShowCalendar(!showCalendar)}
+                            >
+                                <FaCalendarAlt />
+                                {selectedDate ? selectedDate.toLocaleDateString() : "Select Date"}
+                            </button>
+                            {selectedDate && (
+                                <button
+                                    className="btn btn-sm btn-link text-danger p-0 ms-1"
+                                    title="Clear date"
+                                    onClick={clearDateFilter}
+                                >
+                                    <BsXCircle />
+                                </button>
+                            )}
+                        </div>
 
                         {showCalendar && (
                             <div
@@ -480,11 +477,7 @@ export default function ManageAppointments() {
                                 }}
                             >
                                 <Calendar
-                                    onChange={(date) => {
-                                        setSelectedDate(date);
-                                        setShowCalendar(false);
-                                        fetchAppointments(date);
-                                    }}
+                                    onChange={handleDateChange}
                                     value={selectedDate}
                                 />
                             </div>
@@ -502,11 +495,11 @@ export default function ManageAppointments() {
                             <BsSearch className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
                             <input
                                 type="text"
-                                className="form-control ps-5 w-100"
-                                placeholder="Search by name, service, or status..."
+                                className="form-control ps-5"
+                                placeholder="Search by customer, technician, service..."
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                style={{ width: "380px" }}
+                                onChange={(e) => handleSearchChange(e.target.value)}
+                                style={{ minWidth: "260px" }}
                             />
                         </div>
                     </div>
@@ -514,7 +507,7 @@ export default function ManageAppointments() {
 
                 <div className="card-body p-0 appointments_table">
                     <div className="table-responsive">
-                        <table className="table table-hover mb-0">
+                        <table className="table table-hover align-middle mb-0">
                             <thead className="table-light">
                                 <tr>
                                     <th>Customer</th>
@@ -527,15 +520,26 @@ export default function ManageAppointments() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {currentAppointments.length > 0 ? (
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan="7" className="text-center py-5">
+                                            <SpinnerLoading />
+                                        </td>
+                                    </tr>
+                                ) : currentAppointments.length > 0 ? (
                                     currentAppointments.map((appt) => (
-                                        <tr key={appt._id} >
-                                            <td>{appt.userId?.username || "Unknown"}</td>
+                                        <tr key={appt._id}>
+                                            <td>
+                                                <div className="d-flex flex-column">
+                                                    <span className="fw-bold">{appt.userId?.username || "Unknown"}</span>
+                                                    <span className="text-muted small">{appt.userId?.email || "Unknown"}</span>
+                                                </div>
+                                            </td>
                                             <td>{getServiceNames(appt.servicesDetail)}</td>
                                             <td>{getTechnicianNames(appt.servicesDetail)}</td>
                                             <td>{formatDateTimeUS(appt.servicesDetail?.[0]?.scheduledAt)}</td>
-                                            <td>${appt.totalAmount}</td>
-                                            <td>{getStatusBadge(appt.status)}</td>
+                                            <td>${(appt.totalAmount || 0).toFixed(2)}</td>
+                                            <td>{getStatusBadge(appt.status || appt.servicesDetail?.[0]?.status)}</td>
                                             <td>
                                                 <button
                                                     className="btn btn-outline-dark btn-sm"
@@ -548,7 +552,7 @@ export default function ManageAppointments() {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className="text-center text-muted py-4">
+                                        <td colSpan="7" className="text-center text-muted py-5">
                                             No Appointments Found.
                                         </td>
                                     </tr>
@@ -557,43 +561,51 @@ export default function ManageAppointments() {
                         </table>
                     </div>
 
-                    {/* Pagination */}
-                    <div className="d-flex justify-content-between align-items-start p-3 border-top flex-wrap gap-3">
-                        <div className="d-flex align-items-center gap-2 flex-wrap">
-                            <select
-                                className="form-select form-select-sm"
-                                value={itemsPerPage}
-                                onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                                style={{ width: "auto" }}
-                            >
-                                <option value={10}>10</option>
-                                <option value={20}>20</option>
-                                <option value={50}>50</option>
-                            </select>
-                            <small className="text-muted">
-                                {startIndex + 1}-{Math.min(endIndex, filteredAppointments.length)}{" "}
-                                of {filteredAppointments.length}
-                            </small>
+                    {/* Pagination Footer */}
+                    {effectiveTotalCount > 10 && (
+                        <div className="d-flex justify-content-between align-items-center p-3 border-top flex-wrap gap-3">
+                            <div className="d-flex align-items-center gap-2 flex-wrap">
+                                <span className="text-muted small">Show</span>
+                                <select
+                                    className="form-select form-select-sm"
+                                    value={itemsPerPage}
+                                    onChange={(e) => handleLimitChange(Number(e.target.value))}
+                                    style={{ width: "auto" }}
+                                >
+                                    <option value={10}>10</option>
+                                    <option value={20}>20</option>
+                                    <option value={50}>50</option>
+                                </select>
+                                <span className="text-muted small">
+                                    {effectiveTotalCount > 0
+                                        ? `Showing ${startIndex + 1} to ${endIndex} of ${effectiveTotalCount} entries`
+                                        : "0 entries"}
+                                </span>
+                            </div>
+                            <div className="d-flex align-items-center gap-2">
+                                <button
+                                    className="btn btn-outline-secondary btn-sm"
+                                    onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                                    disabled={currentPage === 1 || loading}
+                                >
+                                    <BsChevronLeft />
+                                </button>
+                                <span className="small text-muted px-2">
+                                    Page {currentPage} of {totalPages}
+                                </span>
+                                <button
+                                    className="btn btn-outline-secondary btn-sm"
+                                    onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                                    disabled={currentPage >= totalPages || loading}
+                                >
+                                    <BsChevronRight />
+                                </button>
+                            </div>
                         </div>
-                        <div className="d-flex align-items-center gap-2">
-                            <button
-                                className="btn btn-outline-secondary btn-sm"
-                                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                                disabled={currentPage === 1}
-                            >
-                                <BsChevronLeft />
-                            </button>
-                            <button
-                                className="btn btn-outline-secondary btn-sm"
-                                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                                disabled={currentPage === totalPages}
-                            >
-                                <BsChevronRight />
-                            </button>
-                        </div>
-                    </div>
+                    )}
                 </div>
             </div>
+
             <AppointmentDetail
                 isOpen={isOpen}
                 onClose={onClose}
