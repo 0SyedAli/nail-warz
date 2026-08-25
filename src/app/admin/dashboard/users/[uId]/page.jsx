@@ -8,6 +8,7 @@ import { IoIosMail } from "react-icons/io";
 import { MdModeEdit } from "react-icons/md";
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 import Modal from "@/components/Modal/layout";
+import AdminAppointmentDetailModal from "@/components/Modal/AdminAppointmentDetailModal";
 
 export default function UserDetail() {
     const { uId } = useParams();
@@ -24,6 +25,7 @@ export default function UserDetail() {
     const [appointmentCursor, setAppointmentCursor] = useState(null);
     const [appointmentHasMore, setAppointmentHasMore] = useState(false);
     const [appointmentLoading, setAppointmentLoading] = useState(false);
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
 
     // Abuse flags
     const [abuseFlags, setAbuseFlags] = useState([]);
@@ -162,7 +164,7 @@ export default function UserDetail() {
                 </div>
                 <div className="vendor-stats" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))" }}>
                     <StatBox title="Wallet Balance" value={`$${user.walletBalance ?? 0}`} color="purple" icon={<FaWallet size={20} className="text-purple opacity-50" style={{ color: "#7b2cbf" }} />} />
-                    <StatBox title="Total Spend" value={`$${user.totalSpend ?? 0}`} color="green" icon={<FaRegCalendarAlt size={18} className="text-success opacity-50" />} />
+                    <StatBox title="Total Spend" value={`$${user.totalSpend.toFixed(2) ?? 0}`} color="green" icon={<FaRegCalendarAlt size={18} className="text-success opacity-50" />} />
                     <StatBox title="Appointments" value={user?.appointmentPagination?.totalRecords ?? appointments.length} color="blue" icon={<FaUser size={18} className="text-primary opacity-50" />} />
                     <StatBox title="Last Appointment" value={user.lastAppointmentDate ? new Date(user.lastAppointmentDate).toLocaleDateString("en-GB") : "-"} color="gray" icon={<FaCalendarCheck size={20} className="text-primary opacity-50" />} />
                 </div>
@@ -191,7 +193,10 @@ export default function UserDetail() {
                                         <tr>
                                             <th>Salon</th>
                                             <th>Services</th>
-                                            <th>Amount</th>
+                                            <th>Total Amount</th>
+                                            <th>Nail Warz Commission</th>
+                                            <th>Vendor Share</th>
+                                            <th>App Charges</th>
                                             <th>Discount</th>
                                             <th>Status</th>
                                             <th>Date</th>
@@ -199,7 +204,7 @@ export default function UserDetail() {
                                     </thead>
                                     <tbody>
                                         {appointments.map((apt) => (
-                                            <tr key={apt._id}>
+                                            <tr key={apt._id} onClick={() => setSelectedAppointment(apt)} style={{ cursor: "pointer" }} title="Click to view appointment details">
                                                 <td>{apt?.salonId?.salonName || "-"}</td>
                                                 <td>
                                                     <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
@@ -208,14 +213,17 @@ export default function UserDetail() {
                                                         ))}
                                                     </div>
                                                 </td>
-                                                <td style={{ fontWeight: 600 }}>${apt.totalAmount}</td>
-                                                <td style={{ fontWeight: 600 }}>${apt.discountDetails.amount}</td>
+                                                <td style={{ fontWeight: 600 }}>${apt.totalAmount.toFixed(2)}</td>
+                                                <td style={{ fontWeight: 600 }}>${apt.platformCommission.toFixed(2)}</td>
+                                                <td style={{ fontWeight: 600 }}>${apt.vendorCommission.toFixed(2)}</td>
+                                                <td style={{ fontWeight: 600 }}>${apt.appCharges.toFixed(2)}</td>
+                                                <td style={{ fontWeight: 600 }}>${apt.discountDetails.amount.toFixed(2)}</td>
                                                 <td>
                                                     <span className={`status-badge mt-0 text-capitalize ${apt.status === "Completed" ? "bg-success text-white" : apt.status === "Confirmed" ? "bg-primary text-white" : "bg-warning text-dark"}`}>
                                                         {apt.status}
                                                     </span>
-                                                    </td>
-                                                    <td>{apt.servicesDetail[0].scheduledAt ? new Date(apt.servicesDetail[0].scheduledAt).toLocaleDateString("en-GB") : "-"}</td>
+                                                </td>
+                                                <td>{apt.servicesDetail[0].scheduledAt ? new Date(apt.servicesDetail[0].scheduledAt).toLocaleDateString("en-GB") : "-"}</td>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -312,6 +320,14 @@ export default function UserDetail() {
                     </form>
                 </div>
             </Modal>
+
+            {/* APPOINTMENT DETAIL MODAL */}
+            <AdminAppointmentDetailModal
+                isOpen={!!selectedAppointment}
+                onClose={() => setSelectedAppointment(null)}
+                appointment={selectedAppointment}
+                currentUser={user}
+            />
         </div>
     );
 }

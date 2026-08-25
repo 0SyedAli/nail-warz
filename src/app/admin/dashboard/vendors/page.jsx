@@ -207,11 +207,12 @@ export default function SuperAdminVendors() {
                                         <th>Business Name</th>
                                         <th>City</th>
                                         <th>Total Revenue</th>
-                                        <th>Platform Fee</th>
+                                        <th>Nail Warz Commission</th>
+                                        <th>App Charges</th>
                                         <th>Total Paid Out</th>
+                                        <th>Payouts Pending</th>
                                         <th>Average Rating</th>
                                         <th>Cancel Count</th>
-                                        <th>Payouts Pending</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -248,10 +249,11 @@ export default function SuperAdminVendors() {
                                                 <td>{v?.city || "-"}</td>
                                                 <td className="fw-bold">${v.revenueSummary.totalRevenue.toFixed(2) || 0}</td>
                                                 <td className="fw-bold">${v.revenueSummary.platformFee.toFixed(2) || 0}</td>
+                                                <td className="fw-bold">${v.revenueSummary.appCharges.toFixed(2) || 0}</td>
                                                 <td className="fw-bold">${v.revenueSummary.totalPaid.toFixed(2) || 0}</td>
+                                                <td className="fw-bold">${v.revenueSummary?.payableBalance?.toFixed(2) || 0}</td>
                                                 <td className="fw-bold">{v.avgRating?.toFixed(2) || 0}</td>
                                                 <td className="fw-bold">{v.salonCancellationCount || 0}</td>
-                                                <td className="fw-bold">${v.revenueSummary?.payableBalance?.toFixed(2) || 0}</td>
                                                 <td className="user-toggle" onClick={(e) => e.stopPropagation()}>
                                                     <div className="form-check form-switch d-flex align-items-center ps-0 gap-2 m-0">
                                                         <input

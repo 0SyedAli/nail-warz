@@ -245,11 +245,11 @@ export default function SuperAdminUsers() {
                                         <th>First Name</th>
                                         <th>Last Name</th>
                                         <th>Email</th>
+                                        <th>Total Spent</th>
+                                        <th>Wallet Balance</th>
                                         <th>Join Date</th>
                                         <th>Total Bookings</th>
                                         <th>Cancel Bookings</th>
-                                        <th>Wallet Balance</th>
-                                        <th>Total Spent</th>
                                         {smartFilter === "inactive" ? (<th>Last Active</th>) : null}
                                         <th>Status</th>
                                     </tr>
@@ -271,13 +271,14 @@ export default function SuperAdminUsers() {
                                             <td>{u.firstName || "-"}</td>
                                             <td>{u.lastName || "-"}</td>
                                             <td>{u.email}</td>
-                                            <td>{new Date(u.createdAt).toLocaleDateString()}</td>
-                                            <td>{u.appointmentCount}</td>
-                                            <td>{u.cancelledByCount}</td>
-                                            <td>${u.walletBalance.toFixed(2)}</td>
                                             <td className="fw-bold ">
                                                 ${u.totalSpend.toFixed(2)}
                                             </td>
+                                            <td className="fw-bold ">${u.walletBalance.toFixed(2)}</td>
+                                            <td>{new Date(u.createdAt).toLocaleDateString()}</td>
+                                            <td>{u.appointmentCount}</td>
+                                            <td>{u.cancelledByCount}</td>
+
                                             {/* {smartFilter === "inactive" ? (
                                                 <span
                                                     style={{

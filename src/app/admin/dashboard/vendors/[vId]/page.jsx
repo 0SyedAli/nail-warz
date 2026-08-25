@@ -13,6 +13,7 @@ import { HiTrendingUp } from "react-icons/hi";
 // import { IoWarningOutline } from "react-icons/io5";
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
 import Modal from "@/components/Modal/layout";
+import AdminAppointmentDetailModal from "@/components/Modal/AdminAppointmentDetailModal";
 
 export default function VendorDetail() {
     const { vId } = useParams();
@@ -46,6 +47,7 @@ export default function VendorDetail() {
     const [appointmentCursor, setAppointmentCursor] = useState(null);
     const [appointmentHasMore, setAppointmentHasMore] = useState(false);
     const [appointmentLoading, setAppointmentLoading] = useState(false);
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
 
     // Ratings pagination
     const [ratings, setRatings] = useState([]);
@@ -452,7 +454,7 @@ export default function VendorDetail() {
                         icon={<MdAttachMoney size={24} className="text-success opacity-50" />}
                     />
                     <StatBox
-                        title="Platform Commission"
+                        title="Nail Warz Commission"
                         value={`$${revenueSummary?.platformFee.toFixed(2)}`}
                         color="purple"
                         icon={<MdAttachMoney size={24} className="text-purple opacity-50" style={{ color: "#7b2cbf" }} />}
@@ -577,8 +579,12 @@ export default function VendorDetail() {
                             <span>${revenueSummary?.totalRevenue.toFixed(2)}</span>
                         </div>
                         <div className="summary-row red">
-                            <span>Platform Commission</span>
+                            <span>Nail Warz Commission</span>
                             <span>${revenueSummary?.platformFee?.toFixed(2)}</span>
+                        </div>
+                        <div className="summary-row red">
+                            <span>App Charges</span>
+                            <span>${revenueSummary?.appCharges?.toFixed(2)}</span>
                         </div>
                         <div className="summary-row green">
                             <span>Vendor Share</span>
@@ -614,7 +620,10 @@ export default function VendorDetail() {
                                         <tr>
                                             <th>User</th>
                                             <th>Services</th>
-                                            <th>Amount</th>
+                                            <th>Total Amount</th>
+                                            <th>Nail Warz Commission</th>
+                                            <th>Vendor Share</th>
+                                            <th>App Charges</th>
                                             <th>Discount</th>
                                             <th>Payment</th>
                                             <th>Status</th>
@@ -623,7 +632,7 @@ export default function VendorDetail() {
                                     </thead>
                                     <tbody>
                                         {appointments.map((apt, i) => (
-                                            <tr key={apt._id || i}>
+                                            <tr key={apt._id || i} onClick={() => setSelectedAppointment(apt)} style={{ cursor: "pointer" }} title="Click to view appointment details">
                                                 <td>
                                                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                                                         <img
@@ -645,6 +654,9 @@ export default function VendorDetail() {
                                                     </div>
                                                 </td>
                                                 <td style={{ fontWeight: 600 }}>${apt.totalAmount}</td>
+                                                <td style={{ fontWeight: 600 }}>${apt.platformCommission}</td>
+                                                <td style={{ fontWeight: 600 }}>${apt.vendorCommission}</td>
+                                                <td style={{ fontWeight: 600 }}>${apt.appCharges}</td>
                                                 <td style={{ fontWeight: 600 }}>${apt.discountDetails.amount}</td>
                                                 <td>
                                                     <div style={{ display: "flex", flexDirection: "column", gap: 2, fontSize: 13 }}>
@@ -976,6 +988,14 @@ export default function VendorDetail() {
                     </form>
                 </div>
             </Modal>
+
+            {/* APPOINTMENT DETAIL MODAL */}
+            <AdminAppointmentDetailModal
+                isOpen={!!selectedAppointment}
+                onClose={() => setSelectedAppointment(null)}
+                appointment={selectedAppointment}
+                currentVendor={vendor}
+            />
         </div>
     );
 }
