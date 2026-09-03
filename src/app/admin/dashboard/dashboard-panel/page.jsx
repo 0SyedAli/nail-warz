@@ -265,7 +265,6 @@ export default function SuperAdminDashboard() {
               value={`$${stats.walletBalance.toFixed(2) ?? 0}`}
               icon={LuWallet}
               icon_class="icon-dash"
-
             />
 
             {/* Total Users */}

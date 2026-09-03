@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter, useParams } from "next/navigation";
-import { FaUser, FaRegCalendarAlt, FaWallet, FaCalendarCheck } from "react-icons/fa";
+import { FaUser, FaRegCalendarAlt, FaWallet, FaCalendarCheck, FaInfoCircle, FaCheckCircle, FaTimesCircle, FaExchangeAlt } from "react-icons/fa";
 import { IoIosMail } from "react-icons/io";
 import { MdModeEdit } from "react-icons/md";
 import { showErrorToast, showSuccessToast } from "@/lib/toast";
@@ -142,7 +142,50 @@ export default function UserDetail() {
             setUpdatingAbuseFlag(false);
         }
     };
+    // Status badge style
+    const getStatusBadge = (status) => {
+        const s = (status || "").toLowerCase();
+        let bg = "#e2e8f0";
+        let color = "#334155";
+        // let icon = <FaInfoCircle style={{ marginRight: "4px" }} />;
 
+        if (s === "completed") {
+            bg = "#dcfce7";
+            color = "#15803d";
+            // icon = <FaCheckCircle style={{ marginRight: "4px" }} />;
+        } else if (s === "confirmed") {
+            bg = "#dbeafe";
+            color = "#1d4ed8";
+            // icon = <FaCheckCircle style={{ marginRight: "4px" }} />;
+        } else if (s === "canceled" || s === "cancelled") {
+            bg = "#fee2e2";
+            color = "#b91c1c";
+            // icon = <FaTimesCircle style={{ marginRight: "4px" }} />;
+        } else if (s === "rescheduled" || s === "in_progress") {
+            bg = "#fef3c7";
+            color = "#b45309";
+            // icon = <FaExchangeAlt style={{ marginRight: "4px" }} />;
+        }
+
+        return (
+            <span
+                style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    padding: "6px 14px",
+                    borderRadius: "20px",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    backgroundColor: bg,
+                    color: color,
+                    textTransform: "capitalize",
+                }}
+            >
+                {/* {icon}  */}
+                {status || "Unknown"}
+            </span>
+        );
+    };
     if (loading) return <p className="m-4">Loading user…</p>;
     if (error) return <p className="m-4 text-danger">{error}</p>;
     if (!user) return <p className="m-4">User not found</p>;
@@ -194,9 +237,9 @@ export default function UserDetail() {
                                             <th>Salon</th>
                                             <th>Services</th>
                                             <th>Total Amount</th>
-                                            <th>Nail Warz Commission</th>
+                                            <th>Nail Warz Commission (7%)</th>
+                                            <th>App Charges (tiered)</th>
                                             <th>Vendor Share</th>
-                                            <th>App Charges</th>
                                             <th>Discount</th>
                                             <th>Status</th>
                                             <th>Date</th>
@@ -213,15 +256,40 @@ export default function UserDetail() {
                                                         ))}
                                                     </div>
                                                 </td>
-                                                <td style={{ fontWeight: 600 }}>${apt.totalAmount.toFixed(2)}</td>
-                                                <td style={{ fontWeight: 600 }}>${apt.platformCommission.toFixed(2)}</td>
-                                                <td style={{ fontWeight: 600 }}>${apt.vendorCommission.toFixed(2)}</td>
-                                                <td style={{ fontWeight: 600 }}>${apt.appCharges.toFixed(2)}</td>
-                                                <td style={{ fontWeight: 600 }}>${apt.discountDetails.amount.toFixed(2)}</td>
+                                                <td style={{ fontWeight: 600 }}>${Number(apt.totalAmount ?? 0).toFixed(2)}</td>
+                                                <td style={{ fontWeight: 600 }}>${Number(apt.platformCommission ?? 0).toFixed(2)}</td>
+                                                <td style={{ fontWeight: 600 }}>${Number(apt.appCharges ?? 0).toFixed(2)}</td>
+                                                <td style={{ fontWeight: 600 }}>${Number(apt.vendorCommission ?? apt.vendorPayableAmount ?? 0).toFixed(2)}</td>
                                                 <td>
-                                                    <span className={`status-badge mt-0 text-capitalize ${apt.status === "Completed" ? "bg-success text-white" : apt.status === "Confirmed" ? "bg-primary text-white" : "bg-warning text-dark"}`}>
-                                                        {apt.status}
-                                                    </span>
+                                                    {(() => {
+                                                        const amt = apt.discountDetails?.amount ?? apt.chargesBreakdown?.discount?.amount ?? 0;
+                                                        const fType = apt.discountDetails?.fundingType || apt.chargesBreakdown?.discount?.fundingType || apt.chargesBreakdown?.discount?.borneBy;
+                                                        if (!amt) return <span style={{ fontWeight: 600 }}>$0.00</span>;
+                                                        return (
+                                                            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                                                                <span style={{ fontWeight: 600 }}>${Number(amt).toFixed(2)}</span>
+                                                                {fType && (
+                                                                    <span
+                                                                        style={{
+                                                                            fontSize: 10,
+                                                                            padding: "1px 6px",
+                                                                            borderRadius: 4,
+                                                                            width: "fit-content",
+                                                                            backgroundColor: fType === "Vendor" ? "#fff7ed" : "#faf5ff",
+                                                                            color: fType === "Vendor" ? "#c2410c" : "#7e22ce",
+                                                                            border: fType === "Vendor" ? "1px solid #ffedd5" : "1px solid #f3e8ff",
+                                                                            fontWeight: 700,
+                                                                        }}
+                                                                    >
+                                                                        {fType}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })()}
+                                                </td>
+                                                <td>
+                                                    {getStatusBadge(apt.status)}
                                                 </td>
                                                 <td>{apt.servicesDetail[0].scheduledAt ? new Date(apt.servicesDetail[0].scheduledAt).toLocaleDateString("en-GB") : "-"}</td>
                                             </tr>

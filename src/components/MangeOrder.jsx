@@ -515,6 +515,8 @@ export default function ManageAppointments() {
                                     <th>Technician</th>
                                     <th>Date & Time</th>
                                     <th>Total</th>
+                                    <th>Discount</th>
+                                    <th>Payment</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -522,37 +524,115 @@ export default function ManageAppointments() {
                             <tbody>
                                 {loading ? (
                                     <tr>
-                                        <td colSpan="7" className="text-center py-5">
+                                        <td colSpan="9" className="text-center py-5">
                                             <SpinnerLoading />
                                         </td>
                                     </tr>
                                 ) : currentAppointments.length > 0 ? (
-                                    currentAppointments.map((appt) => (
-                                        <tr key={appt._id}>
-                                            <td>
-                                                <div className="d-flex flex-column">
-                                                    <span className="fw-bold">{appt.userId?.username || "Unknown"}</span>
-                                                    <span className="text-muted small">{appt.userId?.email || "Unknown"}</span>
-                                                </div>
-                                            </td>
-                                            <td>{getServiceNames(appt.servicesDetail)}</td>
-                                            <td>{getTechnicianNames(appt.servicesDetail)}</td>
-                                            <td>{formatDateTimeUS(appt.servicesDetail?.[0]?.scheduledAt)}</td>
-                                            <td>${(appt.totalAmount || 0).toFixed(2)}</td>
-                                            <td>{getStatusBadge(appt.status || appt.servicesDetail?.[0]?.status)}</td>
-                                            <td>
-                                                <button
-                                                    className="btn btn-outline-dark btn-sm"
-                                                    onClick={() => router.push(`/dashboard/appointmentslist/${appt._id}`)}
-                                                >
-                                                    View Details
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
+                                    currentAppointments.map((appt) => {
+                                        const userImg = appt.userId?.image
+                                            ? (appt.userId.image.startsWith("http") ? appt.userId.image : `${process.env.NEXT_PUBLIC_IMAGE_URL}/${appt.userId.image}`)
+                                            : null;
+                                        const discAmt = appt.discountDetails?.amount ?? appt.chargesBreakdown?.discount?.amount ?? 0;
+                                        const fType = appt.discountDetails?.fundingType || appt.chargesBreakdown?.discount?.fundingType || appt.chargesBreakdown?.discount?.borneBy;
+
+                                        return (
+                                            <tr
+                                                key={appt._id}
+                                                onClick={() => router.push(`/dashboard/appointmentslist/${appt._id}`)}
+                                                style={{ cursor: "pointer" }}
+                                                title="Click to view appointment details"
+                                            >
+                                                <td>
+                                                    <div className="d-flex align-items-center gap-2">
+                                                        {userImg ? (
+                                                            <img
+                                                                src={userImg}
+                                                                alt="user"
+                                                                onError={(e) => (e.currentTarget.style.display = "none")}
+                                                                style={{ width: 34, height: 34, borderRadius: "50%", objectFit: "cover", border: "1px solid #eee" }}
+                                                            />
+                                                        ) : (
+                                                            <div
+                                                                style={{
+                                                                    width: 34,
+                                                                    height: 34,
+                                                                    borderRadius: "50%",
+                                                                    backgroundColor: "#e0e7ff",
+                                                                    color: "#4338ca",
+                                                                    display: "flex",
+                                                                    alignItems: "center",
+                                                                    justifyContent: "center",
+                                                                    fontWeight: 700,
+                                                                    fontSize: 13,
+                                                                }}
+                                                            >
+                                                                {(appt.userId?.username || "U").charAt(0).toUpperCase()}
+                                                            </div>
+                                                        )}
+                                                        <div className="d-flex flex-column">
+                                                            <span className="fw-bold" style={{ fontSize: 13 }}>{appt.userId?.username || `${appt.userId?.firstName || ""} ${appt.userId?.lastName || ""}`.trim() || "Unknown"}</span>
+                                                            <span className="text-muted small" style={{ fontSize: 11 }}>{appt.userId?.email || "-"}</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td style={{ fontSize: 13 }}>{getServiceNames(appt.servicesDetail)}</td>
+                                                <td style={{ fontSize: 13 }}>{getTechnicianNames(appt.servicesDetail)}</td>
+                                                <td style={{ fontSize: 13, whiteSpace: "nowrap" }}>{formatDateTimeUS(appt.servicesDetail?.[0]?.scheduledAt)}</td>
+                                                <td className="fw-bold" style={{ fontSize: 13 }}>${(appt.totalAmount || 0).toFixed(2)}</td>
+                                                <td>
+                                                    {!discAmt ? (
+                                                        <span className="fw-bold" style={{ fontSize: 13 }}>$0.00</span>
+                                                    ) : (
+                                                        <div className="d-flex flex-column gap-1">
+                                                            <span className="fw-bold" style={{ fontSize: 13 }}>${Number(discAmt).toFixed(2)}</span>
+                                                            {fType && (
+                                                                <span
+                                                                    style={{
+                                                                        fontSize: 10,
+                                                                        padding: "1px 6px",
+                                                                        borderRadius: 4,
+                                                                        width: "fit-content",
+                                                                        backgroundColor: fType === "Vendor" ? "#fff7ed" : "#faf5ff",
+                                                                        color: fType === "Vendor" ? "#c2410c" : "#7e22ce",
+                                                                        border: fType === "Vendor" ? "1px solid #ffedd5" : "1px solid #f3e8ff",
+                                                                        fontWeight: 700,
+                                                                    }}
+                                                                >
+                                                                    {fType}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </td>
+                                                <td>
+                                                    <div className="d-flex flex-column" style={{ fontSize: 12 }}>
+                                                        <span>{appt.paymentMethod || "N/A"}</span>
+                                                        {appt.paymentStatus && (
+                                                            <span className={`small ${appt.paymentStatus === "Success" ? "text-success" : "text-warning"}`} style={{ fontSize: 11 }}>
+                                                                {appt.paymentStatus}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td>{getStatusBadge(appt.status || appt.servicesDetail?.[0]?.status)}</td>
+                                                <td>
+                                                    <button
+                                                        className="btn btn-outline-dark btn-sm"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            router.push(`/dashboard/appointmentslist/${appt._id}`);
+                                                        }}
+                                                    >
+                                                        View Details
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
                                 ) : (
                                     <tr>
-                                        <td colSpan="7" className="text-center text-muted py-5">
+                                        <td colSpan="9" className="text-center text-muted py-5">
                                             No Appointments Found.
                                         </td>
                                     </tr>

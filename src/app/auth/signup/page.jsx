@@ -104,7 +104,7 @@ export default function LoginPage() {
         secure: process.env.NODE_ENV === "production",
         sameSite: "Strict",
       });
-      showSuccessToast("Signed in with Google successfully!");
+      showSuccessToast("Signed up with Google successfully!");
       // ✅ Redirect based on isUpdated
       if (result?.data?.isUpdated === true) {
         router.push("/dashboard");
@@ -112,7 +112,7 @@ export default function LoginPage() {
         router.push("/auth/bussinessprofile");
       }
     } catch (error) {
-      showErrorToast(error.message || "Google Sign-in error");
+      showErrorToast(error.message || "Google Sign-up error");
     }
   };
 
@@ -123,8 +123,9 @@ export default function LoginPage() {
         <BallsLoading borderWidth="mx-auto" />
       ) : (
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="d-flex align-items-center justify-content-center mb-3">
-            <Image src="/images/logo.png" width={120} height={150} alt="Logo" />
+          <div className="text-center mb-4">
+            <h3 className="pb-2" style={{ color: "#C11111", fontWeight: "800", }}>Sign Up Vendor</h3>
+            <p>Enter vendor details to <br /> sign up for an vendor account.</p>
           </div>
 
           <label htmlFor="email">Enter your email</label>

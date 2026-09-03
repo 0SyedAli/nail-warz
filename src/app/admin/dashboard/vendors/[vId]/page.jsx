@@ -350,7 +350,50 @@ export default function VendorDetail() {
             fetchVendor();
         }
     };
+    // Status badge style
+    const getStatusBadge = (status) => {
+        const s = (status || "").toLowerCase();
+        let bg = "#e2e8f0";
+        let color = "#334155";
+        // let icon = <FaInfoCircle style={{ marginRight: "4px" }} />;
 
+        if (s === "completed") {
+            bg = "#dcfce7";
+            color = "#15803d";
+            // icon = <FaCheckCircle style={{ marginRight: "4px" }} />;
+        } else if (s === "confirmed") {
+            bg = "#dbeafe";
+            color = "#1d4ed8";
+            // icon = <FaCheckCircle style={{ marginRight: "4px" }} />;
+        } else if (s === "canceled" || s === "cancelled") {
+            bg = "#fee2e2";
+            color = "#b91c1c";
+            // icon = <FaTimesCircle style={{ marginRight: "4px" }} />;
+        } else if (s === "rescheduled" || s === "in_progress") {
+            bg = "#fef3c7";
+            color = "#b45309";
+            // icon = <FaExchangeAlt style={{ marginRight: "4px" }} />;
+        }
+
+        return (
+            <span
+                style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    padding: "6px 14px",
+                    borderRadius: "20px",
+                    fontSize: "13px",
+                    fontWeight: 600,
+                    backgroundColor: bg,
+                    color: color,
+                    textTransform: "capitalize",
+                }}
+            >
+                {/* {icon} */}
+                {status || "Unknown"}
+            </span>
+        );
+    };
     /* ===================== STATES ===================== */
     if (loading) return <p className="m-4">Loading vendor…</p>;
     if (error) return <p className="m-4 text-danger">{error}</p>;
@@ -456,6 +499,12 @@ export default function VendorDetail() {
                     <StatBox
                         title="Nail Warz Commission"
                         value={`$${revenueSummary?.platformFee.toFixed(2)}`}
+                        color="purple"
+                        icon={<MdAttachMoney size={24} className="text-purple opacity-50" style={{ color: "#7b2cbf" }} />}
+                    />
+                    <StatBox
+                        title="App Charges"
+                        value={`$${revenueSummary?.appCharges.toFixed(2)}`}
                         color="purple"
                         icon={<MdAttachMoney size={24} className="text-purple opacity-50" style={{ color: "#7b2cbf" }} />}
                     />
@@ -653,11 +702,38 @@ export default function VendorDetail() {
                                                         ))}
                                                     </div>
                                                 </td>
-                                                <td style={{ fontWeight: 600 }}>${apt.totalAmount}</td>
-                                                <td style={{ fontWeight: 600 }}>${apt.platformCommission}</td>
-                                                <td style={{ fontWeight: 600 }}>${apt.vendorCommission}</td>
-                                                <td style={{ fontWeight: 600 }}>${apt.appCharges}</td>
-                                                <td style={{ fontWeight: 600 }}>${apt.discountDetails.amount}</td>
+                                                <td style={{ fontWeight: 600 }}>${Number(apt.totalAmount ?? 0).toFixed(2)}</td>
+                                                <td style={{ fontWeight: 600 }}>${Number(apt.platformCommission ?? 0).toFixed(2)}</td>
+                                                <td style={{ fontWeight: 600 }}>${Number(apt.vendorCommission ?? apt.vendorPayableAmount ?? 0).toFixed(2)}</td>
+                                                <td style={{ fontWeight: 600 }}>${Number(apt.appCharges ?? 0).toFixed(2)}</td>
+                                                <td>
+                                                    {(() => {
+                                                        const amt = apt.discountDetails?.amount ?? apt.chargesBreakdown?.discount?.amount ?? 0;
+                                                        const fType = apt.discountDetails?.fundingType || apt.chargesBreakdown?.discount?.fundingType || apt.chargesBreakdown?.discount?.borneBy;
+                                                        if (!amt) return <span style={{ fontWeight: 600 }}>$0.00</span>;
+                                                        return (
+                                                            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                                                                <span style={{ fontWeight: 600 }}>${Number(amt).toFixed(2)}</span>
+                                                                {fType && (
+                                                                    <span
+                                                                        style={{
+                                                                            fontSize: 10,
+                                                                            padding: "1px 6px",
+                                                                            borderRadius: 4,
+                                                                            width: "fit-content",
+                                                                            backgroundColor: fType === "Vendor" ? "#fff7ed" : "#faf5ff",
+                                                                            color: fType === "Vendor" ? "#c2410c" : "#7e22ce",
+                                                                            border: fType === "Vendor" ? "1px solid #ffedd5" : "1px solid #f3e8ff",
+                                                                            fontWeight: 700,
+                                                                        }}
+                                                                    >
+                                                                        {fType}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })()}
+                                                </td>
                                                 <td>
                                                     <div style={{ display: "flex", flexDirection: "column", gap: 2, fontSize: 13 }}>
                                                         <span>{apt.paymentMethod}</span>
@@ -667,13 +743,9 @@ export default function VendorDetail() {
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <span className={`status-badge text-capitalize ${apt.status === "Completed" ? "bg-success text-white" :
-                                                        apt.status === "Confirmed" ? "bg-primary text-white" :
-                                                            apt.status === "Canceled" || apt.status === "Cancelled" ? "bg-danger text-white" :
-                                                                "bg-warning text-dark"
-                                                        }`}>
-                                                        {apt.status}
-                                                    </span>
+
+                                                    {getStatusBadge(apt.status)}
+
                                                 </td>
                                                 <td style={{ fontSize: 13, whiteSpace: "nowrap" }}>
                                                     {apt.createdAt ? new Date(apt.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "-"}

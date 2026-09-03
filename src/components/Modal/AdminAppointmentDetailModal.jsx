@@ -2,7 +2,7 @@
 
 import React from "react";
 import Modal from "./layout";
-import { FaUser, FaStore, FaCalendarAlt, FaClock, FaCheckCircle, FaTimesCircle, FaInfoCircle, FaTag, FaCreditCard } from "react-icons/fa";
+import { FaUser, FaStore, FaCalendarAlt, FaClock, FaCheckCircle, FaTimesCircle, FaInfoCircle, FaTag, FaCreditCard, FaExchangeAlt } from "react-icons/fa";
 import { MdAttachMoney, MdOutlineReceiptLong } from "react-icons/md";
 import { IoClose } from "react-icons/io5";
 
@@ -67,15 +67,27 @@ export default function AdminAppointmentDetailModal({ isOpen, onClose, appointme
     const salonPhone = salonObj.phoneNumber || salonObj.phone || "N/A";
     const salonImg = getImageUrl(salonObj.image);
 
-    // Financial calculations / fallbacks
+    // Financial calculations / charges breakdown resolution
     const charges = apt.chargesBreakdown || {};
-    const subtotal = apt.subtotal ?? charges.appointmentPrice ?? charges.vendorGrossRevenue ?? 0;
+    const discountObj = charges.discount || apt.discountDetails || {};
+
+    const subtotal = apt.subtotal ?? charges.appointmentPrice ?? 0;
     const appCharges = apt.appCharges ?? charges.appCharges ?? 0;
-    const discountAmount = apt.discountDetails?.amount ?? charges.discount?.amount ?? 0;
-    const discountCode = apt.discountDetails?.code ?? charges.discount?.code ?? null;
+
+    const discountAmount = discountObj.amount ?? apt.discountDetails?.amount ?? 0;
+    const discountCode = discountObj.code ?? apt.discountDetails?.code ?? null;
+    const discountType = discountObj.type ?? apt.discountDetails?.type ?? null;
+    const discountValue = discountObj.value ?? apt.discountDetails?.value ?? 0;
+    const fundingType = discountObj.fundingType || discountObj.borneBy || apt.discountDetails?.fundingType || null;
+
     const totalAmount = apt.totalAmount ?? charges.customerTotalPaid ?? 0;
+    const vendorGrossRevenue = charges.vendorGrossRevenue ?? (fundingType === "Vendor" ? (subtotal - discountAmount) : subtotal);
     const platformCommission = apt.platformCommission ?? charges.platformCommission ?? 0;
     const vendorCommission = apt.vendorCommission ?? apt.vendorPayableAmount ?? charges.vendorCommission ?? charges.vendorPayableAmount ?? 0;
+
+    const paymentId = apt.paymentId || null;
+    const paymentMethod = apt.paymentMethod || "N/A";
+    const paymentStatus = apt.paymentStatus || null;
 
     // Status badge style
     const getStatusBadge = (status) => {
@@ -99,6 +111,7 @@ export default function AdminAppointmentDetailModal({ isOpen, onClose, appointme
         } else if (s === "rescheduled" || s === "in_progress") {
             bg = "#fef3c7";
             color = "#b45309";
+            icon = <FaExchangeAlt style={{ marginRight: "4px" }} />;
         }
 
         return (
@@ -124,17 +137,17 @@ export default function AdminAppointmentDetailModal({ isOpen, onClose, appointme
         <Modal isOpen={isOpen} onClose={onClose} modalClass="admin-apt-modal-content">
             <div style={{ padding: "8px 4px", fontFamily: "inherit" }}>
                 {/* Header */}
-                <div style={{ display: "flex", justifyContent: "between", alignItems: "center", borderBottom: "1px solid #f1f5f9", paddingBottom: "16px", marginBottom: "20px" }} className="d-flex justify-content-between align-items-center">
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f1f5f9", paddingBottom: "16px", marginBottom: "20px" }} className="d-flex justify-content-between align-items-center">
                     <div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
                             <h4 style={{ margin: 0, fontWeight: 700, fontSize: "20px", color: "#0f172a" }}>
                                 Appointment Details
                             </h4>
                             {getStatusBadge(apt.status)}
                         </div>
                         <p style={{ margin: "4px 0 0 0", fontSize: "12px", color: "#64748b" }}>
-                            {/* ID: <code style={{ backgroundColor: "#f1f5f9", padding: "2px 6px", borderRadius: "4px", color: "#334155" }}>{apt._id}</code> */}
-                            {apt.createdAt && <span>Booked on: {formatDateTime(apt.createdAt)}</span>}
+                            ID: <code style={{ backgroundColor: "#f1f5f9", padding: "2px 6px", borderRadius: "4px", color: "#334155" }}>{apt._id}</code>
+                            {apt.createdAt && <span style={{ marginLeft: "12px" }}>Booked on: {formatDateTime(apt.createdAt)}</span>}
                         </p>
                     </div>
                     <button
@@ -231,22 +244,30 @@ export default function AdminAppointmentDetailModal({ isOpen, onClose, appointme
                                 const techObj = s.technician || {};
                                 const techName = techObj.fullName || techObj.name || "Unassigned";
                                 const techImg = getImageUrl(techObj.image);
+                                const isRescheduled = s.reschedule || s.status === "Rescheduled" || Boolean(s.previousScheduledAt);
 
                                 return (
                                     <div
                                         key={s._id || index}
                                         style={{
                                             backgroundColor: "#fff",
-                                            border: "1px solid #e2e8f0",
+                                            border: isRescheduled ? "1px solid #fde68a" : "1px solid #e2e8f0",
                                             borderRadius: "10px",
                                             padding: "12px 14px",
                                             boxShadow: "0 1px 2px rgba(0,0,0,0.02)",
                                         }}
                                     >
-                                        <div style={{ display: "flex", justifyContent: "between", alignItems: "flex-start", flexWrap: "wrap", gap: "8px" }} className="d-flex justify-content-between">
+                                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "8px" }} className="d-flex justify-content-between">
                                             <div>
-                                                <div style={{ fontWeight: 600, fontSize: "14px", color: "#0f172a" }}>
-                                                    {s.serviceName || s.service?.serviceName || "Service"}
+                                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                                    <span style={{ fontWeight: 600, fontSize: "14px", color: "#0f172a" }}>
+                                                        {s.serviceName || s.service?.serviceName || "Service"}
+                                                    </span>
+                                                    {isRescheduled && (
+                                                        <span style={{ backgroundColor: "#fef3c7", color: "#92400e", fontSize: "11px", fontWeight: 600, padding: "2px 8px", borderRadius: "12px", display: "inline-flex", alignItems: "center", gap: "4px" }}>
+                                                            <FaExchangeAlt size={10} /> Rescheduled
+                                                        </span>
+                                                    )}
                                                 </div>
                                                 {s.description && (
                                                     <div style={{ fontSize: "12px", color: "#64748b", marginTop: "2px" }}>
@@ -263,8 +284,15 @@ export default function AdminAppointmentDetailModal({ isOpen, onClose, appointme
                                             {/* Scheduled Date */}
                                             <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
                                                 <FaCalendarAlt style={{ color: "#3b82f6" }} />
-                                                <span>{formatDateTime(s.scheduledAt)}</span>
+                                                <span>Scheduled: <strong>{formatDateTime(s.scheduledAt)}</strong></span>
                                             </div>
+
+                                            {/* Previous Scheduled Date if Rescheduled */}
+                                            {s.previousScheduledAt && (
+                                                <div style={{ display: "flex", alignItems: "center", gap: "5px", color: "#92400e" }}>
+                                                    <span>(Prev: <del>{formatDateTime(s.previousScheduledAt)}</del>)</span>
+                                                </div>
+                                            )}
 
                                             {/* Technician */}
                                             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
@@ -278,7 +306,7 @@ export default function AdminAppointmentDetailModal({ isOpen, onClose, appointme
                                                 ) : (
                                                     <FaUser style={{ color: "#8b5cf6" }} />
                                                 )}
-                                                <span>Technician: <strong>{techName}</strong></span>
+                                                <span>Tech: <strong>{techName}</strong></span>
                                             </div>
 
                                             {/* Service Status if different */}
@@ -325,21 +353,50 @@ export default function AdminAppointmentDetailModal({ isOpen, onClose, appointme
                             <div style={{ fontSize: "12px", fontWeight: 700, color: "#64748b", textTransform: "uppercase", marginBottom: "8px" }}>
                                 Customer Payment Breakdown
                             </div>
-                            <div style={{ display: "flex", justifyContent: "between", fontSize: "13px", marginBottom: "4px" }} className="d-flex justify-content-between">
-                                <span style={{ color: "#64748b" }}>Subtotal / Services:</span>
+                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", marginBottom: "6px" }} className="d-flex justify-content-between">
+                                <span style={{ color: "#64748b" }}>Subtotal / Services Price:</span>
                                 <span style={{ fontWeight: 600 }}>${Number(subtotal).toFixed(2)}</span>
                             </div>
-                            <div style={{ display: "flex", justifyContent: "between", fontSize: "13px", marginBottom: "4px" }} className="d-flex justify-content-between">
+                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", marginBottom: "6px" }} className="d-flex justify-content-between">
                                 <span style={{ color: "#64748b" }}>App Charges:</span>
                                 <span style={{ fontWeight: 600 }}>${Number(appCharges).toFixed(2)}</span>
                             </div>
+
+                            {/* Discount Details & Funding Source */}
                             {discountAmount > 0 && (
-                                <div style={{ display: "flex", justifyContent: "between", fontSize: "13px", marginBottom: "4px", color: "#dc2626" }} className="d-flex justify-content-between">
-                                    <span>Discount {discountCode ? `(${discountCode})` : ""}:</span>
-                                    <span style={{ fontWeight: 600 }}>-${Number(discountAmount).toFixed(2)}</span>
+                                <div style={{ backgroundColor: "#fff", borderRadius: "8px", border: "1px solid #fee2e2", padding: "8px 10px", marginBottom: "8px" }}>
+                                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#dc2626", fontWeight: 600 }} className="d-flex justify-content-between">
+                                        <span>
+                                            {/* <FaTag style={{ marginRight: "4px" }} /> */}
+                                            Discount {discountCode ? `(${discountCode})` : ""}
+                                            {discountValue ? ` - ${discountValue}${discountType === "percentage" ? "%" : "$"}` : ""}:
+                                        </span>
+                                        <span>-${Number(discountAmount).toFixed(2)}</span>
+                                    </div>
+
+                                    {/* Funding Type Badge */}
+                                    {fundingType && (
+                                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "4px", fontSize: "11px" }}>
+                                            <span style={{ color: "#78350f" }}>Funding Source:</span>
+                                            <span
+                                                style={{
+                                                    backgroundColor: fundingType === "Vendor" ? "#fff7ed" : "#faf5ff",
+                                                    color: fundingType === "Vendor" ? "#c2410c" : "#7e22ce",
+                                                    border: fundingType === "Vendor" ? "1px solid #ffedd5" : "1px solid #f3e8ff",
+                                                    padding: "2px 8px",
+                                                    borderRadius: "12px",
+                                                    fontWeight: 700,
+                                                    textTransform: "capitalize",
+                                                }}
+                                            >
+                                                {fundingType}
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                             )}
-                            <div style={{ display: "flex", justifyContent: "between", fontSize: "14px", marginTop: "8px", paddingTop: "8px", borderTop: "1px solid #e2e8f0" }} className="d-flex justify-content-between">
+
+                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", marginTop: "8px", paddingTop: "8px", borderTop: "1px solid #e2e8f0" }} className="d-flex justify-content-between">
                                 <span style={{ fontWeight: 700, color: "#0f172a" }}>Customer Total Paid:</span>
                                 <span style={{ fontWeight: 700, color: "#2563eb", fontSize: "15px" }}>${Number(totalAmount).toFixed(2)}</span>
                             </div>
@@ -350,21 +407,43 @@ export default function AdminAppointmentDetailModal({ isOpen, onClose, appointme
                             <div style={{ fontSize: "12px", fontWeight: 700, color: "#64748b", textTransform: "uppercase", marginBottom: "8px" }}>
                                 Revenue Split
                             </div>
-                            <div style={{ display: "flex", justifyContent: "between", fontSize: "13px", marginBottom: "4px" }} className="d-flex justify-content-between">
+
+                            {/* Vendor Gross Revenue */}
+                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", marginBottom: "6px" }} className="d-flex justify-content-between">
+                                <span style={{ color: "#64748b" }}>Vendor Gross Revenue:</span>
+                                <span style={{ fontWeight: 600, color: "#0f172a" }}>${Number(vendorGrossRevenue).toFixed(2)}</span>
+                            </div>
+
+                            {/* Commission */}
+                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", marginBottom: "6px" }} className="d-flex justify-content-between">
                                 <span style={{ color: "#64748b" }}>Nail Warz Commission:</span>
-                                <span style={{ fontWeight: 600, color: "#ef4444" }}>${Number(platformCommission).toFixed(2)}</span>
+                                <span style={{ fontWeight: 600, color: "#ef4444" }}>-${Number(platformCommission).toFixed(2)}</span>
                             </div>
-                            <div style={{ display: "flex", justifyContent: "between", fontSize: "13px", marginBottom: "4px" }} className="d-flex justify-content-between">
-                                <span style={{ color: "#64748b" }}>Vendor Share:</span>
-                                <span style={{ fontWeight: 700, color: "#16a34a" }}>${Number(vendorCommission).toFixed(2)}</span>
+
+                            {/* Vendor Net Share */}
+                            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "14px", marginTop: "8px", paddingTop: "8px", borderTop: "1px solid #e2e8f0" }} className="d-flex justify-content-between">
+                                <span style={{ fontWeight: 700, color: "#16a34a" }}>Vendor Net Share:</span>
+                                <span style={{ fontWeight: 700, color: "#16a34a", fontSize: "15px" }}>${Number(vendorCommission).toFixed(2)}</span>
                             </div>
-                            <div style={{ display: "flex", justifyContent: "between", fontSize: "12px", marginTop: "12px", paddingTop: "8px", borderTop: "1px solid #e2e8f0" }} className="d-flex justify-content-between">
-                                <span style={{ color: "#64748b", display: "flex", alignItems: "center", gap: "4px" }}>
-                                    <FaCreditCard /> Payment Method:
-                                </span>
-                                <span style={{ fontWeight: 600, color: "#334155" }}>
-                                    {apt.paymentMethod || "N/A"} {apt.paymentStatus ? `(${apt.paymentStatus})` : ""}
-                                </span>
+
+                            {/* Payment Info */}
+                            <div style={{ marginTop: "12px", paddingTop: "8px", borderTop: "1px dashed #e2e8f0", fontSize: "12px" }}>
+                                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "3px" }}>
+                                    <span style={{ color: "#64748b", display: "flex", alignItems: "center", gap: "4px" }}>
+                                        <FaCreditCard /> Payment Method:
+                                    </span>
+                                    <span style={{ fontWeight: 600, color: "#334155" }}>
+                                        {paymentMethod} {paymentStatus ? `(${paymentStatus})` : ""}
+                                    </span>
+                                </div>
+                                {paymentId && (
+                                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                        <span style={{ color: "#64748b" }}>Payment ID:</span>
+                                        <code style={{ fontSize: "11px", backgroundColor: "#f1f5f9", padding: "1px 5px", borderRadius: "4px", color: "#334155" }}>
+                                            {paymentId}
+                                        </code>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
