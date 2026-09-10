@@ -157,9 +157,13 @@ export default function ContentDetail() {
                 </div>
 
                 <InfoRow label="Name" value={item.name} />
+                {item.type && <InfoRow label="Participant Type" value={item.type} />}
                 <InfoRow label="Phone" value={item.phone} />
                 <InfoRow label="Email" value={item.email} />
                 <InfoRow label="Address" value={item.address} />
+                {item.city && <InfoRow label="City" value={item.city} />}
+                {item.state && <InfoRow label="State" value={item.state} />}
+                {item.zipCode && <InfoRow label="Zip Code" value={item.zipCode} />}
 
                 <div className="info-row">
                   <span className="label">Social Media</span>

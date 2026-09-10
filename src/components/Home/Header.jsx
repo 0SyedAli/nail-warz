@@ -114,8 +114,8 @@ export default function Header() {
           <Image
             src="/images/cart-head.png"
             alt="Cart"
-            width={20}
-            height={20}
+            width={30}
+            height={30}
             className="img-fluid"
             priority
           />

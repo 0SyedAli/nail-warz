@@ -1,12 +1,12 @@
 "use client";
-import BattleHero from "@/components/battles/BattleHero";
+// import BattleHero from "@/components/battles/BattleHero";
 import Battles from "@/components/battles/Battles";
 import AppCTASection from "@/components/Home/AppCTASection";
 import Footer from "@/components/Home/Footer";
 import Header from "@/components/Home/Header";
 import WebBanner from "@/components/Home/WebBanner";
 import BattleCTA from "@/components/battles/BattleCTA";
-import BattleLeaderboard from "@/components/battles/BattleLeaderboard";
+// import BattleLeaderboard from "@/components/battles/BattleLeaderboard";
 import { useEffect, useState } from "react";
 import api from "@/lib/axios";
 export default function BattlesPage() {

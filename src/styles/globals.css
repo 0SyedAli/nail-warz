@@ -242,8 +242,8 @@ a {
   background-color: #FFF;
   padding: 0;
   border-radius: 100%;
-  width: 50px;
-  height: 50px;
+  width: 70px;
+  height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -266,14 +266,14 @@ a {
   right: -4px;
   border-radius: 100%;
   background-color: #af2b2b;
-  min-width: 21px;
+  min-width: 25px;
   padding: 3px;
-  min-height: 21px;
+  min-height: 25px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #FFF;
-  font-size: 12px;
+  font-size: 15px;
   line-height: normal;
 }
 
@@ -5037,6 +5037,7 @@ span.prod_stock_status {
 .category-request-page2 p {
   margin: 0 0 5px 0;
 }
+
 .form-check .nail-warz-switch {
   width: 37px;
   height: 20px;

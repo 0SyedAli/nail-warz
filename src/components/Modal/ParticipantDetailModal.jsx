@@ -57,8 +57,16 @@ export default function ParticipantDetailModal({ isOpen, onClose, participant })
                         <div className="row g-3">
                             <InfoItem label="Email" value={participant.email} />
                             <InfoItem label="Phone" value={participant.phone} />
+                            {participant.type && <InfoItem label="Type" value={participant.type} />}
                             <div className="col-12">
-                                <InfoItem label="Address" value={participant.address} />
+                                <InfoItem
+                                    label="Address"
+                                    value={
+                                        [participant.address, participant.city, participant.state, participant.zipCode]
+                                            .filter(Boolean)
+                                            .join(", ") || participant.address
+                                    }
+                                />
                             </div>
                             <div className="col-12">
                                 <label className="text-muted small mb-1 d-block">Description</label>

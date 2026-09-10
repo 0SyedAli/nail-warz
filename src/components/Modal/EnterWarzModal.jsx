@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import Cookies from "js-cookie";
 import axios from "@/lib/axios";
 import Modal from "./layout";
@@ -12,23 +13,30 @@ import "./EnterWarzModal.css";
 export default function EnterWarzModal({ isOpen, onClose }) {
   const [form, setForm] = useState({
     name: "",
+    type: "",
     nailTechnicianName: "",
     salonName: "",
     email: "",
     phone: "",
     address: "",
+    city: "",
+    state: "",
+    zipCode: "",
     description: "",
     socialPlatform: "instagram",
     socialHandle: "",
     images: [],
+    followingSocialMedia: false,
+    agreeTerms: false,
   });
 
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type: inputType, checked } = e.target;
+    const val = inputType === "checkbox" ? checked : value;
+    setForm((prev) => ({ ...prev, [name]: val }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -70,6 +78,10 @@ export default function EnterWarzModal({ isOpen, onClose }) {
       tempErrors.name = "Name must be at least 3 characters";
     }
 
+    if (!form.type) {
+      tempErrors.type = "Please select a participant type";
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!form.email.trim()) {
       tempErrors.email = "Email is required";
@@ -82,15 +94,17 @@ export default function EnterWarzModal({ isOpen, onClose }) {
     } else if (form.phone.trim().length < 7) {
       tempErrors.phone = "Please enter a valid phone number";
     }
+
+    if (!form.address.trim()) {
+      tempErrors.address = "Address is required";
+    }
+
     if (!form.nailTechnicianName.trim()) {
       tempErrors.nailTechnicianName = "Nail Technician Name is required";
     }
 
     if (!form.salonName.trim()) {
       tempErrors.salonName = "Salon Name is required";
-    }
-    if (!form.address.trim()) {
-      tempErrors.address = "Address/Location is required";
     }
 
     if (!form.description.trim()) {
@@ -105,6 +119,16 @@ export default function EnterWarzModal({ isOpen, onClose }) {
 
     if (form.images.length === 0) {
       tempErrors.images = "At least one image of your artwork is required";
+    }
+
+    if (!form.followingSocialMedia) {
+      tempErrors.followingSocialMedia =
+        "Please confirm that you are following Nail Warz on Social Media";
+    }
+
+    if (!form.agreeTerms) {
+      tempErrors.agreeTerms =
+        "You must agree to the Nail Terms and Conditions and Warzone Rule";
     }
 
     setErrors(tempErrors);
@@ -122,11 +146,15 @@ export default function EnterWarzModal({ isOpen, onClose }) {
     try {
       const formData = new FormData();
       formData.append("name", form.name.trim());
+      formData.append("type", form.type);
       formData.append("nailTechnicianName", form.nailTechnicianName.trim());
       formData.append("salonName", form.salonName.trim());
       formData.append("email", form.email.trim());
       formData.append("phone", form.phone.trim());
       formData.append("address", form.address.trim());
+      formData.append("city", form.city.trim());
+      formData.append("state", form.state.trim());
+      formData.append("zipCode", form.zipCode.trim());
       formData.append("description", form.description.trim());
 
       // Format handle to always start with '@' if not already present
@@ -166,15 +194,21 @@ export default function EnterWarzModal({ isOpen, onClose }) {
         // Reset form
         setForm({
           name: "",
+          type: "",
           nailTechnicianName: "",
           salonName: "",
           email: "",
           phone: "",
           address: "",
+          city: "",
+          state: "",
+          zipCode: "",
           description: "",
           socialPlatform: "instagram",
           socialHandle: "",
           images: [],
+          followingSocialMedia: false,
+          agreeTerms: false,
         });
         setErrors({});
         onClose();
@@ -206,19 +240,38 @@ export default function EnterWarzModal({ isOpen, onClose }) {
 
         {/* Form */}
         <form onSubmit={handleSubmit} noValidate>
-          {/* Name */}
-          <div className="ewm_form_group">
-            <label className="ewm_label">Full Name <span>*</span></label>
-            <input
-              type="text"
-              name="name"
-              value={form.name}
-              onChange={handleInputChange}
-              placeholder="e.g. John Doe"
-              className="ewm_input"
-              disabled={submitting}
-            />
-            {errors.name && <span className="ewm_error_text">{errors.name}</span>}
+          {/* Name & Type Grid */}
+          <div className="row g-3">
+            <div className="col-md-6 ewm_form_group">
+              <label className="ewm_label">Full Name <span>*</span></label>
+              <input
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleInputChange}
+                placeholder="e.g. John Doe"
+                className="ewm_input"
+                disabled={submitting}
+              />
+              {errors.name && <span className="ewm_error_text">{errors.name}</span>}
+            </div>
+
+            <div className="col-md-6 ewm_form_group">
+              <label className="ewm_label">Participant Type <span>*</span></label>
+              <select
+                name="type"
+                value={form.type}
+                onChange={handleInputChange}
+                className="ewm_select"
+                disabled={submitting}
+              >
+                <option value="">Select Type</option>
+                <option value="Nail Salon">Nail Salon</option>
+                <option value="Technician">Technician</option>
+                <option value="Naillee">Naillee</option>
+              </select>
+              {errors.type && <span className="ewm_error_text">{errors.type}</span>}
+            </div>
           </div>
 
           {/* Email & Phone (Grid) */}
@@ -254,18 +307,64 @@ export default function EnterWarzModal({ isOpen, onClose }) {
 
           {/* Address */}
           <div className="ewm_form_group">
-            <label className="ewm_label">Address / Location <span>*</span></label>
+            <label className="ewm_label">Address <span>*</span></label>
             <input
               type="text"
               name="address"
               value={form.address}
               onChange={handleInputChange}
-              placeholder="e.g. Los Angeles, CA"
+              placeholder="e.g. 123 Main Street, Suite 100"
               className="ewm_input"
               disabled={submitting}
             />
             {errors.address && <span className="ewm_error_text">{errors.address}</span>}
           </div>
+
+          {/* City, State, Zip Code */}
+          <div className="row g-3">
+            <div className="col-md-4 col-sm-12 ewm_form_group">
+              <label className="ewm_label">City</label>
+              <input
+                type="text"
+                name="city"
+                value={form.city}
+                onChange={handleInputChange}
+                placeholder="e.g. Los Angeles"
+                className="ewm_input"
+                disabled={submitting}
+              />
+              {errors.city && <span className="ewm_error_text">{errors.city}</span>}
+            </div>
+
+            <div className="col-md-4 col-sm-6 ewm_form_group">
+              <label className="ewm_label">State</label>
+              <input
+                type="text"
+                name="state"
+                value={form.state}
+                onChange={handleInputChange}
+                placeholder="e.g. CA"
+                className="ewm_input"
+                disabled={submitting}
+              />
+              {errors.state && <span className="ewm_error_text">{errors.state}</span>}
+            </div>
+
+            <div className="col-md-4 col-sm-6 ewm_form_group">
+              <label className="ewm_label">Zip Code</label>
+              <input
+                type="text"
+                name="zipCode"
+                value={form.zipCode}
+                onChange={handleInputChange}
+                placeholder="e.g. 90001"
+                className="ewm_input"
+                disabled={submitting}
+              />
+              {errors.zipCode && <span className="ewm_error_text">{errors.zipCode}</span>}
+            </div>
+          </div>
+
           <div className="row g-3">
             <div className="col-md-6 ewm_form_group">
               <label className="ewm_label">
@@ -394,6 +493,70 @@ export default function EnterWarzModal({ isOpen, onClose }) {
                   );
                 })}
               </div>
+            )}
+          </div>
+
+          {/* Checkboxes */}
+          <div className="ewm_checkbox_group">
+            <div className="ewm_checkbox_item">
+              <input
+                type="checkbox"
+                id="followingSocialMedia"
+                name="followingSocialMedia"
+                checked={form.followingSocialMedia}
+                onChange={handleInputChange}
+                className="ewm_checkbox_input"
+                disabled={submitting}
+              />
+              <label htmlFor="followingSocialMedia" className="ewm_checkbox_label">
+                By Checking this box, I confirm that I am following Nail Warz on{" "}
+                <a
+                  href="https://www.instagram.com/nailwarz"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ewm_link"
+                >
+                  Social Media
+                </a>
+              </label>
+            </div>
+            {errors.followingSocialMedia && (
+              <span className="ewm_error_text">{errors.followingSocialMedia}</span>
+            )}
+
+            <div className="ewm_checkbox_item">
+              <input
+                type="checkbox"
+                id="agreeTerms"
+                name="agreeTerms"
+                checked={form.agreeTerms}
+                onChange={handleInputChange}
+                className="ewm_checkbox_input"
+                disabled={submitting}
+              />
+              <label htmlFor="agreeTerms" className="ewm_checkbox_label">
+                By Checking this box, I confirm that I agree to the Nail{" "}
+                <Link
+                  href="/terms-and-conditions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ewm_link"
+                >
+                  Terms and Conditions
+                </Link>{" "}
+                and{" "}
+                <Link
+                  href="/terms-and-conditions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ewm_link"
+                >
+                  Warzone Rule
+                </Link>
+              </label>
+            </div>
+            {errors.agreeTerms && (
+              <span className="ewm_error_text">{errors.agreeTerms}</span>
             )}
           </div>
 
