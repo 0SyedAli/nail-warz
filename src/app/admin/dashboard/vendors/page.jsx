@@ -206,6 +206,7 @@ export default function SuperAdminVendors() {
                                     <tr>
                                         <th>Business Name</th>
                                         <th>City</th>
+                                        <th>Registration Date</th>
                                         <th>Total Revenue</th>
                                         <th>Nail Warz Commission</th>
                                         <th>App Charges</th>
@@ -213,6 +214,7 @@ export default function SuperAdminVendors() {
                                         <th>Payouts Pending</th>
                                         <th>Average Rating</th>
                                         <th>Cancel Count</th>
+                                        <th>Stripe Status</th>
                                         <th>Status</th>
                                         <th>Actions</th>
                                     </tr>
@@ -221,7 +223,7 @@ export default function SuperAdminVendors() {
                                 <tbody>
                                     {loading ? (
                                         <tr>
-                                            <td colSpan="10" className="text-center py-5">
+                                            <td colSpan="13" className="text-center py-5">
                                                 <div
                                                     className="d-flex justify-content-center align-items-center"
                                                     style={{ minHeight: "200px" }}
@@ -232,13 +234,13 @@ export default function SuperAdminVendors() {
                                         </tr>
                                     ) : error ? (
                                         <tr>
-                                            <td colSpan="10" className="text-center py-4 text-danger">
+                                            <td colSpan="13" className="text-center py-4 text-danger">
                                                 {error}
                                             </td>
                                         </tr>
                                     ) : vendors.length === 0 ? (
                                         <tr>
-                                            <td colSpan="10" className="text-center py-4 text-muted">
+                                            <td colSpan="13" className="text-center py-4 text-muted">
                                                 No vendors found
                                             </td>
                                         </tr>
@@ -247,6 +249,15 @@ export default function SuperAdminVendors() {
                                             <tr key={v._id}>
                                                 <td>{v.salonName || "-"}</td>
                                                 <td>{v?.city || "-"}</td>
+                                                <td style={{ whiteSpace: "nowrap" }}>
+                                                    {v.createdAt
+                                                        ? new Date(v.createdAt).toLocaleDateString("en-GB", {
+                                                            day: "2-digit",
+                                                            month: "short",
+                                                            year: "numeric",
+                                                        })
+                                                        : "-"}
+                                                </td>
                                                 <td className="fw-bold">${v.revenueSummary.totalRevenue.toFixed(2) || 0}</td>
                                                 <td className="fw-bold">${v.revenueSummary.platformFee.toFixed(2) || 0}</td>
                                                 <td className="fw-bold">${v.revenueSummary.appCharges.toFixed(2) || 0}</td>
@@ -254,6 +265,13 @@ export default function SuperAdminVendors() {
                                                 <td className="fw-bold">${v.revenueSummary?.payableBalance?.toFixed(2) || 0}</td>
                                                 <td className="fw-bold">{v.avgRating?.toFixed(2) || 0}</td>
                                                 <td className="fw-bold">{v.salonCancellationCount || 0}</td>
+                                                <td width={200}>
+                                                    {v?.isStripeConnected ? (
+                                                        <span className="badge bg-success p-2">Verified</span>
+                                                    ) : (
+                                                        <span className="badge bg-warning text-dark p-2">Not Started</span>
+                                                    )}
+                                                </td>
                                                 <td className="user-toggle" onClick={(e) => e.stopPropagation()}>
                                                     <div className="form-check form-switch d-flex align-items-center ps-0 gap-2 m-0">
                                                         <input

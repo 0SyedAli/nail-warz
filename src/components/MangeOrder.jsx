@@ -13,7 +13,7 @@ import { useDisclosure } from "@chakra-ui/react";
 import BallsLoading from "./Spinner/BallsLoading";
 
 export const APPOINTMENT_STATUS = {
-    // PAYMENT_PENDING: "PaymentPending",
+    PAYMENT_PENDING: "PaymentPending",
     CONFIRMED: "Confirmed",
     RESCHEDULED: "Rescheduled",  // Both parties agreed to a new time
     IN_PROGRESS: "In_Progress",  // started the service
@@ -24,6 +24,7 @@ export const APPOINTMENT_STATUS = {
 
 const STATUS_TABS = [
     { key: "All", label: "All", statusValue: "", activeClass: "bg-dark text-white", badgeClass: "bg-dark text-white" },
+    { key: APPOINTMENT_STATUS.PAYMENT_PENDING, label: "Payment Pending", statusValue: APPOINTMENT_STATUS.PAYMENT_PENDING, activeClass: "bg-secondary text-dark", badgeClass: "bg-secondary text-dark" },
     { key: APPOINTMENT_STATUS.CONFIRMED, label: "Confirmed", statusValue: APPOINTMENT_STATUS.CONFIRMED, activeClass: "bg-primary text-white", badgeClass: "bg-primary text-white" },
     { key: APPOINTMENT_STATUS.RESCHEDULED, label: "Rescheduled", statusValue: APPOINTMENT_STATUS.RESCHEDULED, activeClass: "bg-info text-dark", badgeClass: "bg-info text-dark" },
     { key: APPOINTMENT_STATUS.IN_PROGRESS, label: "In Progress", statusValue: APPOINTMENT_STATUS.IN_PROGRESS, activeClass: "bg-secondary text-white", badgeClass: "bg-secondary text-white" },
@@ -61,7 +62,7 @@ export default function ManageAppointments() {
 
     const [stats, setStats] = useState({
         all: 0,
-        // [APPOINTMENT_STATUS.PAYMENT_PENDING]: 0,
+        [APPOINTMENT_STATUS.PAYMENT_PENDING]: 0,
         [APPOINTMENT_STATUS.CONFIRMED]: 0,
         [APPOINTMENT_STATUS.RESCHEDULED]: 0,
         [APPOINTMENT_STATUS.IN_PROGRESS]: 0,
@@ -103,6 +104,7 @@ export default function ManageAppointments() {
     const calculateStats = (data) => {
         let statsObj = {
             all: 0,
+            [APPOINTMENT_STATUS.PAYMENT_PENDING]: 0,
             [APPOINTMENT_STATUS.CONFIRMED]: 0,
             [APPOINTMENT_STATUS.RESCHEDULED]: 0,
             [APPOINTMENT_STATUS.IN_PROGRESS]: 0,
@@ -113,7 +115,6 @@ export default function ManageAppointments() {
 
         data.forEach(appt => {
             const status = appt.status || appt.servicesDetail?.[0]?.status;
-            if (status === "PaymentPending") return;
             statsObj.all++;
             if (status && statsObj[status] !== undefined) {
                 statsObj[status]++;
@@ -281,7 +282,6 @@ export default function ManageAppointments() {
     // Client side filtering as fallback if API returns full dataset un-filtered
     const filteredAppointments = appointments.filter((appt) => {
         const apptStatus = appt.status || appt.servicesDetail?.[0]?.status;
-        if (apptStatus === "PaymentPending") return false;
 
         // Status filter
         if (selectedStatus && selectedStatus !== "All") {
@@ -320,8 +320,10 @@ export default function ManageAppointments() {
 
     const getStatusBadge = (status = "") => {
         switch (status) {
+            case APPOINTMENT_STATUS.PAYMENT_PENDING:
             case "PaymentPending":
-                return <span className="badge py-2 bg-warning text-dark">Payment Pending</span>;
+                return <span className="badge py-2 bg-secondary text-dark">Payment Pending</span>;
+            case APPOINTMENT_STATUS.CONFIRMED:
             case "Confirmed":
                 return <span className="badge py-2 bg-primary">Confirmed</span>;
             case "Rescheduled":
@@ -609,7 +611,7 @@ export default function ManageAppointments() {
                                                     <div className="d-flex flex-column" style={{ fontSize: 12 }}>
                                                         <span>{appt.paymentMethod || "N/A"}</span>
                                                         {appt.paymentStatus && (
-                                                            <span className={`small ${appt.paymentStatus === "Success" ? "text-success" : "text-warning"}`} style={{ fontSize: 11 }}>
+                                                            <span className={`small ${appt.paymentStatus === "Success" ? "text-success" : "text-secondary"}`} style={{ fontSize: 11 }}>
                                                                 {appt.paymentStatus}
                                                             </span>
                                                         )}

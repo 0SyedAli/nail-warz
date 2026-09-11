@@ -33,6 +33,7 @@ const EditProfile = () => {
     const [vendorCategory, setVendorCategory] = useState([]);
     const [vendorInput, setVendorInput] = useState("");
     const [cityAutocomplete, setCityAutocomplete] = useState(null);
+    const [latLng, setLatLng] = useState({ lat: "", lng: "" });
     const { isLoaded } = useLoadScript({
         googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
         libraries: ["places"],
@@ -55,9 +56,10 @@ const EditProfile = () => {
             category: [],
             salonName: "",
             name: "",
+            email: "",
             phoneNumber: "",
             // bussinessAddress: "",
-            // locationName: "",
+            locationName: "",
             city: "",
             state: "",
             zipCode: "",
@@ -98,7 +100,17 @@ const EditProfile = () => {
         setValue("state", state, { shouldValidate: true });
         setValue("zipCode", zip, { shouldValidate: true });
 
+        const locationName = place.formatted_address || place.name || city;
+        setValue("locationName", locationName, { shouldValidate: true });
 
+        if (place.geometry && place.geometry.location) {
+            console.log(place.geometry);
+
+            setLatLng({
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng(),
+            });
+        }
     };
 
     useEffect(() => {
@@ -141,6 +153,10 @@ const EditProfile = () => {
                 if (profileRes.data?.success) {
                     const profileData = profileRes.data.data;
                     setExistingData(profileData);
+                    setLatLng({
+                        lat: profileData.latitude || profileData.location?.coordinates?.[1] || "",
+                        lng: profileData.longitude || profileData.location?.coordinates?.[0] || "",
+                    });
 
                     // Check if all working days have the same times
                     const firstDay = profileData.workingDays?.[0];
@@ -159,15 +175,17 @@ const EditProfile = () => {
                             endTime: found?.endTime || "",
                         };
                     });
+                    const existingLoc = profileData.locationName || profileData.location?.locationName || profileData.city || "";
+
                     // Set form values
                     reset({
                         name: profileData.name || "",
+                        email: profileData.email || "",
                         salonName: profileData.salonName || "",
                         phoneNumber: profileData.phoneNumber?.toString() || "",
                         // bussinessAddress: profileData.bussinessAddress || "",
-                        // locationName: profileData.locationName || "",
                         city: profileData.city || "",
-                        locationName: profileData.city || "",
+                        locationName: existingLoc,
                         state: profileData.state || "",
                         zipCode: profileData.zipCode || "",
                         street: profileData.street || "",
@@ -247,8 +265,10 @@ const EditProfile = () => {
             if (data.city !== existingData.city) {
                 formData.append("city", data.city);
             }
-            if (data.locationName !== existingData.locationName) {
-                formData.append("locationName", data.city);
+
+            const existingLoc = existingData.locationName || existingData.location?.locationName || "";
+            if (data.locationName && data.locationName !== existingLoc) {
+                formData.append("locationName", data.locationName);
             }
 
             if (data.state !== existingData.state) {
@@ -257,6 +277,16 @@ const EditProfile = () => {
 
             if (data.zipCode !== existingData.zipCode) {
                 formData.append("zipCode", data.zipCode);
+            }
+
+            const existingLat = existingData.latitude?.toString() || existingData.location?.coordinates?.[1]?.toString() || "";
+            const existingLng = existingData.longitude?.toString() || existingData.location?.coordinates?.[0]?.toString() || "";
+
+            if (latLng.lat && latLng.lat.toString() !== existingLat) {
+                formData.append("latitude", latLng.lat);
+            }
+            if (latLng.lng && latLng.lng.toString() !== existingLng) {
+                formData.append("longitude", latLng.lng);
             }
 
             if (data.bussinessPhoneNumber !== existingData.bussinessPhoneNumber) {
@@ -295,11 +325,18 @@ const EditProfile = () => {
             }
 
             // new image(s)
-            if (data.images.length > 0) {
-                data.images.forEach(f => formData.append("image", f));
+            const imageFiles = (data.images || images || []).filter(f => f instanceof File);
+            if (imageFiles.length > 0) {
+                imageFiles.forEach(f => formData.append("image", f));
             }
 
-            const res = await api.post("/updateAdminProfile", formData);
+            const cookieToken = Cookies.get("token");
+            const res = await api.post("/updateAdminProfile", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    ...(cookieToken ? { Authorization: `Bearer ${cookieToken}` } : {}),
+                },
+            });
             if (res.data.success) {
                 showSuccessToast("Updated!");
                 router.refresh();
@@ -465,7 +502,20 @@ const EditProfile = () => {
                         )}
 
                         <div className="row pt-3 gx-3 gy-3">
-                            {/* Salon Name */}
+                            {/* Owner Email */}
+                            <div className="col-md-4">
+                                <div className="am_field">
+                                    <label>Owner Email</label>
+                                    <input
+                                        type="email"
+                                        {...register("email")}
+                                        disabled
+                                        className="form-control"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Owner Name */}
                             <div className="col-md-4">
                                 <div className="am_field">
                                     <label>Owner Name</label>
@@ -523,6 +573,35 @@ const EditProfile = () => {
                                     )}
                                 </div>
                             </div>
+                            {/* Phone Number */}
+                            <div className="col-md-4">
+                                <div className="am_field">
+                                    <label>Salon Phone Number</label>
+                                    {/* <input
+                                        type="text"
+                                        {...register("phoneNumber")}
+                                        className={`form-control ${errors.phoneNumber ? "is-invalid" : ""}`}
+                                    /> */}
+
+                                    <PatternFormat
+                                        format="+1 (###) ###-####"
+                                        mask="_"
+                                        value={watch("bussinessPhoneNumber") || ""}
+                                        onValueChange={(values) => {
+                                            setValue("bussinessPhoneNumber", values.formattedValue, {
+                                                shouldValidate: true,
+                                            });
+                                        }}
+                                        customInput="input"
+                                        className={`form-control ${errors.bussinessPhoneNumber ? "is-invalid" : ""}`}
+                                        placeholder="+1 (123) 456-7890"
+                                    />
+
+                                    {errors.bussinessPhoneNumber && (
+                                        <div className="invalid-feedback">{errors.bussinessPhoneNumber.message}</div>
+                                    )}
+                                </div>
+                            </div>
                             {/* Business Address */}
                             {/* <div className="col-md-4">
                                 <div className="am_field">
@@ -552,20 +631,7 @@ const EditProfile = () => {
                                     )}
                                 </div>
                             </div> */}
-                            {/* Street Address */}
-                            <div className="col-md-4">
-                                <div className="am_field">
-                                    <label>Street Address</label>
-                                    <input
-                                        type="text"
-                                        {...register("street")}
-                                        className={`form-control ${errors.street ? "is-invalid" : ""}`}
-                                    />
-                                    {errors.street && (
-                                        <div className="invalid-feedback">{errors.street.message}</div>
-                                    )}
-                                </div>
-                            </div>
+
                             {/* City */}
                             <div className="col-md-4">
                                 <div className="am_field">
@@ -620,7 +686,20 @@ const EditProfile = () => {
                                     )}
                                 </div>
                             </div>
-
+                            {/* Street Address */}
+                            <div className="col-md-4">
+                                <div className="am_field">
+                                    <label>Street Address</label>
+                                    <input
+                                        type="text"
+                                        {...register("street")}
+                                        className={`form-control ${errors.street ? "is-invalid" : ""}`}
+                                    />
+                                    {errors.street && (
+                                        <div className="invalid-feedback">{errors.street.message}</div>
+                                    )}
+                                </div>
+                            </div>
                             {/* Zip Code */}
                             <div className="col-md-4">
                                 <div className="am_field">
@@ -636,35 +715,7 @@ const EditProfile = () => {
                                 </div>
                             </div>
 
-                            {/* Phone Number */}
-                            <div className="col-md-4">
-                                <div className="am_field">
-                                    <label>Salon Phone Number</label>
-                                    {/* <input
-                                        type="text"
-                                        {...register("phoneNumber")}
-                                        className={`form-control ${errors.phoneNumber ? "is-invalid" : ""}`}
-                                    /> */}
 
-                                    <PatternFormat
-                                        format="+1 (###) ###-####"
-                                        mask="_"
-                                        value={watch("bussinessPhoneNumber") || ""}
-                                        onValueChange={(values) => {
-                                            setValue("bussinessPhoneNumber", values.formattedValue, {
-                                                shouldValidate: true,
-                                            });
-                                        }}
-                                        customInput="input"
-                                        className={`form-control ${errors.bussinessPhoneNumber ? "is-invalid" : ""}`}
-                                        placeholder="+1 (123) 456-7890"
-                                    />
-
-                                    {errors.bussinessPhoneNumber && (
-                                        <div className="invalid-feedback">{errors.bussinessPhoneNumber.message}</div>
-                                    )}
-                                </div>
-                            </div>
 
                             {/* Business Email */}
                             <div className="col-md-4">

@@ -266,7 +266,7 @@ const TopBar = ({ header }) => {
             Review Warning
           </div>
         )}
-        <div className="d-flex flex-row-reverse flex-md-row flex-wrap gap-2">
+        <div className="d-flex align-items-center flex-row-reverse flex-md-row flex-wrap gap-2">
           <div>
             {salonName && <h4>{salonName}</h4>}
             {location && <h5>{location}</h5>}
@@ -275,7 +275,7 @@ const TopBar = ({ header }) => {
             src={image ? `${process.env.NEXT_PUBLIC_IMAGE_URL}/${image}` : "/images/avatar.png"}
             width={50}
             height={50}
-            style={{ borderRadius: "100%", minWidth: "50px", minHeight: "50px" }}
+            style={{ borderRadius: "100%", minWidth: "50px", minHeight: "50px", width: "50px", height: "50px" }}
             alt=""
           />
         </div>

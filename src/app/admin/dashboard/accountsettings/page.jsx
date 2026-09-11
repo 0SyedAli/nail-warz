@@ -269,11 +269,18 @@ const EditProfile = () => {
             }
 
             // new image(s)
-            if (data.images.length > 0) {
-                data.images.forEach(f => formData.append("image", f));
+            const imageFiles = (data.images || images || []).filter(f => f instanceof File);
+            if (imageFiles.length > 0) {
+                imageFiles.forEach(f => formData.append("image", f));
             }
 
-            const res = await api.post("/updateAdminProfile", formData);
+            const cookieToken = Cookies.get("token");
+            const res = await api.post("/updateAdminProfile", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    ...(cookieToken ? { Authorization: `Bearer ${cookieToken}` } : {}),
+                },
+            });
             if (res.data.success) {
                 showSuccessToast("Updated!");
                 router.refresh();

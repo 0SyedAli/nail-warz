@@ -23,32 +23,41 @@ const MAX_IMAGES = 3;
 
 /* ----------------------- Yup schema ----------------------- */
 const schema = Yup.object({
+  name: Yup.string().required("Owner name is required"),
   salonName: Yup.string().required("Salon name is required"),
+  bussinessEmail: Yup.string()
+    .email("Invalid email format")
+    .required("Salon email is required"),
+  bussinessPhoneNumber: Yup.string()
+    .min(6, "Min 6 characters")
+    .matches(/^[+\d][\d\s\-()]+$/, "Invalid phone number format")
+    .required("Salon phone number is required"),
   phoneNumber: Yup.string()
     .min(6, "Min 6 characters")
     .matches(/^[+\d][\d\s\-()]+$/, "Invalid phone number format")
     .required("Phone number is required"),
-  street: Yup.string().required("Street is required"),
+  // street: Yup.string().required("Street is required"),
   city: Yup.string().required("City is required"),
   state: Yup.string().required("State is required"),
   zipCode: Yup.string()
     .matches(/^\d{4,10}$/, "Invalid postal code")
     .required("Postal Code is required"),
   description: Yup.string().required("Description is required"),
-  workingDays: Yup.array().of(Yup.string()).min(1, "Select at least one working day"),
+  workingDays: Yup.array().of(Yup.string()).min(1, "Select at least one working day").required("Select at least one working day"),
   startTime: Yup.string().required("Start time is required"),
   endTime: Yup.string().required("End time is required"),
-  categories: Yup.array().of(Yup.string()).min(1, "Select at least one filter"),
+  categories: Yup.array().of(Yup.string()).min(1, "Select at least one filter").required("Select at least one filter"),
   images: Yup.array()
     .of(
       Yup.mixed()
-        .test("fileSize", "Max 2 MB", (f) => f && f.size <= 2 * 1024 * 1024)
+        .test("fileSize", "Max 2 MB", (f) => !f || f.size <= 2 * 1024 * 1024)
         .test("fileType", "Unsupported type", (f) =>
-          f && ["image/jpeg", "image/png", "image/webp"].includes(f.type)
+          !f || ["image/jpeg", "image/png", "image/webp"].includes(f.type)
         )
     )
     .max(MAX_IMAGES, `Max ${MAX_IMAGES} images`)
-    .required("Image is required"),
+    .nullable()
+    .notRequired(),
 });
 export const clearAllCookies = () => {
   Object.keys(Cookies.get()).forEach((cookie) => {
@@ -104,6 +113,11 @@ export default function BussinessProfile() {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
+      name: "",
+      salonName: "",
+      bussinessEmail: "",
+      bussinessPhoneNumber: "",
+      phoneNumber: "",
       workingDays: [],
       startTime: "",
       endTime: "",
@@ -113,6 +127,7 @@ export default function BussinessProfile() {
       city: "",
       state: "",
       zipCode: "",
+      locationName: "",
     },
   });
 
@@ -142,6 +157,7 @@ export default function BussinessProfile() {
     setValue("city", city);
     setValue("state", state);
     setValue("zipCode", zip);
+    setValue("locationName", place.formatted_address || city);
     setLatLng({
       lat: place.geometry.location.lat(),
       lng: place.geometry.location.lng(),
@@ -153,7 +169,7 @@ export default function BussinessProfile() {
   const [previews, setPreviews] = useState([]);
 
   useEffect(() => {
-    const urls = images.map((f) => URL.createObjectURL(f));
+    const urls = (images || []).map((f) => URL.createObjectURL(f));
     setPreviews(urls);
     return () => urls.forEach((u) => URL.revokeObjectURL(u));
   }, [images]);
@@ -181,6 +197,9 @@ export default function BussinessProfile() {
       // ✅ Otherwise just set admin id
       if (u?._id) {
         setAdminId(u._id);
+        if (u?.name) {
+          setValue("name", u.name);
+        }
       } else {
         router.replace("/auth/login");
       }
@@ -290,13 +309,25 @@ export default function BussinessProfile() {
       const formData = new FormData();
 
       formData.append("id", adminId);
+      if (data.name) {
+        formData.append("name", data.name);
+      }
       formData.append("salonName", data.salonName);
+      if (data.bussinessEmail) {
+        formData.append("bussinessEmail", data.bussinessEmail);
+      }
+      if (data.bussinessPhoneNumber) {
+        formData.append("bussinessPhoneNumber", data.bussinessPhoneNumber);
+      }
       formData.append("phoneNumber", data.phoneNumber.replace(/\D/g, ""));
       formData.append("description", data.description);
       formData.append("street", data.street);
       formData.append("city", data.city);
       formData.append("state", data.state);
       formData.append("zipCode", data.zipCode);
+      if (data.locationName) {
+        formData.append("locationName", data.locationName);
+      }
       formData.append("latitude", latLng.lat);
       formData.append("longitude", latLng.lng);
 
@@ -309,7 +340,9 @@ export default function BussinessProfile() {
       formData.append("workingDays", JSON.stringify(days));
       formData.append("categoryId", JSON.stringify(data.categories || []));
 
-      data.images.forEach((f) => formData.append("image", f));
+      if (data.images && data.images.length > 0) {
+        data.images.forEach((f) => formData.append("image", f));
+      }
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/updateAdminProfile`,
@@ -371,16 +404,25 @@ export default function BussinessProfile() {
               {errors[name] && <p className="text-danger">{errors[name].message}</p>}
             </div>
           ))} */}
+          <label>Owner Name</label>
+          <InputField {...register("name")} placeholder="Enter owner name" />
+          {errors.name && <p className="text-danger">{errors.name.message}</p>}
+
+          <label>Owner Phone Number</label>
+          <InputField {...register("phoneNumber")} placeholder="+1 (xxx) xxx-xxxx" />
+          {errors.phoneNumber && <p className="text-danger">{errors.phoneNumber.message}</p>}
+
           <label>Salon Name</label>
-          <InputField {...register("salonName")} />
+          <InputField {...register("salonName")} placeholder="Enter salon name" />
           {errors.salonName && <p className="text-danger">{errors.salonName.message}</p>}
 
-          <label>Street</label>
-          <InputField {...register("street")} />
-          {errors.street && <p className="text-danger">{errors.street.message}</p>}
+          <label>Salon Email</label>
+          <InputField type="email" {...register("bussinessEmail")} placeholder="Enter salon email" />
+          {errors.bussinessEmail && <p className="text-danger">{errors.bussinessEmail.message}</p>}
 
-          {/* CITY AUTOCOMPLETE */}
-          {console.log(isLoaded)}
+          <label>Salon Phone Number</label>
+          <InputField {...register("bussinessPhoneNumber")} placeholder="+1 (xxx) xxx-xxxx" />
+          {errors.bussinessPhoneNumber && <p className="text-danger">{errors.bussinessPhoneNumber.message}</p>}
 
           {isLoaded && (
             <>
@@ -393,7 +435,7 @@ export default function BussinessProfile() {
                 <input
                   type="text"
                   className="form-control classInput"
-                  placeholder=""
+                  placeholder="Start typing city..."
                 />
               </Autocomplete>
               {errors.city && <p className="text-danger">{errors.city.message}</p>}
@@ -401,20 +443,20 @@ export default function BussinessProfile() {
           )}
 
           <label>State</label>
-          <InputField {...register("state")} readOnly />
+          <InputField {...register("state")} readOnly placeholder="Auto-fills when city is selected" />
           {errors.state && <p className="text-danger">{errors.state.message}</p>}
 
+          <label>Street</label>
+          <InputField {...register("street")} placeholder="Enter your street address" />
+          {errors.street && <p className="text-danger">{errors.street.message}</p>}
+
           <label>Postal Code</label>
-          <InputField {...register("zipCode")} />
+          <InputField {...register("zipCode")} placeholder="Enter your postal code" />
           {errors.zipCode && <p className="text-danger">{errors.zipCode.message}</p>}
 
           <label>Description</label>
-          <InputField {...register("description")} />
+          <InputField {...register("description")} placeholder="Enter your business description" />
           {errors.description && <p className="text-danger">{errors.description.message}</p>}
-
-          {/* phone */}
-          <label>Phone Number</label>
-          <InputField {...register("phoneNumber")} placeholder="+1 (xxx) xxx-xxxx" />
 
           {/* working days */}
           <label>Select Working Days</label>
@@ -443,7 +485,7 @@ export default function BussinessProfile() {
           )}
 
           {/* categories */}
-          <label>Assign Service Filters</label>
+          <label>Select Service Filter</label>
           <select
             defaultValue=""
             className="form-select input_field2 mt-1"
@@ -459,6 +501,9 @@ export default function BussinessProfile() {
               </option>
             ))}
           </select>
+          <small className="text-muted d-block mt-1">
+            You will be able to create or request more filters once your account is created.
+          </small>
           <div className="d-flex flex-wrap my-2 gap-2">
             {watch("categories").map((id, idx) => (
               <span
@@ -471,9 +516,10 @@ export default function BussinessProfile() {
               </span>
             ))}
           </div>
+          {errors.categories && <p className="text-danger">{errors.categories.message}</p>}
 
           {/* images */}
-          <label>Upload Images (max 3)</label>
+          <label>Upload Images (max 3) <span className="text-muted">(Optional)</span></label>
           <div className="input_file">
             <p>Upload image(s)</p>
             <span>

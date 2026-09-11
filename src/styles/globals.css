@@ -2361,7 +2361,9 @@ input[type="checkbox"]:checked {
   text-align: left;
   border-top: 1px solid #ccc;
   padding: 15px;
-
+  max-height: 375px;
+  overflow: hidden;
+  overflow-y: auto;
 }
 
 .term_content p {
@@ -5601,6 +5603,11 @@ span.prod_stock_status {
 
   .chakra-modal__content-container {
     z-index: 1111111;
+    width: 100% !important;
+  }
+
+  .chakra-modal__overlay {
+    width: 100% !important;
   }
 
   .appointment-calendere-container {
@@ -5929,6 +5936,10 @@ span.prod_stock_status {
 
   .sidebar_container ul li {
     margin: 0;
+  }
+
+  .term_content {
+    max-height: 335px;
   }
 }
 

@@ -265,10 +265,10 @@ export default function EnterWarzModal({ isOpen, onClose }) {
                 className="ewm_select"
                 disabled={submitting}
               >
-                <option value="">Select Type</option>
-                <option value="Nail Salon">Nail Salon</option>
-                <option value="Technician">Technician</option>
-                <option value="Naillee">Naillee</option>
+                <option value="" disabled></option>
+                <option value="nailSalon">Nail Salon</option>
+                <option value="technician">Technician</option>
+                <option value="naillee">Naillee</option>
               </select>
               {errors.type && <span className="ewm_error_text">{errors.type}</span>}
             </div>
@@ -509,15 +509,15 @@ export default function EnterWarzModal({ isOpen, onClose }) {
                 disabled={submitting}
               />
               <label htmlFor="followingSocialMedia" className="ewm_checkbox_label">
-                By Checking this box, I confirm that I am following Nail Warz on{" "}
-                <a
+                By Checking this box, I confirm that I am following Nail Warz on <span className="ewm_link">Social Media</span>
+                {/* <a
                   href="https://www.instagram.com/nailwarz"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="ewm_link"
                 >
-                  Social Media
-                </a>
+                  
+                </a> */}
               </label>
             </div>
             {errors.followingSocialMedia && (
@@ -546,7 +546,7 @@ export default function EnterWarzModal({ isOpen, onClose }) {
                 </Link>{" "}
                 and{" "}
                 <Link
-                  href="/terms-and-conditions"
+                  href="/warzone-rule"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="ewm_link"

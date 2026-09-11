@@ -1,9 +1,31 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "./layout";
 import Image from "next/image";
 import { AuthBtn } from "../AuthBtn/AuthBtn";
+import SpinnerLoading from "../Spinner/SpinnerLoading";
 function TermAndConditionModal({ isOpen, onClose, onAgree, agree, setAgree }) {
   const [submitting, setSubmitting] = useState(false);
+  const [termsCondition, setTermsCondition] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/terms.html")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("terms.html not found");
+        }
+        return res.text();
+      })
+      .then((html) => {
+        setTermsCondition(html);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error loading terms.html:", error);
+        setTermsCondition("<p>Failed to load terms and conditions.</p>");
+        setLoading(false);
+      });
+  }, []);
 
   if (!isOpen) return null;
 
@@ -22,13 +44,13 @@ function TermAndConditionModal({ isOpen, onClose, onAgree, agree, setAgree }) {
       <div className="aus_dialog">
         {/* Header */}
         <div className="term_body mb-3">
-          <div className="d-flex align-items-center justify-content-center gap-4 p-3">
+          <div className="d-flex align-items-center justify-content-center gap-4 p-2">
             <Image src="/images/docs-icon.png" width={25} height={32} alt="docs" />
             <h3 className=" mb-0">Terms & Conditions</h3>
           </div>
 
           {/* Terms Content */}
-          <div className="term_content">
+          {/* <div className="term_content">
             <h4 className="fw-bolder">1. Terms</h4>
             <p className="mb-2">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
@@ -48,6 +70,16 @@ function TermAndConditionModal({ isOpen, onClose, onAgree, agree, setAgree }) {
               anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua.
             </p>
+          </div> */}
+          <div className="term_content">
+            {loading ? (
+              <SpinnerLoading />
+            ) : (
+              <div
+                dangerouslySetInnerHTML={{ __html: termsCondition }}
+                style={{ fontFamily: "inherit", lineHeight: "1.6" }}
+              />
+            )}
           </div>
         </div>
 

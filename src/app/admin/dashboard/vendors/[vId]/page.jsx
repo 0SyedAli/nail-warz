@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import Cookies from "js-cookie";
 import { useRouter, useParams } from "next/navigation";
-import { FaPhoneAlt, FaUser, FaRegCalendarAlt, FaCalendarCheck, FaCalendarTimes, FaWallet, FaChartLine } from "react-icons/fa";
+import { FaPhoneAlt, FaUser, FaRegCalendarAlt, FaCalendarCheck, FaCalendarTimes, FaWallet, FaChartLine, FaTrash, FaPlus, FaStickyNote } from "react-icons/fa";
 import { IoIosMail } from "react-icons/io";
 import { MdDescription, MdModeEdit } from "react-icons/md";
 import { GiWorld } from "react-icons/gi";
@@ -34,6 +34,15 @@ export default function VendorDetail() {
     const [payoutSearch, setPayoutSearch] = useState("");
     const [approvalUpdating, setApprovalUpdating] = useState(false);
 
+    // Internal notes states
+    const [internalNotes, setInternalNotes] = useState([]);
+    const [newNoteText, setNewNoteText] = useState("");
+    const [submittingNote, setSubmittingNote] = useState(false);
+    const [editingNoteId, setEditingNoteId] = useState(null);
+    const [editingNoteText, setEditingNoteText] = useState("");
+    const [updatingNoteId, setUpdatingNoteId] = useState(null);
+    const [deletingNoteId, setDeletingNoteId] = useState(null);
+
     // Abuse flag status update states
     const [selectedAbuseFlag, setSelectedAbuseFlag] = useState(null);
     const [abuseFlagUpdateForm, setAbuseFlagUpdateForm] = useState({
@@ -62,9 +71,9 @@ export default function VendorDetail() {
     const [abuseFlagLoading, setAbuseFlagLoading] = useState(false);
 
     /* ===================== FETCH VENDOR ===================== */
-    const fetchVendor = async () => {
+    const fetchVendor = async (silent = false) => {
         try {
-            setLoading(true);
+            if (!silent) setLoading(true);
 
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor/${vId}`,
@@ -84,28 +93,40 @@ export default function VendorDetail() {
             setRevenueStats(json.revenueStats);
             setPayouts(json.revenueSummary?.payoutHistory || []);
 
-            // Initialize appointments
-            setAppointments(json.vendor?.appointments || []);
-            const aptPag = json.vendor?.appointmentPagination;
-            setAppointmentCursor(aptPag?.nextCursor || null);
-            setAppointmentHasMore(aptPag?.hasMore ?? false);
+            const rawNotes = json.vendor?.internalNotes || json.vendor?.internalNote || json.internalNotes || [];
+            const parsedNotes = Array.isArray(rawNotes)
+                ? rawNotes
+                : rawNotes && typeof rawNotes === "object"
+                    ? [rawNotes]
+                    : typeof rawNotes === "string" && rawNotes.trim()
+                        ? [{ note: rawNotes, _id: "single-note" }]
+                        : [];
+            setInternalNotes(parsedNotes);
 
-            // Initialize ratings
-            setRatings(json.vendor?.ratings || []);
-            const ratPag = json.vendor?.ratingPagination;
-            setRatingCursor(ratPag?.nextCursor || null);
-            setRatingHasMore(ratPag?.hasMore ?? false);
+            if (!silent) {
+                // Initialize appointments
+                setAppointments(json.vendor?.appointments || []);
+                const aptPag = json.vendor?.appointmentPagination;
+                setAppointmentCursor(aptPag?.nextCursor || null);
+                setAppointmentHasMore(aptPag?.hasMore ?? false);
 
-            // Initialize abuse flags
-            setAbuseFlags(json.vendor?.abuseFlags || []);
-            const abPag = json.vendor?.abuseFlagPagination;
-            setAbuseFlagCursor(abPag?.nextCursor || null);
-            setAbuseFlagHasMore(abPag?.hasMore ?? false);
+                // Initialize ratings
+                setRatings(json.vendor?.ratings || []);
+                const ratPag = json.vendor?.ratingPagination;
+                setRatingCursor(ratPag?.nextCursor || null);
+                setRatingHasMore(ratPag?.hasMore ?? false);
+
+                // Initialize abuse flags
+                setAbuseFlags(json.vendor?.abuseFlags || []);
+                const abPag = json.vendor?.abuseFlagPagination;
+                setAbuseFlagCursor(abPag?.nextCursor || null);
+                setAbuseFlagHasMore(abPag?.hasMore ?? false);
+            }
         } catch (err) {
             console.error(err);
-            setError(err.message);
+            if (!silent) setError(err.message);
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     };
 
@@ -182,10 +203,28 @@ export default function VendorDetail() {
                 throw new Error(json.message || "Payout failed");
             }
 
+            // Immediately update state with response data if returned
+            if (json.revenueSummary) {
+                setRevenueSummary(json.revenueSummary);
+                if (json.revenueSummary.payoutHistory) {
+                    setPayouts(json.revenueSummary.payoutHistory);
+                }
+            } else if (json.payout) {
+                setPayouts((prev) => [json.payout, ...(prev || [])]);
+                setRevenueSummary((prev) => prev ? {
+                    ...prev,
+                    payableBalance: Math.max(0, (prev.payableBalance || 0) - payoutAmount),
+                    totalPaid: (prev.totalPaid || 0) + payoutAmount,
+                } : prev);
+            }
+
+            // Silently refetch vendor to keep all calculations & history perfectly synced without reloading the page
+            await fetchVendor(true);
+
             setAmount("");
             setRemarks("");
 
-            showSuccessToast("Payout processed successfully");
+            showSuccessToast(json.message || "Payout processed successfully");
         } catch (err) {
             showErrorToast(err.message || "Payout error");
         } finally {
@@ -209,6 +248,158 @@ export default function VendorDetail() {
             );
         });
     }, [payouts, payoutSearch]);
+
+    /* ===================== INTERNAL NOTES ===================== */
+    const notesList = internalNotes;
+    const currentNote = notesList.length > 0 ? notesList[0] : null;
+
+    const handleAddNote = async (e) => {
+        if (e) e.preventDefault();
+        if (!newNoteText.trim()) {
+            showErrorToast("Please enter a note");
+            return;
+        }
+
+        if (currentNote) {
+            showErrorToast("Only one internal note is allowed. Please edit or delete the existing note.");
+            return;
+        }
+
+        setSubmittingNote(true);
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor/${vId}/internalNote`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        note: newNoteText.trim(),
+                    }),
+                }
+            );
+
+            const json = await res.json();
+            if (!res.ok || !json.success) {
+                throw new Error(json.message || "Failed to add internal note");
+            }
+
+            if (json.internalNote || json.note || json.data) {
+                const added = json.internalNote || json.note || json.data;
+                if (typeof added === "object") {
+                    setInternalNotes([added]);
+                } else {
+                    setInternalNotes([{ note: String(added), createdAt: new Date().toISOString() }]);
+                }
+            } else {
+                setInternalNotes([{ note: newNoteText.trim(), createdAt: new Date().toISOString() }]);
+            }
+
+            setNewNoteText("");
+            showSuccessToast("Internal note added successfully");
+            await fetchVendor(true);
+        } catch (err) {
+            showErrorToast(err.message || "Failed to add internal note");
+        } finally {
+            setSubmittingNote(false);
+        }
+    };
+
+    const handleUpdateNote = async (noteId) => {
+        if (!editingNoteText.trim()) {
+            showErrorToast("Note content cannot be empty");
+            return;
+        }
+
+        setUpdatingNoteId(noteId);
+        try {
+            let res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor/${vId}/internalNote/${noteId}`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        note: editingNoteText.trim(),
+                    }),
+                }
+            );
+
+            if (res.status === 404 || res.status === 405) {
+                res = await fetch(
+                    `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor/${vId}/internalNote/${noteId}`,
+                    {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`,
+                        },
+                        body: JSON.stringify({
+                            note: editingNoteText.trim(),
+                        }),
+                    }
+                );
+            }
+
+            const json = await res.json();
+            if (!res.ok || !json.success) {
+                throw new Error(json.message || "Failed to update internal note");
+            }
+
+            setInternalNotes((prev) =>
+                prev.map((n) => {
+                    const id = n._id || n.id;
+                    if (id === noteId) {
+                        return typeof n === "object" ? { ...n, note: editingNoteText.trim() } : editingNoteText.trim();
+                    }
+                    return n;
+                })
+            );
+
+            setEditingNoteId(null);
+            setEditingNoteText("");
+            showSuccessToast("Internal note updated successfully");
+            await fetchVendor(true);
+        } catch (err) {
+            showErrorToast(err.message || "Failed to update internal note");
+        } finally {
+            setUpdatingNoteId(null);
+        }
+    };
+
+    const handleDeleteNote = async (noteId) => {
+        if (!confirm("Are you sure you want to delete this internal note?")) return;
+
+        setDeletingNoteId(noteId);
+        try {
+            const res = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/superAdmin/vendor/${vId}/internalNote/${noteId}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            const json = await res.json();
+            if (!res.ok || !json.success) {
+                throw new Error(json.message || "Failed to delete internal note");
+            }
+
+            setInternalNotes((prev) => prev.filter((n, idx) => (n._id || n.id || idx) !== noteId));
+            showSuccessToast("Internal note deleted successfully");
+            await fetchVendor(true);
+        } catch (err) {
+            showErrorToast(err.message || "Failed to delete internal note");
+        } finally {
+            setDeletingNoteId(null);
+        }
+    };
 
     const toggleVendorApproval = async () => {
         if (!vendor?._id) return;
@@ -422,6 +613,12 @@ export default function VendorDetail() {
                         </span>
                     </div> */}
                     <div className="d-flex align-items-center gap-3">
+                        {vendor?.createdAt && (
+                            <span className="badge bg-white text-secondary border px-3 py-2 d-flex align-items-center gap-2" style={{ fontSize: "13px", fontWeight: "500", borderRadius: "20px" }}>
+                                <FaRegCalendarAlt size={14} className="text-primary" />
+                                <span>Registered: <strong className="text-dark">{new Date(vendor.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</strong></span>
+                            </span>
+                        )}
 
                         <div className="form-check form-switch d-flex align-items-center ps-0 gap-2 m-0">
                             <input
@@ -532,6 +729,12 @@ export default function VendorDetail() {
                     <div className="card-box">
                         <h6>Bussiness Info</h6>
                         {vendor.salonName && <h5 className="d-flex align-items-center gap-2 mb-2"><span><FaUser size={14} /></span>{vendor.salonName}</h5>}
+                        {vendor.createdAt && (
+                            <p className="d-flex align-items-center gap-2 mb-2 text-muted" style={{ fontSize: "13px" }}>
+                                <span><FaRegCalendarAlt size={15} /></span>
+                                <span>Registered Date: <strong className="text-dark">{new Date(vendor.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</strong></span>
+                            </p>
+                        )}
                         {vendor.bussinessEmail && <p className="d-flex align-items-center gap-2 mb-2"><span><IoIosMail size={17} /></span>{vendor.bussinessEmail}</p>}
                         {vendor.bussinessPhoneNumber && <p className="d-flex align-items-center gap-2 mb-2"><span><FaPhoneAlt size={17} /></span>{vendor.bussinessPhoneNumber}</p>}
                         {vendor.bussinessWebsite && <a href={`https://${vendor.bussinessWebsite}`} target="_blank" className="d-flex align-items-center gap-2 text-decoration-none mb-2"><span><GiWorld size={17} /></span>{vendor.bussinessWebsite}</a>}
@@ -585,8 +788,141 @@ export default function VendorDetail() {
 
 
 
+                {/* INTERNAL NOTE */}
+                <div className="card-box mt-4">
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h6 className="mb-0 d-flex align-items-center gap-2">
+                            <FaStickyNote style={{ color: "#7b2cbf" }} size={18} />
+                            <span>Internal Note</span>
+                        </h6>
+                    </div>
+
+                    {!currentNote ? (
+                        /* New Note Form when no note exists */
+                        <form onSubmit={handleAddNote}>
+                            <div className="d-flex flex-column gap-2">
+                                <textarea
+                                    className="form-control"
+                                    rows={3}
+                                    placeholder="Add an internal note about this vendor (e.g. documentation status, verification notes, call logs)..."
+                                    value={newNoteText}
+                                    onChange={(e) => setNewNoteText(e.target.value)}
+                                    disabled={submittingNote}
+                                    style={{ resize: "vertical", fontSize: "14px", borderRadius: "8px" }}
+                                />
+                                <div className="d-flex justify-content-end">
+                                    <button
+                                        type="submit"
+                                        className="btn btn-dark d-flex align-items-center gap-2 px-3 py-2"
+                                        disabled={submittingNote || !newNoteText.trim()}
+                                        style={{ fontSize: "13px", borderRadius: "6px" }}
+                                    >
+                                        <FaPlus size={11} />
+                                        <span>{submittingNote ? "Adding Note..." : "Add Note"}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    ) : (
+                        /* Display existing single note */
+                        (() => {
+                            const noteId = currentNote._id || currentNote.id || "single-note";
+                            const isEditing = editingNoteId === noteId;
+                            const noteText = typeof currentNote === "string" ? currentNote : (currentNote.note || "");
+                            const noteDate = currentNote.createdAt || currentNote.updatedAt || currentNote.date;
+
+                            return (
+                                <div
+                                    className="p-3 border rounded"
+                                    style={{ backgroundColor: "#fafbfc" }}
+                                >
+                                    {isEditing ? (
+                                        <div>
+                                            <textarea
+                                                className="form-control mb-2"
+                                                rows={3}
+                                                value={editingNoteText}
+                                                onChange={(e) => setEditingNoteText(e.target.value)}
+                                                disabled={updatingNoteId === noteId}
+                                                style={{ fontSize: "14px" }}
+                                            />
+                                            <div className="d-flex justify-content-end gap-2">
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-outline-secondary btn-sm"
+                                                    onClick={() => {
+                                                        setEditingNoteId(null);
+                                                        setEditingNoteText("");
+                                                    }}
+                                                    disabled={updatingNoteId === noteId}
+                                                >
+                                                    Cancel
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-primary btn-sm"
+                                                    onClick={() => handleUpdateNote(noteId)}
+                                                    disabled={updatingNoteId === noteId || !editingNoteText.trim()}
+                                                >
+                                                    {updatingNoteId === noteId ? "Saving..." : "Save Changes"}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <div className="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                                <div className="text-muted small d-flex align-items-center gap-2" style={{ fontSize: "12px" }}>
+                                                    <FaRegCalendarAlt size={12} />
+                                                    <span>
+                                                        {noteDate
+                                                            ? new Date(noteDate).toLocaleString("en-GB", {
+                                                                day: "2-digit",
+                                                                month: "short",
+                                                                year: "numeric",
+                                                                hour: "2-digit",
+                                                                minute: "2-digit",
+                                                            })
+                                                            : "Internal Note"}
+                                                    </span>
+                                                </div>
+                                                <div className="d-flex align-items-center gap-1">
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-sm btn-outline-secondary p-1"
+                                                        onClick={() => {
+                                                            setEditingNoteId(noteId);
+                                                            setEditingNoteText(noteText);
+                                                        }}
+                                                        title="Edit Note"
+                                                        style={{ lineHeight: 1 }}
+                                                    >
+                                                        <MdModeEdit size={15} />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-sm btn-outline-danger p-1"
+                                                        onClick={() => handleDeleteNote(noteId)}
+                                                        disabled={deletingNoteId === noteId}
+                                                        title="Delete Note"
+                                                        style={{ lineHeight: 1 }}
+                                                    >
+                                                        <FaTrash size={12} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <p className="mb-0" style={{ fontSize: "14px", whiteSpace: "pre-wrap", color: "#212529" }}>
+                                                {noteText}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })()
+                    )}
+                </div>
+
                 {/* PAYOUT + SUMMARY */}
-                <div className="vendor-grid">
+                <div className="vendor-grid mt-4">
 
                     <div className="card-box">
                         <h6>Process Payout</h6>
@@ -625,24 +961,24 @@ export default function VendorDetail() {
 
                         <div className="summary-row">
                             <span>Total Revenue</span>
-                            <span>${revenueSummary?.totalRevenue.toFixed(2)}</span>
+                            <span>${(revenueSummary?.totalRevenue ?? 0).toFixed(2)}</span>
                         </div>
                         <div className="summary-row red">
                             <span>Nail Warz Commission</span>
-                            <span>${revenueSummary?.platformFee?.toFixed(2)}</span>
+                            <span>${(revenueSummary?.platformFee ?? 0).toFixed(2)}</span>
                         </div>
                         <div className="summary-row red">
                             <span>App Charges</span>
-                            <span>${revenueSummary?.appCharges?.toFixed(2)}</span>
+                            <span>${(revenueSummary?.appCharges ?? 0).toFixed(2)}</span>
                         </div>
                         <div className="summary-row green">
                             <span>Vendor Share</span>
-                            <span>${revenueSummary?.totalPayableAmount.toFixed(2)}</span>
+                            <span>${(revenueSummary?.totalPayableAmount ?? 0).toFixed(2)}</span>
                         </div>
 
                         <div className="summary-row purple">
                             <span>Total Paid Out</span>
-                            <span>${revenueSummary?.totalPaid.toFixed(2)}</span>
+                            <span>${(revenueSummary?.totalPaid ?? 0).toFixed(2)}</span>
                         </div>
                         {/* <div className="summary-row purple">
                             <span>Remaining Revenue</span>
@@ -650,7 +986,7 @@ export default function VendorDetail() {
                         </div> */}
                         <div className="summary-row">
                             <span><strong>Remaining Balance</strong></span>
-                            <span>${revenueSummary?.payableBalance.toFixed(2)}</span>
+                            <span>${(revenueSummary?.payableBalance ?? 0).toFixed(2)}</span>
                         </div>
                     </div>
                 </div>

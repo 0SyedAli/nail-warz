@@ -2,33 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useSelector, useDispatch } from "react-redux";
-import Cookies from "js-cookie";
-import { useEffect, useMemo, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { showSuccessToast } from "@/lib/toast";
-import { clearCart } from "@/redux/slice/cartSlice";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
-  const router = useRouter();
-  const dispatch = useDispatch();
-
   const cartItems = useSelector((state) => state.cart.items);
   const totalQty = cartItems.reduce((sum, i) => sum + i.qty, 0);
-
-  const { isLoginModalOpen } = useSelector((state) => state.ui);
-
-  const [token, setToken] = useState(null);
-  const [user, setUser] = useState(null);
   const pathname = usePathname();
 
   // hide cart on these routes
   const hideCart = pathname === "/cart" || pathname === "/checkout";
-  // Guest-only flow: token logic removed
-  useEffect(() => {
-    // Logic for auth checking removed as per request for guest-only flow
-  }, []);
-
   return (
     <>
       <header

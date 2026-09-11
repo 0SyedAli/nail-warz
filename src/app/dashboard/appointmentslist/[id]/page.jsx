@@ -171,6 +171,10 @@ export default function AppointmentDetailPage() {
             bg = "#fef3c7";
             color = "#b45309";
             icon = <FaExchangeAlt style={{ marginRight: "4px" }} />;
+        } else if (s === "paymentpending" || s === "payment pending") {
+            bg = "#fef9c3";
+            color = "#854d0e";
+            icon = <FaInfoCircle style={{ marginRight: "4px" }} />;
         }
 
         return (
