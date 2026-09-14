@@ -5032,6 +5032,10 @@ span.prod_stock_status {
 
 }
 
+.vendor-form-switch .form-check-input {
+  margin-left: 0;
+}
+
 .category-request-page p {
   margin: 0;
 }

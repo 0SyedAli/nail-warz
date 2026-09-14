@@ -240,7 +240,7 @@ const TopBar = ({ header }) => {
                 />
               </svg>
             )}
-            {stripeLoading ? "Connecting…" : "Connect Stripe"}
+            {stripeLoading ? "Connecting…" : "Connect to Stripe"}
           </button>
         )}
 

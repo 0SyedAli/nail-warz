@@ -620,7 +620,7 @@ export default function VendorDetail() {
                             </span>
                         )}
 
-                        <div className="form-check form-switch d-flex align-items-center ps-0 gap-2 m-0">
+                        <div className="form-check form-switch vendor-form-switch d-flex align-items-center ps-0 gap-2 m-0">
                             <input
                                 className="form-check-input"
                                 type="checkbox"
