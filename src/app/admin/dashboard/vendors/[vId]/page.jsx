@@ -613,6 +613,16 @@ export default function VendorDetail() {
                         </span>
                     </div> */}
                     <div className="d-flex align-items-center gap-3">
+                        <div>
+                            <span className="badge bg-white text-secondary border px-3 py-2 d-flex align-items-center gap-2" style={{ fontSize: "13px", fontWeight: "500", borderRadius: "20px" }}> Stipe Status : {
+                                vendor?.isStripeConnected ? (
+                                    <span className="badge bg-success px-3 py-2" style={{ borderRadius: "20px" }}>Connected</span>
+                                ) : (
+                                    <span className="badge bg-warning text-dark px-3 py-2" style={{ borderRadius: "20px" }}>Not Started</span>
+                                )}
+                            </span>
+                        </div>
+
                         {vendor?.createdAt && (
                             <span className="badge bg-white text-secondary border px-3 py-2 d-flex align-items-center gap-2" style={{ fontSize: "13px", fontWeight: "500", borderRadius: "20px" }}>
                                 <FaRegCalendarAlt size={14} className="text-primary" />
@@ -647,6 +657,21 @@ export default function VendorDetail() {
                                         : "Pending"}
                             </span>
                         </div>
+                        {/* <span
+                            style={{
+                                padding: "6px 12px",
+                                borderRadius: "20px",
+                                fontSize: "12px",
+                                fontWeight: 600,
+                                backgroundColor: vendor?.isStripeConnected ? "#e6f4ea" : "#f1f3f5",
+                                color: vendor?.isStripeConnected ? "#1e7e34" : "#6c757d"
+                            }}
+                        > */}
+
+                        {/* {vendor?.isStripeConnected
+                                ? "Stripe Connected"
+                                : "Not Started"} */}
+                        {/* </span> */}
                         {vendor?.isFlaggedForAbuse && (
                             <div
                                 className="cursor-pointer animate-pulse"
