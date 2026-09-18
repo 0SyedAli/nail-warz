@@ -612,7 +612,7 @@ export default function VendorDetail() {
                             {vendor?.isVerified ? "Approved" : "Pending"}
                         </span>
                     </div> */}
-                    <div className="d-flex align-items-center gap-3">
+                    <div className="d-flex align-items-center gap-3 ">
                         <div>
                             <span className="badge bg-white text-secondary border px-3 py-2 d-flex align-items-center gap-2" style={{ fontSize: "13px", fontWeight: "500", borderRadius: "20px" }}> Stipe Status : {
                                 vendor?.isStripeConnected ? (
